@@ -1,4 +1,4 @@
-# [PROJEKT] ([GRUPP])
+# Chat up! (Adrenaline)
 
 Projektarbete på kursen [Operativsystem och processorienterad programmering
 (1DT096) våren 2020][homepage], [Uppsala universitet][uu].
@@ -7,23 +7,8 @@ Projektarbete på kursen [Operativsystem och processorienterad programmering
 
 [uu]: https://www.uu.se/
 
-**TODO:** Byt ut `[PROJEKT]` mot det namn ni själva givet projektet, notera att
-hakparenteserna `[` och `]` ingår i det ni skall byta ut.
-
-**TODO:** Byt ut `[GRUPP]` mot namnet på gruppen (Adrenaline, Asterix, Cacofonix,
-Dogmatix, Getafix eller Obelix). Notera att den yttre parentesen `(` och `)`
-skall behållas men att de inre parentesen `[` och `]` skall bytas ut.
-
-**INFO:** Detta dokument är skrivet i formatet
-[Markdown](https://help.github.com/articles/getting-started-with-writing-and-formatting-on-github/).
-
-**INFO:** Det går att [redigera][edit], förhandsvisa och spara
-(commit) den här [README.md](./README.md) sidan på GitHub direkt i din webbläsare.
-
-[edit]: https://help.github.com/en/enterprise/2.14/user/articles/editing-files-in-your-repository
-
 **TODO:** Lägg till en kort beskrivning av projektet.
-
+Chat up är en kombination av facebooks direktmeddelande, slacks gruppchatter samt reddits forumfunktionalitet.
 ## Kom igång
 
 **INFO:** Detta avsnitt är till för de som i framtiden är intresserade av ert
