@@ -7,8 +7,7 @@ Projektarbete på kursen [Operativsystem och processorienterad programmering
 
 [uu]: https://www.uu.se/
 
-**TODO:** Lägg till en kort beskrivning av projektet.
-Chat up är en kombination av facebooks direktmeddelande, slacks gruppchatter samt reddits forumfunktionalitet.
+Chat up! är en applikation som drar inspiration från redan befintliga chat- och kommunikationsplattformar. Syftet med applikationen är att kombinera de mest användbara aspekterna från andra plattformar till en och samma plattform. Användare skall kunna skapa enkel- och gruppchatt kanaler tillsammans med andra användare och samtidigt kunna prenumerera/ansluta sig till olika servrar som tillhandahåller ett slags forumliknande vy där anslutna användare kan skapa trådar och interagera med varandra på det viset också.
 ## Kom igång
 
 **INFO:** Detta avsnitt är till för de som i framtiden är intresserade av ert
