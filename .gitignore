@@ -7,7 +7,7 @@
 
 # production
 /frontend/build
-
+.vscode
 # misc
 /frontend/.DS_Store
 /frontend/.env.local
