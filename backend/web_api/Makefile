@@ -6,7 +6,7 @@ HEADERS=$(wildcard src/*.hrl)
 
 OBJECTS:=$(SOURCES:src/%.erl=ebin/%.beam)
 
-APPNAME=Concurrent search
+APPNAME=Chat up! Web API
 
 .PHONY: doc doc_url help skeleton
 
