@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * Input field form component that contains a label and a button
+ * Input field form component 
  *
  * @property id associate label with id and add id to input
  * @property inputStyles className will have this line of string
@@ -11,7 +11,7 @@ import React from "react";
  * @property buttonName text on the button
  * @property onButtonClick callback function that gets called when pressing the button
  * @property onInputChange callback function that gets called each time that input field value changes
- * @returns an input field form with a corresponding lable and button
+ * @returns an input field form with a corresponding button
  */
 const InputBox = ({
   id,

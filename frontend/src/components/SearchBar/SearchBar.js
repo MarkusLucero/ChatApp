@@ -9,7 +9,7 @@ import InputBox from "./InputBox";
  * @property value start value of input field
  * @property onButtonClick callback function that gets called when pressing the button
  * @property onInputChange callback function that gets called each time that input field value changes
- * @returns A div containing a form with an input and corresponding lable and button
+ * @returns A div containing a form with an input and corresponding button
  */
 const SearchBar = ({id, value, onButtonClick, onInputChange}) => {
   return (
