@@ -1,6 +1,8 @@
 import React from "react";
 import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
+import Chat from "../Chat/Chat";
+import ChatInput from "../ChatInput/ChatInput";
 
 /**
  * ChatContainer holds the layout of the focused view of a selected chat
@@ -8,6 +10,7 @@ import SearchBar from "../SearchBar/SearchBar";
  * @returns a div containing the SearchBar, Chat and ChatInput components
  */
 const ChatContainer = () => {
+  
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -34,21 +37,51 @@ const ChatContainer = () => {
     event.preventDefault();
   };
 
+  
+  /* State and callback functions for Chat and ChatInput */
+
+  /*All old messages, these are hardcoded. The self field is if you've sent the message or not */
+  const [messages, setMessages] = React.useState([
+    { message: "Hej", self: true },
+    { message: "Tjena!", self: false },
+  ]);
+  /*This is the state used when typing a new message*/
+  const [newMessage, setNewMessage] = React.useState("");
+  /**
+   * Set the messages state by updating it with the "newMessage" message
+   * @param event the event object of the window
+   */
+  const sendMessage = (event) => {
+    event.preventDefault();
+    setMessages((prev) => [...prev, { message: newMessage, self: true }]);
+    setNewMessage("");
+  };
+  
+  /**
+   * Set the newMessage state to whatever value is in event target
+   * @param event the event object of the window
+   */
+  const handleMessage = (event) => {
+    setNewMessage(event.target.value);
+  };
+
+
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col content-center">
       <SearchBar
         id="search-chat"
         value={searchTerm}
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
       />
-      {/* TODO These divs will be replaced by Chat and ChatInput components respectively hence the id:s*/}
-      <div id="chat" className="bg-blue-400">
-        chat
-      </div>
-      <div id="chat-input" className="bg-blue-600 ">
-        chat-input
-      </div>
+
+      <Chat messages={messages} />
+      <ChatInput
+        message = {newMessage}
+        handleInputChange={handleMessage}
+        handleButtonClick={sendMessage}
+      />
     </div>
   );
 };
