@@ -1,5 +1,6 @@
 import React from "react";
 import "../../assets/main.css"
+import SideDisplayList from "../SideDisplayList/SideDisplayList";
 import FocusedView from "../FocusedView/FocusedView";
 /**
  * LandingPage holds the layout design grid of the app.
@@ -13,7 +14,8 @@ const LandingPage = () => {
        *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
        */
     <div className="grid grid-cols-custom h-screen">
-      <div id="side-display-list" className="bg-blue-200"></div>
+      <SideDisplayList/>
+      
       <div id="info-display-list" className="bg-blue-400"></div>
       <FocusedView/>
     </div>
