@@ -7,14 +7,17 @@ import Message from "./Message";
  * @returns a div containing all messages aswell as input for new messages
  */
 const Chat = () => {
-  //All old messages
+  /*All old messages, these are hardcoded. The self field is if you've sent the message or not */
   const [messages, setMessages] = useState([
     { message: "Hej", self: true },
     { message: "Tjena!", self: false },
   ]);
-  //When typing a new message
+  /*This is the state used when typing a new message*/
   const [newMessage, setNewMessage] = useState("");
-
+  /**
+   * Set the message state by updating it with the "newMessage" message
+   * @param  e the event object of the window
+   */
   const sendMessage = (e) => {
     e.preventDefault();
     setMessages((prev) => [...prev, { message: newMessage, self: true }]);
@@ -26,6 +29,7 @@ const Chat = () => {
   return (
     <div className="bg-gray-800 h-screen">
       <div id="messages">
+        {/* Loop through the state messages and print a message component for each message  */}
         {messages.map((message, index) => (
           <div key={index}>
             <Message message={message} />
