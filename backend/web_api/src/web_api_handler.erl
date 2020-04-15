@@ -26,18 +26,19 @@ terminate(_Reason, _Req, _State) ->
 
 
 websocket_init(State) ->
-    chat_server:start(),
-    {reply, {text, <<"Welcome">>}, State}.
+    chat_server:add_user(),
+    {reply, {text, <<"Welcome">>}, State, hibernate}.
 
 websocket_handle({text, Msg}, State) ->
     chat_server:add(Msg),
-    List = chat_server:get(),
-    {[{text, lists:flatten(List)}], State};
+    {[{text, <<"ACK">>}], State, hibernate};
 websocket_handle(_Data, State) ->
-    {[], State}.
+    {[], State, hibernate}.
 
 websocket_info({timeout, _Ref, Msg}, State) ->
     erlang:start_timer(1000, self(), <<"Are you still there?">>),
-    {[{text, Msg}], State};
+    {[{text, Msg}], State, hibernate};
+websocket_info({text, Text}, State) ->
+    {reply, {text, Text}, State};
 websocket_info(_Info, State) ->
     {[], State}.

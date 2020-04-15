@@ -5,6 +5,7 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
+    chat_server:start(),
     Dispatch = cowboy_router:compile([
                                       {'_', [
                                              {"/", cowboy_static, {priv_file, web_api, "index.html"}},
