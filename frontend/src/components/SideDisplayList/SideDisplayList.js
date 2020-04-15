@@ -7,7 +7,7 @@ import Servers from './Servers';
  */
 
 
-function SideDisplayList(props) {
+const  SideDisplayList = props => {
     /* The initial state, all the servers -- WILL MOST LIKELY BE PASSED DOWN AS PROPS INSTEAD */
     const [servers, setServers] = useState([{name: "OSPP"}, {name: "OSPP"}]);
 
