@@ -11056,6 +11056,14 @@ video {
   transition-duration: 1000ms;
 }
 
+.input-box-custom-bg{
+  background-color: #41454A;
+}
+
+.focused-view-custom-bg{
+  background-color: #23272A;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;
