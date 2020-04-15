@@ -8510,6 +8510,22 @@ video {
   width: 100vw;
 }
 
+.w-screen75 {
+  width: 75vw;
+}
+
+.w-screen50 {
+  width: 50vw;
+}
+
+.w-screen25 {
+  width: 25vw;
+}
+
+.w-screen20 {
+  width: 20vw;
+}
+
 .z-0 {
   z-index: 0;
 }
@@ -18943,6 +18959,22 @@ video {
 
   .sm\:w-screen {
     width: 100vw;
+  }
+
+  .sm\:w-screen75 {
+    width: 75vw;
+  }
+
+  .sm\:w-screen50 {
+    width: 50vw;
+  }
+
+  .sm\:w-screen25 {
+    width: 25vw;
+  }
+
+  .sm\:w-screen20 {
+    width: 20vw;
   }
 
   .sm\:z-0 {
@@ -29381,6 +29413,22 @@ video {
     width: 100vw;
   }
 
+  .md\:w-screen75 {
+    width: 75vw;
+  }
+
+  .md\:w-screen50 {
+    width: 50vw;
+  }
+
+  .md\:w-screen25 {
+    width: 25vw;
+  }
+
+  .md\:w-screen20 {
+    width: 20vw;
+  }
+
   .md\:z-0 {
     z-index: 0;
   }
@@ -39817,6 +39865,22 @@ video {
     width: 100vw;
   }
 
+  .lg\:w-screen75 {
+    width: 75vw;
+  }
+
+  .lg\:w-screen50 {
+    width: 50vw;
+  }
+
+  .lg\:w-screen25 {
+    width: 25vw;
+  }
+
+  .lg\:w-screen20 {
+    width: 20vw;
+  }
+
   .lg\:z-0 {
     z-index: 0;
   }
@@ -50251,6 +50315,22 @@ video {
 
   .xl\:w-screen {
     width: 100vw;
+  }
+
+  .xl\:w-screen75 {
+    width: 75vw;
+  }
+
+  .xl\:w-screen50 {
+    width: 50vw;
+  }
+
+  .xl\:w-screen25 {
+    width: 25vw;
+  }
+
+  .xl\:w-screen20 {
+    width: 20vw;
   }
 
   .xl\:z-0 {

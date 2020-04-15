@@ -417,6 +417,10 @@ module.exports = {
       '11/12': '91.666667%',
       full: '100%',
       screen: '100vw',
+      screen75: '75vw',
+      screen50: '50vw',
+      screen25: '25vw',
+      screen20: '20vw',
     }),
     zIndex: {
       auto: 'auto',

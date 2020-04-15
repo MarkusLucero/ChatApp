@@ -1,6 +1,5 @@
 import React from "react";
 import "../../assets/main.css"
-
 /**
  * LandingPage holds the layout design grid of the app.
  * 
@@ -17,7 +16,6 @@ const LandingPage = () => {
       
       <div id="side-display-list" className="bg-blue-200"></div>
       <div id="info-display-list" className="bg-blue-400"></div>
-      <div id="focused-view" className="bg-blue-600"></div>
     </div>
   );
 };
