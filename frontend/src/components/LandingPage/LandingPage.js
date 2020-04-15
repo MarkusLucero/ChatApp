@@ -1,5 +1,6 @@
 import React from "react";
 import "../../assets/main.css"
+import SideDisplayList from "../SideDisplayList/SideDisplayList";
 /**
  * LandingPage holds the layout design grid of the app.
  * 
@@ -14,7 +15,8 @@ const LandingPage = () => {
     <div className="grid grid-cols-custom h-screen">
       {/* TODO These divs will be replaced by Side display list, info display list and focused view components respectively hence the id:s*/}
       
-      <div id="side-display-list" className="bg-blue-200"></div>
+      <SideDisplayList/>
+      
       <div id="info-display-list" className="bg-blue-400"></div>
     </div>
   );
