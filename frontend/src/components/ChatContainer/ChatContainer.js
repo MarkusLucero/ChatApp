@@ -1,6 +1,7 @@
 import React from "react";
 import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
+import Chat from "../Chat/Chat";
 
 /**
  * ChatContainer holds the layout of the focused view of a selected chat
@@ -42,10 +43,8 @@ const ChatContainer = () => {
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
       />
-      {/* TODO These divs will be replaced by Chat and ChatInput components respectively hence the id:s*/}
-      <div id="chat" className="bg-blue-400">
-        chat
-      </div>
+
+      <Chat />
       <div id="chat-input" className="bg-blue-600 ">
         chat-input
       </div>
