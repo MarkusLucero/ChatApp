@@ -3,3 +3,11 @@
 @tailwind components;
 
 @tailwind utilities;
+
+.input-box-custom-bg{
+    background-color: #41454A;
+}
+
+.focused-view-custom-bg{
+    background-color: #23272A;
+}

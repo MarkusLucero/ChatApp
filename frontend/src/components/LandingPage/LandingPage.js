@@ -16,8 +16,8 @@ const LandingPage = () => {
     <div className="grid grid-cols-custom h-screen">
       <SideDisplayList/>
       
-      <div id="info-display-list" className="bg-blue-400"></div>
-      <FocusedView/>
+      <div id="info-display-list" style={{backgroundColor: "#2C2F33"}}></div>
+      <FocusedView />
     </div>
   );
 };
