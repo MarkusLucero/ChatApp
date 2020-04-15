@@ -269,6 +269,10 @@ module.exports = {
       ...theme('spacing'),
       full: '100%',
       screen: '100vh',
+      screen75: '75vh',
+      screen50: '50vh',
+      screen25: '25vh',
+      screen20: '20vh',
     }),
     inset: {
       '0': '0',
@@ -413,6 +417,10 @@ module.exports = {
       '11/12': '91.666667%',
       full: '100%',
       screen: '100vw',
+      screen75: '75vw',
+      screen50: '50vw',
+      screen25: '25vw',
+      screen20: '20vw',
     }),
     zIndex: {
       auto: 'auto',
