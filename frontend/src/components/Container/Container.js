@@ -1,14 +1,13 @@
 import React from "react";
-import LandingPage from "../LandingPage/LandingPage"
-
+import { BrowserRouter, Route } from "react-router-dom";
+import LandingPage from "../LandingPage/LandingPage";
 
 const Container = () => {
-
-    return (
-        <div>
-           <LandingPage/> 
-        </div>
-    )
-}
+  return (
+    <BrowserRouter>
+      <Route path="/start" component={LandingPage} />
+    </BrowserRouter>
+  );
+};
 
 export default Container;
