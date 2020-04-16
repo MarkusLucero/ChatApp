@@ -26,11 +26,11 @@ terminate(_Reason, _Req, _State) ->
 
 
 websocket_init(State) ->
-    chat_server:add_user(),
+    chat_server:new_connection(self()),
     {reply, {text, <<"Welcome">>}, State, hibernate}.
 
 websocket_handle({text, Msg}, State) ->
-    chat_server:add(Msg),
+    message_parser:handle_message(Msg, self()),
     {[{text, <<"ACK">>}], State, hibernate};
 websocket_handle(_Data, State) ->
     {[], State, hibernate}.
