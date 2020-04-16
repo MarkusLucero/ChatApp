@@ -32,20 +32,20 @@ const Login = ({ history }) => {
     },
   });
   return (
-    <div class="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen">
       <form
-        class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
         onSubmit={formik.handleSubmit}
       >
-        <div class="mb-4">
+        <div className="mb-4">
           <label
-            class="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Username"
           >
             Username
           </label>
           <input
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="Username"
             name="Username"
             type="Text"
@@ -54,16 +54,16 @@ const Login = ({ history }) => {
             value={formik.values.Username}
           ></input>
           {formik.touched.Username && formik.errors.Username ? (
-            <div class="text-red-600">{formik.errors.Username}</div>
+            <div className="text-red-600">{formik.errors.Username}</div>
           ) : null}
           <label
-            class="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Password"
           >
             Password
           </label>
           <input
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="Password"
             name="Password"
             type="Password"
@@ -72,17 +72,17 @@ const Login = ({ history }) => {
             value={formik.values.Password}
           ></input>
           {formik.touched.Password && formik.errors.Password ? (
-            <div class="text-red-600">{formik.errors.Password}</div>
+            <div className="text-red-600">{formik.errors.Password}</div>
           ) : null}
           <button
-            class="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+            className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="submit"
           >
             Login
           </button>
           <Link
             to="/register"
-            class=" mt-10 ml-40 5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+            className=" mt-10 ml-40 5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="button"
           >
             Register
