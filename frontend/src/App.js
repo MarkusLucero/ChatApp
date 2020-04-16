@@ -1,11 +1,11 @@
 import React from "react";
 import "./assets/main.css";
-import LandingPage from "./components/LandingPage/LandingPage";
+import Container from "./components/Container/Container";
 
 const App = () => {
   return (
     <div className="App">
-      <LandingPage />
+      <Container />
     </div>
   );
 };
