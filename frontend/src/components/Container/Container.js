@@ -10,12 +10,13 @@ import Register from "../Register/Register";
  * @returns returns the actuall component that should be rendered depending on pathname
  */
 const Container = () => {
+
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/" exact component={Login} />
-        <Route path="/start" component={LandingPage} />
-        <Route path="/register" component={Register} />
+        <Route path="/" exact render= {(props)=> <Login {...props} />} />
+        <Route path="/start" render={(props)=> <LandingPage {...props} />} />
+        <Route path="/register" render ={(props)=> <Register {...props} />} />
       </Switch>
     </BrowserRouter>
   );
