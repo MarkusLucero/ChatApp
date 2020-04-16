@@ -18,15 +18,17 @@ const validate = (values) => {
 };
 /**
  * Register provides the layout and the registration for an user account
- *
+ * A successfully validated form will redirect to login page pathname = "/"
+ * @property history is passed on due to Register being an immediate child of a Route component in Container component
  * @returns a div containing the form to fill out and its validation
  */
-const Register = () => {
+const Register = ({ history }) => {
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+      history.push("/");
     },
   });
   return (

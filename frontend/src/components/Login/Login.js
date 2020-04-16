@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 
 const validate = (values) => {
@@ -13,14 +14,21 @@ const validate = (values) => {
   }
 };
 
-const Login = () => {
+/**
+ * Login provides the layout and login of a user
+ * A successfully validated form will redirect to LandingPage with pathname = "/start"
+ * @property history is passed on due to Login being an immediate child of a Route component in Container component
+ * @returns a div containing the form to fill out and its validation
+ */
+const Login = ({ history }) => {
   const [text, setText] = useState("");
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+      history.push("/start");
     },
   });
   return (
@@ -45,7 +53,7 @@ const Login = () => {
             onBlur={formik.handleBlur}
             value={formik.values.Username}
           ></input>
-          { formik.touched.Username &&  formik.errors.Username ? (
+          {formik.touched.Username && formik.errors.Username ? (
             <div class="text-red-600">{formik.errors.Username}</div>
           ) : null}
           <label
@@ -72,12 +80,13 @@ const Login = () => {
           >
             Login
           </button>
-          <button
+          <Link
+            to="/register"
             class=" mt-10 ml-40 5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="button"
           >
             Register
-          </button>
+          </Link>
         </div>
       </form>
     </div>
