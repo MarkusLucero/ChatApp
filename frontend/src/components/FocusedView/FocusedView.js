@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 import "../../assets/main.css";
-import ChatContainer from "../ChatContainer/ChatContainer"
+import ChatContainer from "../ChatContainer/ChatContainer";
 
 /**
  * FocusedView is the component that makes sure to route to specific component that is focused on
@@ -9,12 +9,12 @@ import ChatContainer from "../ChatContainer/ChatContainer"
  * TODO Actual routing
  * @returns the appropriate component that should be displayed
  */
-const FocusedView = () =>
-{
-    return (
-        <ChatContainer/>
-    )
-}
+const FocusedView = () => {
+  return (
+    <>
+      <ChatContainer />
+    </>
+  );
+};
 
-
-export default FocusedView
+export default FocusedView;

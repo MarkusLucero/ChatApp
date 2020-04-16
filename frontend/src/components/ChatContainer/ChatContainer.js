@@ -34,6 +34,7 @@ const ChatContainer = () => {
        to be displayed in the chat
     */
     console.log(searchTerm);
+    setSearchTerm("");
     event.preventDefault();
   };
 
@@ -68,7 +69,7 @@ const ChatContainer = () => {
 
 
   return (
-    <div className="flex flex-col content-center">
+    <div className="flex flex-col content-center focused-view-custom-bg">
       <SearchBar
         id="search-chat"
         value={searchTerm}

@@ -15,7 +15,7 @@ const SearchBar = ({id, value, onButtonClick, onInputChange}) => {
   return (
     <div className="mt-10">
       <InputBox
-        inputStyles = "w-screen50 shadow appearance-none border rounded-full py-2 px-3 focus:outline-none "
+        inputStyles = "w-3/4 text-white input-box-custom-bg shadow appearance-none rounded-full py-2 px-3 focus:outline-none "
         id={id}
         type="text"
         placeholder="Search for..."
