@@ -40,11 +40,10 @@ const Login = ({ history }) => {
         Password: values.Password,
       }))
       .then(function (response) {
-        const parsed = JSON.parse(response.data); 
 
-        switch (parsed.status) {
+        switch (response.status) {
           case 200: //LOGIN OK 
-            const server = parsed.body;
+            const server = response.body;
             dispatch(actions.setServer({ server })); 
             break;
         
