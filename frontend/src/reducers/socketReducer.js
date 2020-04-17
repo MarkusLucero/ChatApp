@@ -15,11 +15,11 @@ const socketReducer = (state = initialState, action) => {
     case "LOGIN":
       /* Handle LOGIN -- store user somewhere? */
       console.log(action.payload);
-      state.socket.send(action.payload);
-      return;
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "REGISTER":
       console.log(action.payload);
-      state.socket.send(action.payload);
+      state.socket.send(JSON.stringify(action.payload));
       return state;
     case "SEND_MESSAGE":
       /* TODO handle sending on socket messages */
