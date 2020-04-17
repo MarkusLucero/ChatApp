@@ -9,10 +9,16 @@ const CONNECT = "CONNECT";
 const LOGIN = "LOGIN";
 const RESPONSE = "RESPONSE"
 const REGISTER = "REGISTER";
+const DISCONNECTED = "DISCONNECTED"
 
 /* action functions */
 export function connect(ws) {
   return { type: CONNECT, payload: ws };
+}  
+
+/* action functions */
+export function disconnected(data) {
+  return { type: DISCONNECTED, payload: data };
 }  
 
 export function login({ values }) {
