@@ -1,23 +1,24 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, login_user/3, send_message/5, get_unread_messages/3]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3]).
+
 
 new_connection(_PID) ->
     ok.
 
-register_user(Username, _Password, Timestamp, PID) ->
-    database_api:insert_user(Username, Timestamp),
+register_user(Username, _Password, _, PID) ->
+%    database_api:insert_user(Username, Timestamp),
     chat_server ! {login_user, Username, PID}.
 
-%% TODO: Only here to get fronend to work while database_api fails.
-login_user(UserName, _Password, PID) ->
-    chat_server ! {login_user, UserName, PID}.
+login_user(Username, _Password, PID) ->
+    %%TODO: Add actual password check
+    chat_server ! {login_user, Username, PID}.
 
 send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     %%TODO: Check if we can actually deliver
     chat_members(Chat_ID),
     user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    database_api:insert_chat(From_Username, Chat_ID, delivered),
+%    database_api:insert_chat(From_Username, Chat_ID, delivered),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID}.
 
 

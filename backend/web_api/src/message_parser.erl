@@ -3,6 +3,7 @@
 
 handle_message(Msg, PID) ->
     io:format("~p~n", [Msg]),
+    io:format("~p~n", [mochijson:decode(Msg)]),
     case mochijson:decode(Msg) of
         {struct,[{"action", "register"},
                  {"username", Username},
