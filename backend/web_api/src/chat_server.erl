@@ -42,7 +42,7 @@ start() ->
         _PID -> 
             unregister(chat_server)
     end,
-    register(spawn(fun() -> loop(maps:new()) end), chat_server).
+    register(chat_server, spawn(fun() -> loop(maps:new()) end)).
 
 
 loop(Connection_map) ->
