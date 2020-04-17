@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import LandingPage from "../LandingPage/LandingPage";
 import Login from "../Login/Login";
@@ -13,12 +13,26 @@ import { useDispatch, useSelector } from "react-redux";
  * @returns returns the actuall component that should be rendered depending on pathname
  */
 const Container = () => {
+
+  // so we can dispatch actions to the store
   const dispatch = useDispatch();
 
-  dispatch(actions.connect("ws://localhost:8080/websocket"));
-  const ws = useSelector(state => state.socket);
-  ws.onmessage = msg => {console.log(msg.data)};
-  dispatch(actions.connect("ws://localhost:8080/websocket"));
+  // used to keep a mutable ref object - in this case the websocket
+  const wsRef = useRef();
+
+  // Initiates the websocket client on mount 
+  useEffect(() => {
+    // if current prop of ref is null -> initialize new websocket connection
+    if (!wsRef.current) {
+      wsRef.current = new WebSocket("ws://localhost:8080/websocket");
+      dispatch(actions.connect(wsRef.current)); // add it to the redux store 
+    }
+    wsRef.current.onmessage = (msg) => {
+      console.log(msg.data);
+      dispatch(actions.response(msg));   // handle the response
+    };
+  });
+
   return (
     <BrowserRouter>
       <Switch>
