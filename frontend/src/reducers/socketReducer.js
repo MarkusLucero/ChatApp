@@ -30,6 +30,8 @@ const socketReducer = (state = initialState, action) => {
       return state;
     case "DISCONNECTED":
       return { ...state, socket: action.payload, wsOnline : false };
+    case "SETSERVER" : 
+      return {...state, socket: action.payload };
     default:
       return state;
   }
