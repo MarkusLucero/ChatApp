@@ -46,10 +46,10 @@ fetch_user(UserName) ->
     database ! {fetch_user, UserName, self()},
     
     receive
-	{selected,_,[]} ->
+	{error, no_user} ->
 	    {error, "UserName not found in database."};
-	{selected,_,[Content]} ->
-	    Content;
+	{UserName, TimeStamp} ->
+	    {UserName, TimeStamp};
 	Msg ->
 	    io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
     end.
@@ -63,15 +63,25 @@ fetch_chat(Chat_ID) ->
 	{error, _} ->
 	    {error, "Chat_ID not found in database."};
 	Msg ->
-	    io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
+	    io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
     end.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% Eunit test cases  %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% EUnit adds the database_api:test() function to this module.
+
+%% All functions with names ending wiht _test() or _test_() will be
+%% called automatically by database_api:test()
 
 start_test_() ->
     [?_assertEqual(start(), ok)
     ].
 
 insert_user_test() ->
+    %% This will produce a badmatch error if left hand side (ok) dont match with the right hand side (return value of insert_user). i.e this test will fail if they dont match. 
     ok = insert_user("testuser1","2020-10-19 01:00:00").
 
 insert_chat_test() ->
@@ -79,10 +89,9 @@ insert_chat_test() ->
     ok = insert_chat("testuser2", "chat_id_1",{"2020-10-19 01:00:05", "test message2!!!"}, 0).
 
 fetch_user_test() ->
-    {UserName, {Date,Time}} = fetch_user("testuser1"),
+    {UserName, TimeStamp} = fetch_user("testuser1"),
     "testuser1" = UserName,
-    {2020,10,19} = Date,
-    {1,0,0} = Time,
+    "2020-10-19 1:0:0" = TimeStamp,
     
     {error, "UserName not found in database."} = fetch_user("invalid_username").
 
@@ -99,6 +108,7 @@ fetch_chat_test() ->
     {error, "Chat_ID not found in database."} = fetch_chat("Invalid chat_ID").
 
 stop_test_() ->
+    database ! {remove_user, "testuser1"},
     database ! {remove_table, "chat_id_1"}, 
     timer:sleep(1000),
     [?_assertEqual(stop(), ok)

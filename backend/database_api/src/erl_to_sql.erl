@@ -29,7 +29,12 @@ loop(Ref) ->
 
 	{fetch_user, UserName, From} ->
 	    Content = odbc:sql_query(Ref, "SELECT user_name, registered FROM users WHERE user_name = '"++ UserName ++ "';"),
-	    From ! Content;
+	    case Content of
+		{selected,_,[]} ->
+		    From ! {error, no_user};
+		{selected,_,[{UserName, TimeStamp}]} ->
+		    From ! {UserName, stringify_timestamp(TimeStamp)}
+	    end;
 
 	{fetch_chat, Chat_ID, From} ->
 	    Content = (catch odbc:sql_query(Ref, "SELECT from_user, message, status FROM " ++ Chat_ID ++ ";")),
@@ -42,8 +47,17 @@ loop(Ref) ->
 
 	{remove_table, Table} ->
 	    odbc:sql_query(Ref, "DROP TABLE " ++ Table ++ ";");
+
+	{remove_user, UserName} ->
+	    odbc:sql_query(Ref, "DELETE FROM users WHERE user_name = '" ++ UserName ++ "';");
 	
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
     end,
     loop(Ref).
+
+%% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
+stringify_timestamp({Date,Time}) ->
+    {Year,Month,Day} = Date,
+    {Hour,Minute,Second} = Time,
+    integer_to_list(Year) ++ "-" ++ integer_to_list(Month) ++ "-" ++ integer_to_list(Day) ++ " " ++ integer_to_list(Hour) ++ ":" ++ integer_to_list(Minute) ++ ":" ++ integer_to_list(Second).
