@@ -42,10 +42,7 @@ const ChatContainer = () => {
   /* State and callback functions for Chat and ChatInput */
 
   /*All old messages, these are hardcoded. The self field is if you've sent the message or not */
-  const [messages, setMessages] = React.useState([
-    { message: "Hej", self: true },
-    { message: "Tjena!", self: false },
-  ]);
+  const [messages, setMessages] = React.useState([]);
   /*This is the state used when typing a new message*/
   const [newMessage, setNewMessage] = React.useState("");
   /**
