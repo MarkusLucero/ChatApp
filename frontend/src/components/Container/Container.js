@@ -1,11 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import LandingPage from "../LandingPage/LandingPage";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 
 import * as actions from "../../actions/actions";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 
 /**
  * Container is the component that makes sure to route to specific component on start page

@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
+import * as actions from "../../actions/actions";
+import { useDispatch } from "react-redux";
 
 const validate = (values) => {
   const errors = {};
@@ -21,12 +23,15 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Login = ({ history }) => {
-  const [text, setText] = useState("");
+  /* useDispatch from dispatch function from store */
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
     onSubmit: (values) => {
+      /* Use the store reducer to dispatch login actions */
+      dispatch(actions.login({ values }));
       /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
       history.push("/start");
     },
