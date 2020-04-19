@@ -44,6 +44,9 @@ export function register({ values }) {
   };
 }
 
+export function loginSuccess({}){}
+export function loginFailure({}){}
+
 export function response(data) {
   return { type: RESPONSE, payload: data};
 }

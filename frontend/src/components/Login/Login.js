@@ -45,6 +45,7 @@ const Login = ({ history }) => {
           case 200: //LOGIN OK 
             const server = response.body;
             dispatch(actions.setServer({ server })); 
+            
             break;
         
           default:
