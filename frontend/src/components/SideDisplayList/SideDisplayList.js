@@ -11,10 +11,10 @@ const SideDisplayList = (props) => {
   const [servers, setServers] = useState([{ name: "OSPP" }, { name: "OSPP" }]);
 
   return (
-    <div style={{backgroundColor: '#23272A' }} className="flexflex-col bg-blue-200">
+    <div style={{backgroundColor: '#23272A' }} className="flex flex-col">
       <div className="border-solid border-b-2 border-black h-20">
-        <h1 className="rounded-full h-16 w-16 mb-2 mt-2 bg-gray-600 hover:bg-gray-500 flex items-center justify-center">
-          Profile
+        <h1 className="rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg hover:bg-gray-500 flex items-center justify-center">
+          HOME
         </h1>
       </div>
       <div className="border-solid border-b-2 border-black h-auto">
@@ -25,7 +25,7 @@ const SideDisplayList = (props) => {
         </div>
       </div>
       <div className="border-solid border-b-2 border-black">
-        <div className="rounded-full h-16 w-16 mb-2 mt-2 bg-gray-600 hover:bg-gray-500 flex items-center justify-center ">
+        <div className="rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg hover:bg-gray-500 flex items-center justify-center ">
           <h1 className="text-6xl flex items-center justify-center pb-3">+</h1>
         </div>
       </div>

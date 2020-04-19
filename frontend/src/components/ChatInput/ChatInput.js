@@ -10,10 +10,10 @@ import "../../assets/main.css";
  */
 const ChatInput = ({ message, handleInputChange, handleButtonClick }) => {
   return (
-    <div className="self-center mt-auto w-full">
+    <div className="self-center m-1 mt-auto w-full">
       <form id="message" className="flex justify-center">
         <input
-        className="w-full h-16 input-box-custom-bg text-white shadow appearance-none rounded-full py-2 px-3 focus:outline-none"
+        className="w-full  m-1  h-16 input-box-custom-bg text-white shadow appearance-none py-2 px-3 focus:outline-none"
           type="text"
           onChange={handleInputChange}
           value={message}
