@@ -11,12 +11,7 @@ const socketReducer = (state = initialState, action) => {
     case "CONNECT":
       /* store websocket in state.socket */
       console.log("connecting to ws");
-      return { ...state, socket: action.payload, wsOnline : true };
-    case "LOGIN":
-      /* Handle LOGIN -- store user somewhere? */
-      console.log(action.payload);
-      state.socket.send(JSON.stringify(action.payload));
-      return state;
+      return { ...state, socket: action.payload, wsOnline: true };
     case "REGISTER":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
@@ -29,9 +24,9 @@ const socketReducer = (state = initialState, action) => {
       console.log(action.payload);
       return state;
     case "DISCONNECTED":
-      return { ...state, socket: action.payload, wsOnline : false };
-    case "SETSERVER" : 
-      return {...state, socket: action.payload };
+      return { ...state, socket: action.payload, wsOnline: false };
+    case "SETSERVER":
+      return { ...state, socket: action.payload };
     default:
       return state;
   }

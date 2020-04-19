@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
 
-const axios = require('axios');
+const axios = require("axios");
 
 const validate = (values) => {
   const errors = {};
@@ -25,7 +25,6 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Login = ({ history }) => {
-  
   /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
 
@@ -33,30 +32,42 @@ const Login = ({ history }) => {
     initialValues: { Username: "", Password: "" },
     validate,
     onSubmit: (values) => {
+      axios
+        .post(
+          "localhost:8080/",
+          JSON.stringify({
+            action: "login",
+            username: values.Username,
+            Password: values.Password,
+          })
+        )
+        .then(function (response) {
+          /* The response contains: status and a payload data: server/token */
+          switch (response.status) {
+            /* Login accepted */
 
-      axios.post('localhost:8080/', JSON.stringify({
-        action: "login",
-        username: values.Username,
-        Password: values.Password,
-      }))
-      .then(function (response) {
+            case 200: {
+              const data = response.data;
 
-        switch (response.status) {
-          case 200: //LOGIN OK 
-            const server = response.body;
-            dispatch(actions.setServer({ server })); 
-            
-            break;
-        
-          default:
-            alert("missing memberid");
-            break;
-        }
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+              /* Data should contain token & server */
+              dispatch(actions.loginSuccess({ data }));
+              dispatch(actions.setServer({ data }));
+              break;
+            }
+            case 404: {
+              const data = response.data;
+              dispatch(actions.loginFailure({ data }));
+              break;
+            }
+            default:
+              alert("missing memberid");
+              break;
+          }
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
       /* Use the store reducer to dispatch login actions */
       dispatch(actions.login({ values }));
       /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
@@ -64,15 +75,19 @@ const Login = ({ history }) => {
     },
   });
   return (
-    <div style={{ backgroundImage: 'url(' + require('../../background_night.png') + ')'}} className="flex items-center justify-center h-screen bg-scroll" >
-      
+    <div
+      style={{
+        backgroundImage: "url(" + require("../../background_night.png") + ")",
+      }}
+      className="flex items-center justify-center h-screen bg-scroll"
+    >
       <form
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
         onSubmit={formik.handleSubmit}
       >
         <p className=" justify-center">Welcome!</p>
         <p>Enter your login details to access Chat Up!</p>
-        
+
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -89,9 +104,11 @@ const Login = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Username}
           ></input>
-          <div>{formik.touched.Username && formik.errors.Username ? (
-            <div className="text-red-600">{formik.errors.Username}</div>
-          ) : null}</div>
+          <div>
+            {formik.touched.Username && formik.errors.Username ? (
+              <div className="text-red-600">{formik.errors.Username}</div>
+            ) : null}
+          </div>
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Password"
@@ -107,9 +124,11 @@ const Login = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Password}
           ></input>
-          <div>{formik.touched.Password && formik.errors.Password ? (
-            <div className="text-red-600">{formik.errors.Password}</div>
-          ) : null}</div>
+          <div>
+            {formik.touched.Password && formik.errors.Password ? (
+              <div className="text-red-600">{formik.errors.Password}</div>
+            ) : null}
+          </div>
           <button
             className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="submit"
