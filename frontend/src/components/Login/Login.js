@@ -63,11 +63,15 @@ const Login = ({ history }) => {
     },
   });
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div style={{ backgroundImage: 'url(' + require('../../background_night.png') + ')'}} className="flex items-center justify-center h-screen bg-scroll" >
+      
       <form
         className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
         onSubmit={formik.handleSubmit}
       >
+        <p className=" justify-center">Welcome!</p>
+        <p>Enter your login details to access Chat Up!</p>
+        
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -84,9 +88,9 @@ const Login = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Username}
           ></input>
-          {formik.touched.Username && formik.errors.Username ? (
+          <div>{formik.touched.Username && formik.errors.Username ? (
             <div className="text-red-600">{formik.errors.Username}</div>
-          ) : null}
+          ) : null}</div>
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Password"
@@ -102,9 +106,9 @@ const Login = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Password}
           ></input>
-          {formik.touched.Password && formik.errors.Password ? (
+          <div>{formik.touched.Password && formik.errors.Password ? (
             <div className="text-red-600">{formik.errors.Password}</div>
-          ) : null}
+          ) : null}</div>
           <button
             className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="submit"
