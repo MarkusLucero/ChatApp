@@ -9,7 +9,10 @@ const CONNECT = "CONNECT";
 const LOGIN = "LOGIN";
 const RESPONSE = "RESPONSE"
 const REGISTER = "REGISTER";
-const DISCONNECTED = "DISCONNECTED"
+const DISCONNECTED = "DISCONNECTED";
+const SET = "SETSERVER";
+const SUCCESS = "SUCCESS";
+const FAILURE = "FAILURE";
 
 /* action functions */
 export function connect(ws) {
@@ -43,7 +46,18 @@ export function register({ values }) {
   };
 }
 
+export function loginSuccess({response}){
+  return { type: SUCCESS, payload: response}
+}
+export function loginFailure({response}){
+  return {type: FAILURE, payload: response}
+}
+
 export function response(data) {
   return { type: RESPONSE, payload: data};
+}
+
+export function setServer(server){
+  return {type: SET, payload: server};
 }
 

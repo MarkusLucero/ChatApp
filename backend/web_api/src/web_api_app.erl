@@ -8,9 +8,8 @@ start(_Type, _Args) ->
     chat_server:start(),
     Dispatch = cowboy_router:compile([
                                       {'_', [
-                                             {"/", cowboy_static, {priv_file, web_api, "index.html"}},
-                                             {"/websocket", web_api_handler, []},
-                                             {"/static/[...]", cowboy_static, {priv_dir, web_api, "static"}}
+                                             {"/", auth_handler, []},
+                                             {"/websocket", web_api_handler, []}
                                             ]}
                                      ]),
     {ok, _} = cowboy:start_clear(http,
