@@ -11,3 +11,5 @@ clean:
 test_database_api:
 	erl -pa ebin -eval 'eunit:test("ebin/database_api.beam",[verbose])' -s init stop
 
+test_workers:
+	erl -pa ebin -eval 'database_master:start()' -s init stop
