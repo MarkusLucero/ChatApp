@@ -39,7 +39,7 @@ const Login = ({ history }) => {
           JSON.stringify({
             action: "login",
             username: values.Username,
-            Password: values.Password,
+            password: values.Password,
           })
         )
         .then(function (response) {

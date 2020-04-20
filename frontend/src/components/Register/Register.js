@@ -3,6 +3,8 @@ import { useFormik } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
 
+const axios = require("axios");
+
 const validate = (values) => {
   const errors = {};
   if (!values.Username) {
@@ -21,16 +23,51 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Register = ({ history }) => {
-  const dispatch = useDispatch();
-
+ 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
 
     onSubmit: (values) => {
-      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
-      dispatch(actions.register({ values }));
-      history.push("/");
+      axios
+        .post(
+          "/",
+          JSON.stringify({
+            action: "register",
+            username: values.Username,
+            password: values.Password,
+          })
+        )
+        .then(function (response) {
+          console.log(response);
+          
+          /* The response contains: status and a payload data: server/token */
+          switch (response.status) {
+            /* Login accepted */
+
+            case 200: {
+              const data = response.data;
+              /* Data should contain token & server */
+              console.log(values.Username, values.Password);
+              
+                /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+              history.push("/");
+              break;
+            }
+            case 404: {
+              console.log("Error: "+ response);          
+              break;
+            }
+            default:
+              alert("missing memberid");
+              break;
+          }
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    
     },
   });
   return (

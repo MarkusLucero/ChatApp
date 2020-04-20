@@ -19,10 +19,11 @@ export function sendMessage(data) {
   return {
     type: SENDMESSAGE,
     payload: {
-        //action: send-message,                        // type of action 
-        //chat-id: 0001,                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
-        //user-id: username ,
+        action: "send_message",                        // type of action 
+        chat_id: 0001,                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
+        user_id: username ,
         message: data.message , 
+        timestamp: null
     },
   };
 }
@@ -37,6 +38,7 @@ export function disconnected(data) {
 }  
 
 export function login({ values }) {
+  console.log(values);
   return {
     type: LOGIN,
     payload: {
@@ -47,7 +49,8 @@ export function login({ values }) {
   };
 }
 
-export function register({ values }) {
+export function register( values ) {
+  console.log(values);
   return {
     type: REGISTER,
     payload: {
