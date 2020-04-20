@@ -1,21 +1,20 @@
 -module(database_master).
 
--export([start/0]).
-
--define(NUM_OF_WORKERS, 1).
--define(NUM_OF_INSERTS, 10).
+-export([start/2]).
 
 init() ->
     maps:new().
 
--spec start() -> Master when
+-spec start(NumWorkers, NumInserts) -> Master when
+      NumWorkers :: number(),
+      NumInserts :: number(),
       Master :: pid().
 
-start() ->
+start(NumWorkers, NumInserts) ->
     database_api:start(),
-    Master = spawn(fun() -> loop(?NUM_OF_WORKERS, 0) end),
+    Master = spawn(fun() -> loop(NumWorkers, 0) end),
     
-    [database_workers:start(Master, ?NUM_OF_INSERTS, ID) || ID <- lists:seq(1, ?NUM_OF_WORKERS)],
+    [database_workers:start(Master, NumInserts, ID) || ID <- lists:seq(1, NumWorkers)],
     
     Master.
 
