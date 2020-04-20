@@ -1,10 +1,10 @@
-const initialState = { socket: null, wsOnline: false };
+const initialState = { socket: null, wsOnline: false, socketServer: null };
 
 /**
  * perform a task depending on the action dispatched
  *
- * @property {*} state the current state that is being held by the redux store
- * @property {*} action contains the type and payload
+ * @property {object} state the current state that is being held by the redux store
+ * @property {object} action contains the type and payload
  */
 const socketReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -26,7 +26,7 @@ const socketReducer = (state = initialState, action) => {
     case "DISCONNECTED":
       return { ...state, socket: action.payload, wsOnline: false };
     case "SETSERVER":
-      return { ...state, socket: action.payload };
+      return { ...state, socketServer: action.payload };
     default:
       return state;
   }
