@@ -61,24 +61,24 @@ const Container = () => {
     }
   }, [
     ws,
+    url,
   ]); /* dependency list includes ws - when ws is changed we refire the useEffect hook */
 
+  const loginSuccess = useSelector((state) => state.loginState.loginSuccess);
 
-const loginSuccess = useSelector(state => state.loginState.loginSuccess); 
-
-return (
-  <BrowserRouter>
-    <Switch>
-      <Route path="/" exact>
-        {loginSuccess ? <Redirect to="/start" /> : <Login />}
-      </Route>
-      <Route path="/start">
-        {loginSuccess ? <LandingPage /> : <Redirect to="/" />  }{" "}
-      </Route>
-      <Route path="/register" render={(props) => <Register {...props} />} />
-    </Switch>
-  </BrowserRouter>
-);
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route path="/" exact>
+          {loginSuccess ? <Redirect to="/start" /> : <Login />}
+        </Route>
+        <Route path="/start">
+          {loginSuccess ? <LandingPage /> : <Redirect to="/" />}{" "}
+        </Route>
+        <Route path="/register" render={(props) => <Register {...props} />} />
+      </Switch>
+    </BrowserRouter>
+  );
 };
 
 export default Container;
