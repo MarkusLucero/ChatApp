@@ -11,7 +11,7 @@ const socketReducer = (state = initialState, action) => {
     case "CONNECT":
       /* store websocket in state.socket */
       console.log("connecting to ws");
-      return { ...state, socket: action.payload, wsOnline: true};
+      return { ...state, socket: action.payload, wsOnline: true, firstWelcome: true };
     case "REGISTER":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
