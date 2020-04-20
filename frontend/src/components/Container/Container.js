@@ -63,10 +63,11 @@ const Container = () => {
               magictoken: loginResponse,
             })
           );
+          firstWelcome = false;
         } else {
           dispatch(actions.response(msg));
         }
-        firstWelcome = false;
+
       };
 
       /* our websocket disconnected */
