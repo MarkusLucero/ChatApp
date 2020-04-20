@@ -1,0 +1,4 @@
+ebin/database_api.beam
+ebin/erl_to_sql.beam
+erl_crash.dump
+doc/*
