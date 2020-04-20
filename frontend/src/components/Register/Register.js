@@ -36,7 +36,7 @@ const Register = ({ history }) => {
   return (
     <div className="flex items-center justify-center h-screen">
       <form
-        className="flex-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
         onSubmit={formik.handleSubmit}
       >
         <div className="mb-4">
@@ -52,11 +52,12 @@ const Register = ({ history }) => {
             name="Username"
             type="Text"
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             value={formik.values.Username}
           ></input>
-          {formik.errors.Username ? (
+          <div>{formik.touched.Password && formik.errors.Password ? (
             <div className="text-red-600">{formik.errors.Username}</div>
-          ) : null}
+          ) : null}</div>
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Password"
@@ -69,11 +70,12 @@ const Register = ({ history }) => {
             name="Password"
             type="Password"
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
             value={formik.values.Password}
           ></input>
-          {formik.errors.Password ? (
+          <div>{formik.touched.Password && formik.errors.Password ? (
             <div className="text-red-600">{formik.errors.Password}</div>
-          ) : null}
+          ) : null}</div>
           <button
             className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="submit"

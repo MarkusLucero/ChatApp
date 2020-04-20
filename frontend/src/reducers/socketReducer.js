@@ -1,22 +1,17 @@
-const initialState = { socket: null, wsOnline: false };
+const initialState = { socket: null, wsOnline: false, socketServer: null };
 
 /**
  * perform a task depending on the action dispatched
  *
- * @property {*} state the current state that is being held by the redux store
- * @property {*} action contains the type and payload
+ * @property {object} state the current state that is being held by the redux store
+ * @property {object} action contains the type and payload
  */
 const socketReducer = (state = initialState, action) => {
   switch (action.type) {
     case "CONNECT":
       /* store websocket in state.socket */
       console.log("connecting to ws");
-      return { ...state, socket: action.payload, wsOnline : true };
-    case "LOGIN":
-      /* Handle LOGIN -- store user somewhere? */
-      console.log(action.payload);
-      state.socket.send(JSON.stringify(action.payload));
-      return state;
+      return { ...state, socket: action.payload, wsOnline: true };
     case "REGISTER":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
@@ -29,7 +24,9 @@ const socketReducer = (state = initialState, action) => {
       console.log(action.payload);
       return state;
     case "DISCONNECTED":
-      return { ...state, socket: action.payload, wsOnline : false };
+      return { ...state, socket: action.payload, wsOnline: false };
+    case "SETSERVER":
+      return { ...state, socketServer: action.payload };
     default:
       return state;
   }
