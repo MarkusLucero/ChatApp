@@ -50,11 +50,11 @@ const Login = ({ history }) => {
             /* Login accepted */
 
             case 200: {
-              const data = response.data;
+              const data = {response : response.data, username : values.Username};
 
               /* Data should contain token & server */
               dispatch(actions.setServer( "ws://localhost:8080/websocket" ));
-              dispatch(actions.loginSuccess({ data }));
+              dispatch(actions.loginSuccess( data ));
               //dispatch(actions.setServer({ data }));
               break;
             }

@@ -1,4 +1,4 @@
-const initialState = { socket: null, wsOnline: false, socketServer: null };
+const initialState = { socket: null, wsOnline: false, socketServer: null, firstWelcome: null };
 
 /**
  * perform a task depending on the action dispatched
@@ -11,14 +11,15 @@ const socketReducer = (state = initialState, action) => {
     case "CONNECT":
       /* store websocket in state.socket */
       console.log("connecting to ws");
-      return { ...state, socket: action.payload, wsOnline: true };
+      return { ...state, socket: action.payload, wsOnline: true, firstWelcome: true };
     case "REGISTER":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
       return state;
-    case "SEND_MESSAGE":
-      /* TODO handle sending on socket messages */
-      return state;
+    case "FIRSTRESPONSE":
+      console.log(action.payload);
+      state.socket.send(action.payload);
+      return { ...state, firstWelcome : false};
     case "RESPONSE" /* TODO decipher and handle response here!! */:
       console.log("handle the response bro pls");
       console.log(action.payload);

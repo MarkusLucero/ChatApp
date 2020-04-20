@@ -37,6 +37,10 @@ export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
 }  
 
+export function firstResponse(data){
+  return { type: "FIRSTRESPONSE", payload: JSON.stringify(data)}
+}
+
 export function login({ values }) {
   console.log(values);
   return {
@@ -61,11 +65,11 @@ export function register( values ) {
   };
 }
 
-export function loginSuccess({response}){
-  return { type: SUCCESS, payload: response}
+export function loginSuccess(data){
+  return { type: SUCCESS, payload: data}
 }
-export function loginFailure({response}){
-  return {type: FAILURE, payload: response}
+export function loginFailure(data){
+  return {type: FAILURE, payload: data}
 }
 
 export function response(data) {
@@ -75,4 +79,5 @@ export function response(data) {
 export function setServer(server){
   return {type: SET, payload: server};
 }
+
 
