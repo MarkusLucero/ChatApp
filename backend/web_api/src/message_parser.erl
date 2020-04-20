@@ -11,7 +11,7 @@ handle_message(Msg, PID) ->
             chat_server:register_user(Username, Password, "TODO: REAL TIMESTAMPS", PID);
         {struct,[{"action", "login"},
                  {"username", Username},
-                 {"magicToken", Magic_token}]} ->
+                 {"magictoken", Magic_token}]} ->
             chat_server:login_user(Username, Magic_token, PID);
         {struct,[{"action", "send_message"},
                 {"chat_id", Chat_ID},
