@@ -16,3 +16,6 @@ test:
 
 doc:
 	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl"], [{dir, doc}])' -s init stop
+
+test_workers:
+	erl -noshell -pa ebin -eval 'database_master:start(1, 10)' -s init stop
