@@ -13,7 +13,19 @@ const DISCONNECTED = "DISCONNECTED";
 const SET = "SETSERVER";
 const SUCCESS = "SUCCESS";
 const FAILURE = "FAILURE";
+const SENDMESSAGE = "SENDMESSAGE";
 
+export function sendMessage(data) {
+  return {
+    type: SENDMESSAGE,
+    payload: {
+        //action: send-message,                        // type of action 
+        //chat-id: 0001,                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
+        //user-id: username ,
+        message: data.message , 
+    },
+  };
+}
 /* action functions */
 export function connect(ws) {
   return { type: CONNECT, payload: ws };
