@@ -50,6 +50,7 @@ start() ->
 
 
 loop(Connection_map) ->
+    io:format("Connections: ~p~n", [Connection_map]),
     receive
         {login_user, Username, PID} ->
             loop(maps:put(Username, PID, Connection_map));
@@ -66,6 +67,7 @@ loop(Connection_map) ->
                             PID -> 
                                 ok;
                             _ ->
+                                io:format("Sending to: ~p~n", [Connected_PID]),
                                 Connected_PID ! {text, JSON_Message},
                                 ok
                         end
