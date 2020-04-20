@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 
 const axios = require("axios");
 
+//axios.get("http://localhost:8080/", { crossdomain: true })
 const validate = (values) => {
   const errors = {};
   if (!values.Username) {
@@ -34,7 +35,7 @@ const Login = ({ history }) => {
     onSubmit: (values) => {
       axios
         .post(
-          "localhost:8080/",
+          "/",
           JSON.stringify({
             action: "login",
             username: values.Username,
@@ -42,6 +43,8 @@ const Login = ({ history }) => {
           })
         )
         .then(function (response) {
+          console.log(response);
+          
           /* The response contains: status and a payload data: server/token */
           switch (response.status) {
             /* Login accepted */
@@ -50,8 +53,9 @@ const Login = ({ history }) => {
               const data = response.data;
 
               /* Data should contain token & server */
+              dispatch(actions.setServer( "ws://localhost:8080/websocket" ));
               dispatch(actions.loginSuccess({ data }));
-              dispatch(actions.setServer({ data }));
+              //dispatch(actions.setServer({ data }));
               break;
             }
             case 404: {

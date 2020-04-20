@@ -3,6 +3,8 @@ import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
 import Chat from "../Chat/Chat";
 import ChatInput from "../ChatInput/ChatInput";
+import * as actions from "../../actions/actions";
+import { useDispatch } from "react-redux";
 
 /**
  * ChatContainer holds the layout of the focused view of a selected chat
@@ -10,6 +12,8 @@ import ChatInput from "../ChatInput/ChatInput";
  * @returns a div containing the SearchBar, Chat and ChatInput components
  */
 const ChatContainer = () => {
+
+  const dispatch = useDispatch();
   
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -52,7 +56,9 @@ const ChatContainer = () => {
   const sendMessage = (event) => {
     event.preventDefault();
     setMessages((prev) => [...prev, { message: newMessage, self: true }]);
+    dispatch(actions.sendMessage({message: newMessage}));
     setNewMessage("");
+
   };
   
   /**

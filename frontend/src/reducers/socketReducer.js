@@ -27,6 +27,9 @@ const socketReducer = (state = initialState, action) => {
       return { ...state, socket: action.payload, wsOnline: false };
     case "SETSERVER":
       return { ...state, socketServer: action.payload };
+    case "SENDMESSAGE": 
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     default:
       return state;
   }
