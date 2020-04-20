@@ -19,8 +19,8 @@ export function sendMessage(data) {
   return {
     type: SENDMESSAGE,
     payload: {
-        action: "send_message",                        // type of action 
-        chat_id: "0001",                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
+        action: "send_message",      // type of action 
+        chat_id: "0001",             // TODO . kan skippas nu för alla hamnar i samma chat i prototypen
         user_id: data.username ,
         message: data.message , 
         timestamp: null
@@ -37,6 +37,7 @@ export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
 }  
 
+//TODO should be using a response() action
 export function firstResponse(data){
   return { type: "FIRSTRESPONSE", payload: JSON.stringify(data)}
 }

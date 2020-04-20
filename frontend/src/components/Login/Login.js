@@ -55,7 +55,6 @@ const Login = ({ history }) => {
               /* Data should contain token & server */
               dispatch(actions.setServer( "ws://localhost:8080/websocket" ));
               dispatch(actions.loginSuccess( data ));
-              //dispatch(actions.setServer({ data }));
               break;
             }
             case 404: {

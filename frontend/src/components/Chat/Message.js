@@ -7,15 +7,15 @@ import "../../assets/main.css";
  * @returns a div containing the message with appropriate styles
  */
 const Message = ({ message }) => {
+
   return (
     <div
       style={{ backgroundColor: "#2C2F33" }}
       className="flex h-auto mb-1 text-white flex-col"
     >
-      {/* TODO -- get real usernames */}
       <h1 className="font-medium">
         {" "}
-        {message.self ? "Mark Annala" : "Not Mark Annala"}{" "}
+        {message.username + "  "}
         {/* TODO -- SET REAL TIMESTAMPS */}
         <span className="font-light text-xs text-right">today...</span>
       </h1>

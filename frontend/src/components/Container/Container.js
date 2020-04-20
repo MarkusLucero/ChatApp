@@ -52,8 +52,7 @@ const Container = () => {
     if (wsRef.current != null) {
       /* listening on messages received - response handled by the reducer?? */
       wsRef.current.onmessage = (msg) => {
-        console.log(msg.data);
-
+        
         //first time we need to establish an auth with server
         if (firstWelcome === true) {
           dispatch(
@@ -63,7 +62,7 @@ const Container = () => {
               magictoken: loginResponse,
             })
           );
-          firstWelcome = false;
+          firstWelcome = false; //TODO FIX THIS - not good solution in the long run
         } else {
           dispatch(actions.response(msg));
         }
