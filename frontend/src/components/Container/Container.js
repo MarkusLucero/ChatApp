@@ -66,6 +66,7 @@ const Container = () => {
         } else {
           dispatch(actions.response(msg));
         }
+        firstWelcome = false;
       };
 
       /* our websocket disconnected */
