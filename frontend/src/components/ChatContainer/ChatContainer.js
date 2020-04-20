@@ -56,7 +56,7 @@ const ChatContainer = () => {
   const sendMessage = (event) => {
     event.preventDefault();
     setMessages((prev) => [...prev, { message: newMessage, self: true }]);
-    dispatch(actions.sendMessage({message: newMessage}));
+    dispatch(actions.sendMessage({message: newMessage, username: "Skoben"}));
     setNewMessage("");
 
   };

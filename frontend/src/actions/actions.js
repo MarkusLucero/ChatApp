@@ -20,8 +20,8 @@ export function sendMessage(data) {
     type: SENDMESSAGE,
     payload: {
         action: "send_message",                        // type of action 
-        chat_id: 0001,                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
-        user_id: username ,
+        chat_id: "0001",                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
+        user_id: data.username ,
         message: data.message , 
         timestamp: null
     },
