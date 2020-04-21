@@ -37,11 +37,6 @@ export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
 }  
 
-//TODO should be using a response() action
-export function firstResponse(data){
-  return { type: "FIRSTRESPONSE", payload: JSON.stringify(data)}
-}
-
 export function login({ values }) {
   console.log(values);
   return {
