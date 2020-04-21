@@ -39,7 +39,7 @@ const Login = ({ history }) => {
           JSON.stringify({
             action: "login",
             username: values.Username,
-            Password: values.Password,
+            password: values.Password,
           })
         )
         .then(function (response) {
@@ -50,12 +50,11 @@ const Login = ({ history }) => {
             /* Login accepted */
 
             case 200: {
-              const data = response.data;
+              const data = {response : response.data, username : values.Username};
 
               /* Data should contain token & server */
               dispatch(actions.setServer( "ws://localhost:8080/websocket" ));
-              dispatch(actions.loginSuccess({ data }));
-              //dispatch(actions.setServer({ data }));
+              dispatch(actions.loginSuccess( data ));
               break;
             }
             case 404: {

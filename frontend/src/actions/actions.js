@@ -19,10 +19,11 @@ export function sendMessage(data) {
   return {
     type: SENDMESSAGE,
     payload: {
-        //action: send-message,                        // type of action 
-        //chat-id: 0001,                                       // chat id . kan skippas nu för alla hamnar i samma chat i prototypen
-        //user-id: username ,
+        action: "send_message",      // type of action 
+        chat_id: "0001",             // TODO . kan skippas nu för alla hamnar i samma chat i prototypen
+        user_id: data.username ,
         message: data.message , 
+        timestamp: null
     },
   };
 }
@@ -36,7 +37,13 @@ export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
 }  
 
+//TODO should be using a response() action
+export function firstResponse(data){
+  return { type: "FIRSTRESPONSE", payload: JSON.stringify(data)}
+}
+
 export function login({ values }) {
+  console.log(values);
   return {
     type: LOGIN,
     payload: {
@@ -47,7 +54,8 @@ export function login({ values }) {
   };
 }
 
-export function register({ values }) {
+export function register( values ) {
+  console.log(values);
   return {
     type: REGISTER,
     payload: {
@@ -58,11 +66,11 @@ export function register({ values }) {
   };
 }
 
-export function loginSuccess({response}){
-  return { type: SUCCESS, payload: response}
+export function loginSuccess(data){
+  return { type: SUCCESS, payload: data}
 }
-export function loginFailure({response}){
-  return {type: FAILURE, payload: response}
+export function loginFailure(data){
+  return {type: FAILURE, payload: data}
 }
 
 export function response(data) {
@@ -72,4 +80,5 @@ export function response(data) {
 export function setServer(server){
   return {type: SET, payload: server};
 }
+
 

@@ -16,7 +16,7 @@ login_user(Username, _Password, PID) ->
 send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     %%TODO: Check if we can actually deliver
     chat_members(Chat_ID),
-    user_status("TODO: Check with real users"),
+    %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
     database_api:insert_chat(From_Username, Chat_ID, delivered),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID}.
@@ -28,16 +28,16 @@ get_unread_messages(_Username, _Chat_ID, _PID) ->
 chat_members(_Chat_ID) ->
     tbi.
 
-user_status(Username) ->
-    chat_server ! {user_status_request, Username, self()},
-    receive
-        {user_status_response, online} ->
-            delivered;
-        {user_status_response, offline} ->
-            undelivered;
-                _ ->
-            erlang:error('user does not exist')
-    end.
+%user_status(Username) ->
+%    chat_server ! {user_status_request, Username, self()},
+%    receive
+%        {user_status_response, online} ->
+%            delivered;
+%        {user_status_response, offline} ->
+%            undelivered;
+%                _ ->
+%            erlang:error('user does not exist')
+%    end.
 
 start() ->
     database_api:start(),
@@ -51,12 +51,29 @@ start() ->
 
 
 loop(Connection_map) ->
+    io:format("Connections: ~p~n", [Connection_map]),
     receive
         {login_user, Username, PID} ->
             loop(maps:put(Username, PID, Connection_map));
-        {send_message, _From_Username, _Chat_ID, Message, _Timestamp, _PID} ->
-            %%TODO: JSON-ify message
-            maps:map(fun(_Username, PID) -> PID ! {text, Message} end, Connection_map),
+        {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
+            JSON_Message = mochijson:encode(
+                             {struct,[{"action", "send_message"},
+                                      {"chat_id", Chat_ID},
+                                      {"user_id", From_Username},
+                                      {"message", Message},
+                                      {"timestamp", Timestamp}]}),
+            Send = 
+                fun(_Username, Connected_PID) -> 
+                        case Connected_PID of 
+                            PID -> 
+                                ok;
+                            _ ->
+                                io:format("Sending to: ~p~n", [Connected_PID]),
+                                Connected_PID ! {text, JSON_Message},
+                                ok
+                        end
+                end,
+            maps:map(Send, Connection_map),
             loop(Connection_map);
         {user_status_request, Username, From} ->
             case maps:is_key(Username) of

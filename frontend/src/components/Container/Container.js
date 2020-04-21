@@ -28,8 +28,18 @@ const Container = () => {
   ); /* websocket url - will contain address when we call SETSERVER action */
   const dispatch = useDispatch();
 
+  const loginResponse = useSelector(
+    (state) => state.loginState.loginResponse
+  ); /* used in useEffect to check if we need to refire useEffect() */
+
+  const username = useSelector(
+    (state) => state.loginState.username
+  ); /* used in useEffect to check if we need to refire useEffect() */
+
   // used to keep a mutable ref object - in this case the websocket
   const wsRef = useRef();
+
+  var firstWelcome = useSelector((state) => state.socketState.firstWelcome);
 
   // Initiates the websocket client on mount (everything in useEffect is called on mount - like created/mounted in Vue)
   useEffect(() => {
@@ -42,9 +52,23 @@ const Container = () => {
     if (wsRef.current != null) {
       /* listening on messages received - response handled by the reducer?? */
       wsRef.current.onmessage = (msg) => {
-        console.log(msg.data);
-        dispatch(actions.response(msg));
+        
+        //first time we need to establish an auth with server
+        if (firstWelcome === true) {
+          dispatch(
+            actions.firstResponse({
+              action: "login",
+              username: username,
+              magictoken: loginResponse,
+            })
+          );
+          firstWelcome = false; //TODO FIX THIS - not good solution in the long run
+        } else {
+          dispatch(actions.response(msg));
+        }
+
       };
+
       /* our websocket disconnected */
       wsRef.current.onclose = () => {
         if (wsOnline) {
@@ -62,6 +86,7 @@ const Container = () => {
   }, [
     ws,
     url,
+    username,
   ]); /* dependency list includes ws - when ws is changed we refire the useEffect hook */
 
   const loginSuccess = useSelector((state) => state.loginState.loginSuccess);
