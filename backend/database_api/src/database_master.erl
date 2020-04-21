@@ -12,15 +12,16 @@ init() ->
 
 start(NumWorkers, NumInserts) ->
     database_api:start(),
-    Master = spawn(fun() -> loop(NumWorkers, 0) end),
-    
+    Master = spawn_link(fun() -> loop(NumWorkers, 0) end),
     [database_workers:start(Master, NumInserts, ID) || ID <- lists:seq(1, NumWorkers)],
-    
-    Master.
+    receive
+	    {'EXIT', Master, _} ->
+	    timer:sleep(NumWorkers*200),
+	    database_api:stop()
+    end.
 
 
-loop(0, Inserts) ->    
-    database_api:stop(),
+loop(0, Inserts) ->
     io:format("DONE ~w~n", [Inserts]);
 loop(CountDown, Inserts) ->
     receive

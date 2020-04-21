@@ -3,7 +3,7 @@ SOURCES=$(wildcard src/*.erl)
 HEADERS=$(wildcard src/*.hrl)
 OBJECTS=$(SOURCES:src/%.erl=ebin/%.beam)
 
-all: $(OBJECTS) test
+all: $(OBJECTS)
 
 ebin/%.beam : src/%.erl $(HEADERS) Makefile
 	erlc $(ERLC_FLAGS) -o ebin/ $<
@@ -18,4 +18,4 @@ doc:
 	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl"], [{dir, doc}])' -s init stop
 
 test_workers:
-	erl -noshell -pa ebin -eval 'database_master:start(1, 10)' -s init stop
+	erl -noshell -pa ebin -eval 'database_master:start(10, 10)' -s init stop

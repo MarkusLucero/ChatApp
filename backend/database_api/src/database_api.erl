@@ -12,6 +12,7 @@
 
 start() ->
     DB = erl_to_sql:init("PostgreSQL test", "testuser1", "1234"),
+%%  io:format("database:start() -> DB = ~p~n", [DB]),
     register(database, DB),
     ok.
 
@@ -33,6 +34,7 @@ stop() ->
       TimeStamp::list().
 
 insert_user(Username, Password, TimeStamp) ->
+%%  io:format("Insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
     database ! {insert_user,Username, Password, TimeStamp},
     ok.
 
@@ -51,6 +53,7 @@ insert_user(Username, Password, TimeStamp) ->
       Status::term().
 
 insert_chat(From_Username, Chat_ID, {TimeStamp, Msg}, Status) ->
+%%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
     database ! {insert_chat, From_Username, Chat_ID, {TimeStamp, Msg}, Status},
     ok.
 
