@@ -41,17 +41,16 @@ const socketReducer = (state = initialState, action) => {
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
       return state;
-
-    case "FIRSTRESPONSE":
-      console.log(action.payload);
-      state.socket.send(action.payload);
-      return { ...state, firstWelcome: false };
-
+      
     case "RESPONSE":
       /* if data is ack or welcome there's nothning we need to do */
       if (action.payload.data === "Welcome" || action.payload.data === "ACK") {
         return state;
-      } else {
+      }else if ( action.payload.action === "login")/* first response */{
+        state.socket.send(JSON.stringify(action.payload));
+        return { ...state, firstWelcome: false };
+      }
+      else {
         const parsedData = JSON.parse(action.payload.data);
         console.log(parsedData);
         /* We respond differently depending on the action/type of received data */

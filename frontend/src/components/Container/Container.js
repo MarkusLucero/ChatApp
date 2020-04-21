@@ -56,7 +56,7 @@ const Container = () => {
         //first time we need to establish an auth with server
         if (firstWelcome === true) {
           dispatch(
-            actions.firstResponse({
+            actions.response({
               action: "login",
               username: username,
               magictoken: loginResponse,
