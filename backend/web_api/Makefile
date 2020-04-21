@@ -22,4 +22,5 @@ ebin/%.beam : ./../database_api/src/%.erl $(HEADERS) Makefile
 	erlc -o ebin/ $<
 
 database: $(OBJECTS)
-	cp ./../database_api/src/* ./src/
+	cp ./../database_api/src/database_api.erl ./src/
+	cp ./../database_api/src/erl_to_sql.erl ./src/
