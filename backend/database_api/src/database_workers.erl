@@ -1,16 +1,18 @@
 -module(database_workers).
 
--export([start/3]).
+-export([start/2]).
 
--spec start(Master, NumberInserts, ID) -> Worker when
+-spec start(Master, NumberInserts) -> Worker when
       Master :: pid(),
       NumberInserts :: number(),
-      ID :: number(),
       Worker :: pid().
-
-start(Master, NumberInserts, ID) ->
-    database_api:insert_user("testuser1", "2020-20-19 01:00:00"),
-    Worker = spawn(fun() -> loop(NumberInserts, "testuser1", Master) end),
+%% @doc Creates a worker that inserts messages into a database.
+%% @param Master The PID to the caller.
+%% @param NumInserts The number of insert messages the worker will perform to the database.
+%% @returns The PID of the created worker.
+start(Master, NumInserts) ->
+    database_api:insert_user("testuser1", "2020-10-19 01:00:00"),
+    Worker = spawn(fun() -> loop(NumInserts, "testuser1", Master) end),
     
     Worker.
 
@@ -18,8 +20,9 @@ start(Master, NumberInserts, ID) ->
 
 stop() ->
     ok.
+
 loop(InsertsLeft, Username, Master) ->
-    database_api:insert_chat(Username, "chat_id_1", {"2020-20-19 02:00:00", "Hejsan svejsan"}, 1),
+    database_api:insert_chat(Username, "chat_id_1", {"2020-10-19 02:00:00", "Hejsan svejsan"}, 1),
     NewInsertsLeft = InsertsLeft - 1,
     Master ! {insert, NewInsertsLeft, self()},
     receive

@@ -2,19 +2,20 @@
 
 -export([start/2]).
 
-init() ->
-    maps:new().
 
 -spec start(NumWorkers, NumInserts) -> Master when
       NumWorkers :: number(),
       NumInserts :: number(),
       Master :: pid().
-
+%% @doc Creates a Master process and a number of workers that will insert messages into a database.
+%% @param NumWorkers The number of workers that will be created.
+%% @param NumInserts The number of inserts each worker will perform to the database.
+%% @returns The PID of the created Master.
 start(NumWorkers, NumInserts) ->
     database_api:start(),
     Master = spawn(fun() -> loop(NumWorkers, 0) end),
     
-    [database_workers:start(Master, NumInserts, ID) || ID <- lists:seq(1, NumWorkers)],
+    [database_workers:start(Master, NumInserts) || _ <- lists:seq(1, NumWorkers)],
     
     Master.
 
