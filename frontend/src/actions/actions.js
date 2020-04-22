@@ -28,8 +28,8 @@ export function sendMessage(data) {
   };
 }
 /* action functions */
-export function connect(ws) {
-  return { type: CONNECT, payload: ws };
+export function connect() {
+  return { type: CONNECT, payload: null };
 }  
 
 /* action functions */
