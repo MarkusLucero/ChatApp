@@ -4,6 +4,13 @@
 -export([start/2]).
 -export([stop/1]).
 
+-spec start(Type, Args) -> ok when 
+      Type :: any(),
+      Args :: any().
+%% @doc Starts the Web API listener
+%% @param Type IGNORED
+%% @parak Args IGNORED
+%% @returns ok
 start(_Type, _Args) ->
     chat_server:start(),
     Dispatch = cowboy_router:compile([
@@ -16,7 +23,13 @@ start(_Type, _Args) ->
                                  [{port, 8080}],
                                  #{env => #{dispatch => Dispatch}}
                                 ),
-    web_api_sup:start_link().
+    web_api_sup:start_link(),
+    ok.
 
+-spec stop(State) -> ok when 
+      State :: any().
+%% @doc Stops the Web API listener
+%% @param State The state of the listener
+%% @returns ok
 stop(_State) ->
         ok.
