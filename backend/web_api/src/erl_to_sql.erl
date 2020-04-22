@@ -19,13 +19,12 @@ loop(DSN, UID, PWD) ->
 loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp} ->
-           odbc:sql_query(Ref, "INSERT INTO users VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
+	    odbc:sql_query(Ref, "INSERT INTO users VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
 	{insert_chat, From_Username, Chat_ID, { Timestamp, Msg}, Status} ->
 	    
-	    odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS " ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
+	    odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS chat" ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
 
-	    odbc:sql_query(Ref, "INSERT INTO " ++ Chat_ID ++ " VALUES ('"++ From_Username ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
-%%	    io:format("X = ~p~nY = ~p~n", [X,Y]);
+	    odbc:sql_query(Ref, "INSERT INTO chat" ++ Chat_ID ++ " VALUES ('"++ From_Username ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
 
 	{fetch_user, Username, From} ->
 	    Content = odbc:sql_query(Ref, "SELECT user_name, password, registered FROM users WHERE user_name = '"++ Username ++ "';"),
