@@ -15,7 +15,7 @@ test:
 .PHONY: doc
 
 doc:
-	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl"], [{dir, doc}])' -s init stop
+	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl", "src/database_master.erl", "src/database_workers.erl"], [{dir, doc}])' -s init stop
 
 test_workers:
 	erl -noshell -pa ebin -eval 'database_master:start(10, 10)' -s init stop
