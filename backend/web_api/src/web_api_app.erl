@@ -4,7 +4,7 @@
 -export([start/2]).
 -export([stop/1]).
 
--spec start(Type, Args) -> ok when 
+-spec start(Type, Args) -> {ok, pid() | ignore | {error, any()}} when 
       Type :: any(),
       Args :: any().
 %% @doc Starts the Web API listener
@@ -23,8 +23,7 @@ start(_Type, _Args) ->
                                  [{port, 8080}],
                                  #{env => #{dispatch => Dispatch}}
                                 ),
-    web_api_sup:start_link(),
-    ok.
+    web_api_sup:start_link().
 
 -spec stop(State) -> ok when 
       State :: any().

@@ -4,12 +4,11 @@
 -export([start_link/0]).
 -export([init/1]).
 
--spec start_link() -> ok.
+-spec start_link() -> {ok, pid() | ignore | {error, any()}}.
 %% @doc Starts the supervisor for the Web API node
 %% @returns ok
 start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []),
-    ok.
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 -spec init([]) -> {ok, {{one_for_one, integer(), integer()}, list()}}.
 %% @doc Starts the supervisor for the Web API node
