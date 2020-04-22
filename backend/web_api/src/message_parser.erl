@@ -1,6 +1,13 @@
 -module(message_parser).
 -export([handle_message/2]).
 
+-spec handle_message(Msg, PID) -> ok when
+      Msg :: bitstring,
+      PID :: pid().
+%% @doc Parses and takes appropriate action for a message from a user
+%% @param Msg The message from the client in JSON format
+%% @param PID The PID for the handler process
+%% @returns ok For every message.
 handle_message(Msg, PID) ->
     io:format("~p~n", [Msg]),
     io:format("~p~n", [mochijson:decode(Msg)]),

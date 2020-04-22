@@ -53,7 +53,7 @@ const Login = ({ history }) => {
               const data = {response : response.data, username : values.Username};
 
               /* Data should contain token & server */
-              dispatch(actions.setServer( "ws://localhost:8080/websocket" ));
+              dispatch(actions.setServer( "ws://localhost:8080/websocket"));
               dispatch(actions.loginSuccess( data ));
               break;
             }
@@ -66,15 +66,12 @@ const Login = ({ history }) => {
               alert("missing memberid");
               break;
           }
-          console.log(response);
         })
         .catch(function (error) {
           console.log(error);
         });
       /* Use the store reducer to dispatch login actions */
       dispatch(actions.login({ values }));
-      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
-      history.push("/start");
     },
   });
   return (

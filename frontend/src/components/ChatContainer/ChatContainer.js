@@ -76,10 +76,13 @@ const ChatContainer = () => {
 
   /* HANDLING NEW MESSAGE FROM OTHER USER */
   
-  /* userMessage will hold the latest message obj gotten from another user - will upadte when store updates */
+  /* userMessage will hold the latest message obj gotten from another user - will upadte when store updates 
+    TODO -- only for prototype!
+  */
   const userMessage = useSelector((state) => state.socketState.latestMessage);
 
-  /* will render on mount - dependency list holds userMessage so whenever that changes we will fire everything inside useEffect
+  /* 
+  will render on mount - dependency list holds userMessage so whenever that changes we will fire everything inside useEffect
     so when we get new message it will call seMessages!
   */
   React.useEffect(() => {

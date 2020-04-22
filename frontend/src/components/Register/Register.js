@@ -43,7 +43,7 @@ const Register = ({ history }) => {
           
           /* The response contains: status and a payload data: server/token */
           switch (response.status) {
-            /* Login accepted */
+            /* Register accepted */
 
             case 200: {
               const data = response.data;

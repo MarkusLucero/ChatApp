@@ -9,51 +9,53 @@ import { useDispatch, useSelector } from "react-redux";
 
 /**
  * Container is the component that makes sure to route to specific component on start page
- * TODO more functionality when we can use user objects etc
- * @returns returns the actuall component that should be rendered depending on pathname
+ *
+ * @returns returns the actual component that should be rendered depending on pathname
  */
 const Container = () => {
   /**
    * HANDLING AND INITIALISATION OF WEBSOCKET EFFECTS
    */
 
-  const ws = useSelector(
-    (state) => state.socketState.socket
-  ); /* used in useEffect to check if we need to refire useEffect() */
-  const wsOnline = useSelector(
-    (state) => state.socketState.wsOnline
-  ); /* used in useEffect to check if disconnect is by our own accord */
-  const url = useSelector(
-    (state) => state.socketState.socketServer
-  ); /* websocket url - will contain address when we call SETSERVER action */
+  /* ws is the websocket that we are connected to */
+  const ws = useSelector((state) => state.socketState.socket);
+
+  /* used in useEffect to check if disconnect is by our own accord */
+  const wsOnline = useSelector((state) => state.socketState.wsOnline);
+
+  /* websocket url - will contain address when we call SETSERVER action */
+  const url = useSelector((state) => state.socketState.socketServer);
+
   const dispatch = useDispatch();
 
-  const loginResponse = useSelector(
-    (state) => state.loginState.loginResponse
-  ); /* used in useEffect to check if we need to refire useEffect() */
+  /* used for first login repsonse to the socket*/
+  const loginResponse = useSelector((state) => state.loginState.loginResponse);
+  /* used for first login repsonse to the socket*/
+  const username = useSelector((state) => state.loginState.username);
 
-  const username = useSelector(
-    (state) => state.loginState.username
-  ); /* used in useEffect to check if we need to refire useEffect() */
-
-  // used to keep a mutable ref object - in this case the websocket
+  // used to keep a mutable ref object - in this case the websocket which will not change automatically during a re-render
   const wsRef = useRef();
+  wsRef.current = ws;
 
+  /* 
+    used only for checking if we have made our first response for socket
+    We need to do this because the first response has to look a certain way
+    for the webserver to authenticate us
+  */
   var firstWelcome = useSelector((state) => state.socketState.firstWelcome);
 
-  // Initiates the websocket client on mount (everything in useEffect is called on mount - like created/mounted in Vue)
+  /*  Initiates the websocket client on mount (everything in useEffect is called on mount - like created/mounted in Vue) */
   useEffect(() => {
-    // if current prop of ref is null and ws url is set -> initialize new websocket connection (this happens first time)
+    /* if current prop of ref is null and ws url is set -> initialize new websocket connection (this happens first time) */
     if (!wsRef.current && url !== null) {
-      wsRef.current = new WebSocket(url);
-      dispatch(actions.connect(wsRef.current)); // add the ref to the redux store
+      dispatch(actions.connect()); 
     }
 
+    /* socket is online  */
     if (wsRef.current != null) {
-      /* listening on messages received - response handled by the reducer?? */
+      /* listening on websocket */
       wsRef.current.onmessage = (msg) => {
-        
-        //first time we need to establish an auth with server
+        //first time we need to establish an authentication with server
         if (firstWelcome === true) {
           dispatch(
             actions.response({
@@ -62,11 +64,9 @@ const Container = () => {
               magictoken: loginResponse,
             })
           );
-          firstWelcome = false; //TODO FIX THIS - not good solution in the long run
         } else {
           dispatch(actions.response(msg));
         }
-
       };
 
       /* our websocket disconnected */
@@ -74,8 +74,7 @@ const Container = () => {
         if (wsOnline) {
           /* trigger a reconnect */
           console.log("reconnect to new ws");
-          wsRef.current = new WebSocket(url);
-          dispatch(actions.connect(wsRef.current)); // add the ref to the redux store
+          dispatch(actions.connect()); 
         } else {
           /* disconnect the ws */
           console.log("ws disconnected");
@@ -86,9 +85,10 @@ const Container = () => {
   }, [
     ws,
     url,
-    username,
-  ]); /* dependency list includes ws - when ws is changed we refire the useEffect hook */
+    firstWelcome
+  ]); /* dependency list - when element inside is changed we refire the useEffect hook */
 
+  /* a variable which checks wether we've successfully logged in or not taken from redux store */
   const loginSuccess = useSelector((state) => state.loginState.loginSuccess);
 
   return (

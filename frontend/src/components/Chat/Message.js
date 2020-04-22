@@ -19,7 +19,6 @@ const Message = ({ message }) => {
         {/* TODO -- SET REAL TIMESTAMPS */}
         <span className="font-light text-xs text-right">today...</span>
       </h1>
-      {/* TODO -- SET REAL MESSAGES */}
       <p className="font-light"> {message.message}</p>
     </div>
   );
