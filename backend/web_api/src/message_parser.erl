@@ -17,8 +17,8 @@ handle_message(Msg, PID) ->
                 {"chat_id", Chat_ID},
                 {"user_id", Username},
                 {"message", Message},
-                {"timestamp", Timestamp}]} ->
-            chat_server:send_message(Username, Chat_ID, Message, Timestamp, PID);
+                {"timestamp", _}]} ->
+            chat_server:send_message(Username, Chat_ID, Message, "2020-04-21 15:30:31", PID);
         {struct,[{"action", "request_chat"},
                  {"chat_id", Chat_ID},
                  {"from", Username}]} ->

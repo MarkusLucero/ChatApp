@@ -38,7 +38,7 @@ insert_user(Username, Password, TimeStamp) ->
     database ! {insert_user,Username, Password, TimeStamp},
     ok.
 
-%% @doc Store information about a chat in the databse. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).
+%% @doc Store information about a chat in the databse. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).5
 %% @param From_Username The users ID that sent this message.
 %% @param Chat_ID ID of the chat.
 %% @param TimeStamp The time message was sent.

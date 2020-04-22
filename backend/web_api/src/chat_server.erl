@@ -6,7 +6,7 @@ new_connection(_PID) ->
     ok.
 
 register_user(Username, _Password, _, PID) ->
-    database_api:insert_user(Username, _Password, "2020-05-05 16:00:00"),
+    %%database_api:insert_user(Username, _Password, "2020-05-05 16:00:00"),
     chat_server ! {login_user, Username, PID}.
 
 login_user(Username, _Password, PID) ->
@@ -18,7 +18,7 @@ send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
     %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    database_api:insert_chat(From_Username, Chat_ID, delivered),
+    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID}.
 
 
