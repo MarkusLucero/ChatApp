@@ -9,6 +9,7 @@ tus# See https://help.github.com/articles/ignoring-files/ for more about ignorin
 /frontend/build
 .vscode
 # misc
+.DS_Store
 /frontend/.DS_Store
 /frontend/.env.local
 /frontend/.env.development.local

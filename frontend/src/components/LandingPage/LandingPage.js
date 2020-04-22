@@ -2,6 +2,7 @@ import React from "react";
 import "../../assets/main.css"
 import SideDisplayList from "../SideDisplayList/SideDisplayList";
 import FocusedView from "../FocusedView/FocusedView";
+import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
 /**
  * LandingPage holds the layout design grid of the app.
  * 
@@ -15,8 +16,8 @@ const LandingPage = () => {
        */
     <div className="grid grid-cols-custom h-screen">
       <SideDisplayList/>
-      
-      <div id="info-display-list" style={{backgroundColor: "#2C2F33"}}></div>
+      <InfoDisplayList/>
+
       <FocusedView />
     </div>
   );
