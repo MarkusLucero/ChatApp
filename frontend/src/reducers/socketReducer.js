@@ -126,6 +126,9 @@ const socketReducer = (state = initialState, action) => {
                 }),
               ],
             };
+          case "friend_request": 
+          console.log(parsedData);
+          break;
           default:
             return state;
         }
