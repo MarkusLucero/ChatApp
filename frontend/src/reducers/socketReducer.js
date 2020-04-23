@@ -161,6 +161,10 @@ const socketReducer = (state = initialState, action) => {
         };
       }
       return state;
+    case "ADDFRIEND":
+      console.log(action.payload);
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     default:
       return state;
   }
