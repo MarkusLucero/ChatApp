@@ -7,6 +7,25 @@ const initialState = {
   socketServer: null,
   firstWelcome: null,
   latestMessage: null,
+  listOfDms: null,
+};
+
+/**
+ * helper function used by action type SENDMESSAGE to locate the correct chat id
+ * @param {array} list containing all direct messages of the user
+ * @param {string} chatName used to identify the correct chat object
+ *
+ * @returns the chatID of the chat object
+ */
+const getChatID = (list, chatName) => {
+  let index = 0;
+  for (const chat of list) {
+    if (chat.chatName === chatName) {
+      return [chat.chatID, index];
+    }
+    index++;
+  }
+  return [null, -1]; // this line will only be reached if we give an invalid chatName
 };
 
 /**
@@ -20,10 +39,11 @@ const initialState = {
  * @property {string} socketServer the url of server that we create a websocket with
  * @property {bool} firstWelcome used to know if we've made our first repsonse to socket after login  (TODO maybe better way)
  * @property {object} latestMessage holds the latest message obj sent by another user. (TODO ONLY FOR THE PROTOTYPE!!!)
- *
+ *  @property {array} listOfMessages holds all chatroom objects TODO!
  * @param {object} action contains the type and payload
  * @property {string} action.type what kind of action should the reducer do
  * @property {object} action.payload check actions.js for what it may contain
+ * @property {object} action.identifier used for identifying something inside state object .. eg: chatID of specific chat
  *
  * @returns updated state
  */
@@ -46,8 +66,33 @@ const socketReducer = (state = initialState, action) => {
         return state;
       } else if (action.payload.action === "login") {
         /* first response */
+        console.log(state);
         state.socket.send(JSON.stringify(action.payload));
-        return { ...state, firstWelcome: false };
+
+        return {
+          ...state,
+          firstWelcome: false,
+          /* 
+          TESTING -- each user gets 2 hard coded chatrooms on login
+                     perhaps something like this will work on login.. 
+                     database sends user a list of all its chat rooms with the stored messages in correct order..  
+          */
+          listOfDms: [
+            {
+              chatName: "Skooben",
+              chatID: "1a",
+              messages: [{ message: "test", username: "Markipie" }],
+            },
+            {
+              chatName: "Grabbarna Grus",
+              chatID: "2a",
+              messages: [
+                { message: "Axel mitt sexdjur?", username: "Anton" },
+                { message: "axel e arg på dig", username: "Axel" },
+              ],
+            },
+          ],
+        };
       } else {
         const parsedData = JSON.parse(action.payload.data);
 
@@ -67,13 +112,26 @@ const socketReducer = (state = initialState, action) => {
       }
 
     case "DISCONNECTED":
-      return { ...state, socket: action.payload, wsOnline: false, firstWelcome : true };
+      return {
+        ...state,
+        socket: action.payload,
+        wsOnline: false,
+        firstWelcome: true,
+      };
 
     case "SETSERVER":
       return { ...state, socketServer: action.payload };
 
     case "SENDMESSAGE":
-      state.socket.send(JSON.stringify(action.payload));
+
+      const [chatID, index] = getChatID(state.listOfDms, action.identifier);
+
+      if (chatID !== null && index !== -1) {
+        const msgObject = { ...action.payload, chat_id: chatID };
+        state.socket.send(JSON.stringify(msgObject));
+        state.listOfDms[index].messages.push({message: msgObject.message, username: msgObject.user_id}); /* update listOfDms in state */
+        console.log(state.listOfDms);
+      }
       return state;
 
     default:

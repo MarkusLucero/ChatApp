@@ -7,10 +7,10 @@ import ChatContainer from "../ChatContainer/ChatContainer";
  * TODO Actual routing
  * @returns the appropriate component that should be displayed
  */
-const FocusedView = () => {
+const FocusedView = ({focusedChat}) => {
   return (
     <>
-      <ChatContainer />
+      <ChatContainer focusedChat = {focusedChat} />
     </>
   );
 };

@@ -7,7 +7,9 @@ import Message from "./Message";
  * @returns a div containing all messages
  */
 const Chat = ({ messages }) => {
-  /* Using ref to makes sure that we scroll to end of chat area if it overflows */
+  /* 
+    Using ref to makes sure that we scroll to end of chat area if it overflows 
+  */
   const messagesEndRef = React.useRef(null);
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -19,7 +21,6 @@ const Chat = ({ messages }) => {
       id="chat-area"
       className=" h-screen75 w-full pl-2 pr-2 mt-10 overflow-y-scroll"
     >
-      {/* Loop through the state messages and print a message component for each message  */}
       {messages.map((message, index) => (
         <Message key={index} message={message} />
       ))}

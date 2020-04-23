@@ -1,24 +1,40 @@
 import React from "react";
-import "../../assets/main.css"
+import "../../assets/main.css";
 import SideDisplayList from "../SideDisplayList/SideDisplayList";
 import FocusedView from "../FocusedView/FocusedView";
 import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
 /**
- * LandingPage holds the layout design grid of the app.
- * 
- * @returns a div containing the SideDisplayList, InfoDisplayList and FocusedView components 
+ * LandingPage holds the layout design grid of the app. Also manages
+ * the routing and display of everything inside SideDisplayList, InfoDisplayList and FocusedView
+ *
+ * @returns a div containing the SideDisplayList, InfoDisplayList and FocusedView components
  */
 const LandingPage = () => {
-  return (
-      /**
-       *  The styling is made up of Tailwind css classes 
-       *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
-       */
-    <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList/>
-      <InfoDisplayList/>
 
-      <FocusedView />
+  /* state to check what chat we are currently focusing on */
+  const [focusedChat, setFocusedChat] = React.useState(null);
+
+  /* callback function for getting the name of the direct message div that we are clicking on */
+  const handleFocusedChat = (event) => {
+    console.log(event.target.innerHTML);
+    setFocusedChat(event.target.innerHTML);
+  };
+
+  /* TODO (REMOVE THIS?) a console log of what is focused ... just for debugging! */
+  React.useEffect(() => {
+    console.log({ focusedChat } ? { focusedChat } : "nothing");
+  }, [focusedChat]);
+
+  return (
+    /**
+     *  The styling is made up of Tailwind css classes
+     *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
+     */
+    <div className="grid grid-cols-custom h-screen">
+      <SideDisplayList />
+      <InfoDisplayList handleFocusedChat={handleFocusedChat} />
+
+      <FocusedView focusedChat={focusedChat} />
     </div>
   );
 };
