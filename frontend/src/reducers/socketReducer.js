@@ -6,16 +6,15 @@ const initialState = {
   wsOnline: false,
   socketServer: null,
   firstWelcome: null,
-  latestMessage: null,
   listOfDms: null,
 };
 
 /**
  * helper function used by action type SENDMESSAGE to locate the correct chat id
  * @param {array} list containing all direct messages of the user
- * @param {string} chatName used to identify the correct chat object
+ * @param {string} chatName used to identify the correct dm object
  *
- * @returns the chatID of the chat object
+ * @returns the chatID of the dm object
  */
 const getChatID = (list, chatName) => {
   let index = 0;
@@ -26,6 +25,23 @@ const getChatID = (list, chatName) => {
     index++;
   }
   return [null, -1]; // this line will only be reached if we give an invalid chatName
+};
+/**
+ * helper function used by action type "RESPONSE" and action "send_message" to locate the correct dm object index
+ * @param {array} list containing all direct messages of the user
+ * @param {string} chatID used to identify the correct dm object
+ *
+ * @returns the index of the correct dm object
+ */
+const getChatIndex = (list, chatID) => {
+  let index = 0;
+  for (const chat of list) {
+    if (chat.chatID === chatID) {
+      return index;
+    }
+    index++;
+  }
+  return -1; // this line will only be reached if we give an invalid chatID
 };
 
 /**
@@ -57,7 +73,6 @@ const socketReducer = (state = initialState, action) => {
         socket: new WebSocket(state.socketServer),
         wsOnline: true,
         firstWelcome: true,
-        latestMessage: null,
       };
 
     case "RESPONSE":
@@ -99,12 +114,17 @@ const socketReducer = (state = initialState, action) => {
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
           case "send_message":
+            /* add the new msg object to the right dm object */
+            const index = getChatIndex(state.listOfDms, parsedData.chat_id);
             return {
               ...state,
-              latestMessage: {
-                message: parsedData.message,
-                username: parsedData.user_id,
-              },
+              listOfDms: [
+                ...state.listOfDms,
+                state.listOfDms[index].messages.push({
+                  message: parsedData.message,
+                  username: parsedData.user_id,
+                }),
+              ],
             };
           default:
             return state;
@@ -123,17 +143,24 @@ const socketReducer = (state = initialState, action) => {
       return { ...state, socketServer: action.payload };
 
     case "SENDMESSAGE":
-
       const [chatID, index] = getChatID(state.listOfDms, action.identifier);
 
       if (chatID !== null && index !== -1) {
         const msgObject = { ...action.payload, chat_id: chatID };
         state.socket.send(JSON.stringify(msgObject));
-        state.listOfDms[index].messages.push({message: msgObject.message, username: msgObject.user_id}); /* update listOfDms in state */
-        console.log(state.listOfDms);
+        /* update listOfDms in state */
+        return {
+          ...state,
+          listOfDms: [
+            ...state.listOfDms,
+            state.listOfDms[index].messages.push({
+              message: msgObject.message,
+              username: msgObject.user_id,
+            }),
+          ],
+        };
       }
       return state;
-
     default:
       return state;
   }

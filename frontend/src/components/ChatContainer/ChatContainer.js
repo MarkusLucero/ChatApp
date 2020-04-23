@@ -87,30 +87,23 @@ const ChatContainer = ({ focusedChat }) => {
     setNewMessage(event.target.value);
   };
 
-  /* HANDLING NEW MESSAGE FROM OTHER USER */
-
-  /* userMessage will hold the latest message obj gotten from another user - will upadte when store updates 
-    TODO -- only for prototype!
-  */
-  const userMessage = useSelector((state) => state.socketState.latestMessage);
-  /* 
-    will render on mount - dependency list holds userMessage so whenever that changes we will fire everything inside useEffect
-  */
-  React.useEffect(() => {
-    if (userMessage != null) {
-      setMessages((prev) => [...prev, userMessage]);
-    }
-  }, [userMessage]);
+  /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
 
   /* 
     will render on mount - dependency list holds focusedChat so whenever that changes we will fire everything inside useEffect
-    when focusedChat changes we change the messages that are displayed
-  */
+    when focusedChat changes we change the messages that are displayed. 
+    
+    If state of listOfDms changes we will refire this aswell displaying the new chat messages 
+    ( this hapens when we get a response from someone or when we send a message and update listOfDms)
+  
+  TODO.. I dont know if this is bad performance wise when messages get really long to refire everything? :O 
+    */
   React.useEffect(() => {
+    console.log("fookus my man fookus")
     if (listOfDms != null) {
       setMessages(rightChat(listOfDms));
     }
-  }, [focusedChat]);
+  }, [focusedChat, listOfDms]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
