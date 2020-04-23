@@ -74,7 +74,10 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: true,
       };
-
+    case "CHAT_REQUEST": 
+      console.log(action.payload);
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "RESPONSE":
       /* if data is ack or welcome there's nothning we need to do */
       if (action.payload.data === "Welcome" || action.payload.data === "ACK") {
@@ -128,7 +131,10 @@ const socketReducer = (state = initialState, action) => {
             };
           case "friend_request": 
           console.log(parsedData);
-          break;
+          return state;
+         case "chat_request": 
+          console.log(parsedData);
+            return state;
           default:
             return state;
         }
@@ -167,7 +173,7 @@ const socketReducer = (state = initialState, action) => {
     case "ADDFRIEND":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
-      return state;
+      return state; 
     default:
       return state;
   }
