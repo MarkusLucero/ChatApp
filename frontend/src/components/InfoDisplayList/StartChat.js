@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
  * StartChat is the component which is seen when pressing the '+' icon next to active chats
  * @property friends, all friends of the logged in user
  * @property username, the logged in user's username
- * @param {function} callback is used to show/hide the StartChat modal
+ * @param {function} setShowAddChat callback is used to show/hide the StartChat modal
  * @returns A div where user can choose which friend he want's to chat with
  */
 const StartChat = ({friends, username, setShowAddChat}) => {
