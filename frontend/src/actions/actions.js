@@ -69,7 +69,7 @@ export function startChat(values){
     type: CHAT_REQUEST,
     payload: {
       action: "chat_request",
-      chatName: values.chatName,
+      chat_name: values.chatName,
       from: values.from, 
       members: values.members,
     },
@@ -89,5 +89,4 @@ export function response(data) {
 export function setServer(server){
   return {type: SET, payload: server};
 }
-
 
