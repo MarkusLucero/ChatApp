@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Servers from "./Servers";
+
 /**
  * SideDisplayList holds all components in the side display - servers, add server, profile
  * @param  props - The props passed down from LandingPage - servers and additional information
  * @returns A div containing the servers, add server and profile
  */
-
 const SideDisplayList = (props) => {
   /* The initial state, all the servers -- WILL MOST LIKELY BE PASSED DOWN AS PROPS INSTEAD */
   const [servers, setServers] = useState([{ name: "OSPP" }, { name: "OSPP" }]);

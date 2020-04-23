@@ -1,9 +1,12 @@
 import React from "react";
 import { useFormik } from "formik";
+import * as actions from "../../actions/actions";
+import { useDispatch } from "react-redux";
+import * as Notifications from "../Notifications/Notifications";
 
-const Connection = () => {
-  let ws = new WebSocket("ws://localhost:3000/ws");
-};
+/* import Notifications from "../Notifications/Notifications";
+ */
+const axios = require("axios");
 
 const validate = (values) => {
   const errors = {};
@@ -26,9 +29,43 @@ const Register = ({ history }) => {
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
+
     onSubmit: (values) => {
-      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
-      history.push("/");
+      axios
+        .post(
+          "/",
+          JSON.stringify({
+            action: "register",
+            username: values.Username,
+            password: values.Password,
+          })
+        )
+        .then(function (response) {
+          console.log(response);
+
+          /* The response contains: status and a payload data: server/token */
+          switch (response.status) {
+            /* Register accepted */
+
+            case 200: {
+              /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+              Notifications.registerSuccess();
+              history.push("/");
+              break;
+            }
+            case 404: {
+              Notifications.accountExistsFailure();
+              console.log("Error: " + response);
+              break;
+            }
+            default:
+              Notifications.unknownFailure();
+              break;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
   });
   return (

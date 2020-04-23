@@ -1,40 +1,12 @@
-ERLC_FLAGS=-Wall
+PROJECT = web_api
+PROJECT_DESCRIPTION = A web api for Chat Up!
+PROJECT_VERSION = 0.1.0
+ERLC_OPTS = -Werror +debug_info +warn_export_vars +warn_shadow_vars +warn_obsolete_guard -I ../database_api/ebin
 
-SOURCES=$(wildcard src/*.erl)
+LOCAL_DEPS = odbc
+DEPS = cowboy
+dep_cowboy_commit = 2.6.3
 
-HEADERS=$(wildcard src/*.hrl)
+DEP_PLUGINS = cowboy
 
-OBJECTS:=$(SOURCES:src/%.erl=ebin/%.beam)
-
-APPNAME=Chat up! Web API
-
-.PHONY: doc doc_url help skeleton
-
-all: $(OBJECTS)
-
-ebin/%.beam: src/%.erl
-	erlc $(ERLC_FLAGS) -o ebin/ $<
-
-clean:
-	rm -f erl_crash.dump
-	rm -Rf ebin/*
-	rm -Rf src/*.beam
-	rm -Rf doc/*.html
-	rm -f doc/edoc-info
-
-repl: all
-	cd src && ERL_COMPILER_OPTIONS='[{outdir,"../ebin"}]' erl -pa ../ebin
-
-doc:
-	erl -noshell -run edoc_run application "'$(APPNAME)'"  '"."' '[{def,{vsn,"$(VSN)"}}, {stylesheet, "my_style.css"}]'
-
-doc_url:
-	@echo
-	@echo "EDoc index page available at file://$(PWD)/doc/index.html"
-	@echo
-
-view_doc: doc
-	./view_doc
-
-test: $(OBJECTS)
-	erl -noshell -pa ebin -eval "io:format(\"Not yet implemented~n\")" -s init stop
+include erlang.mk

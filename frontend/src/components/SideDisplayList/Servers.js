@@ -10,4 +10,3 @@ const Servers = ({ server }) => {
 }
 
 export default Servers;
-

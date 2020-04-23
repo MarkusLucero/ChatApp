@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
+import * as actions from "../../actions/actions";
+import { useDispatch } from "react-redux";
 
+const axios = require("axios");
+
+//axios.get("http://localhost:8080/", { crossdomain: true })
 const validate = (values) => {
   const errors = {};
   if (!values.Username) {
@@ -21,14 +26,52 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Login = ({ history }) => {
-  const [text, setText] = useState("");
+  /* useDispatch from dispatch function from store */
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
     onSubmit: (values) => {
-      /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
-      history.push("/start");
+      axios
+        .post(
+          "/",
+          JSON.stringify({
+            action: "login",
+            username: values.Username,
+            password: values.Password,
+          })
+        )
+        .then(function (response) {
+          console.log(response);
+          
+          /* The response contains: status and a payload data: server/token */
+          switch (response.status) {
+            /* Login accepted */
+
+            case 200: {
+              const data = {response : response.data, username : values.Username};
+
+              /* Data should contain token & server */
+              dispatch(actions.setServer( "ws://localhost:8080/websocket"));
+              dispatch(actions.loginSuccess( data ));
+              break;
+            }
+            case 404: {
+              const data = response.data;
+              dispatch(actions.loginFailure({ data }));
+              break;
+            }
+            default:
+              alert("missing memberid");
+              break;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      /* Use the store reducer to dispatch login actions */
+      dispatch(actions.login({ values }));
     },
   });
   return (
