@@ -128,6 +128,8 @@ const socketReducer = (state = initialState, action) => {
                 }),
               ],
             };
+         case "chat_request": 
+          console.log(parsedData);
           default:
             return state;
         }
