@@ -20,7 +20,7 @@ const InfoDisplayList = ({handleFocusedChat}) => {
         <div style={{backgroundColor: "#2C2F33"}} className="border-solid border-l-4 border-gray-700">
             <InformationHeader username = {username}/>
             <FriendsList />
-            <MessagesList handleFocusedChat = {handleFocusedChat} />
+            <MessagesList  username = {username} handleFocusedChat = {handleFocusedChat} />
         </div>
     )
 }

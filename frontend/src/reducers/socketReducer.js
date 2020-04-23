@@ -74,7 +74,9 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: true,
       };
-
+    case "CHAT_REQUEST": 
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "RESPONSE":
       /* if data is ack or welcome there's nothning we need to do */
       if (action.payload.data === "Welcome" || action.payload.data === "ACK") {
@@ -160,7 +162,7 @@ const socketReducer = (state = initialState, action) => {
           ],
         };
       }
-      return state;
+      return state; 
     default:
       return state;
   }
