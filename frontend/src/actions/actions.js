@@ -1,43 +1,53 @@
-
 /**
  * Contains actions that can be called by a dispatcher
- * 
+ *
  */
 
- /* action types */
+/* action types */
 const CONNECT = "CONNECT";
 const LOGIN = "LOGIN";
-const RESPONSE = "RESPONSE"
+const RESPONSE = "RESPONSE";
 const REGISTER = "REGISTER";
 const DISCONNECTED = "DISCONNECTED";
 const SET = "SETSERVER";
 const SUCCESS = "SUCCESS";
 const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
+const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
-
 export function sendMessage(data) {
   return {
     type: SENDMESSAGE,
     payload: {
-        action: "send_message",      // type of action 
-        chat_id: "",     
-        user_id: data.username ,
-        message: data.message , 
-        timestamp: null
+      action: "send_message", // type of action
+      chat_id: "",
+      user_id: data.username,
+      message: data.message,
+      timestamp: null,
     },
-    identifier: data.chatName, /* used by helper function in socketReducer to get correct chat_id */
+    identifier:
+      data.chatName /* used by helper function in socketReducer to get correct chat_id */,
   };
 }
-/* action functions */
+
+export function addFriend(data) {
+  return {
+    type: ADDFRIEND,
+    payload: {
+      action: "friend_request",
+      user_id: data.user_id,
+      from: data.from,
+    },
+  };
+}
+
 export function connect() {
   return { type: CONNECT, payload: null };
-}  
+}
 
-/* action functions */
 export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
-}  
+}
 
 export function login({ values }) {
   console.log(values);
@@ -51,7 +61,7 @@ export function login({ values }) {
   };
 }
 
-export function register( values ) {
+export function register(values) {
   console.log(values);
   return {
     type: REGISTER,
@@ -78,15 +88,16 @@ export function startChat(values){
 export function loginSuccess(data){
   return { type: SUCCESS, payload: data}
 }
-export function loginFailure(data){
-  return {type: FAILURE, payload: data}
+  
+export function loginFailure(data) {
+  return { type: FAILURE, payload: data };
 }
 
 export function response(data) {
-  return { type: RESPONSE, payload: data};
+  return { type: RESPONSE, payload: data };
 }
 
-export function setServer(server){
-  return {type: SET, payload: server};
+export function setServer(server) {
+  return { type: SET, payload: server };
 }
 

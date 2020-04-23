@@ -75,6 +75,7 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: true,
       };
     case "CHAT_REQUEST": 
+      console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
       return state;
     case "RESPONSE":
@@ -128,8 +129,12 @@ const socketReducer = (state = initialState, action) => {
                 }),
               ],
             };
+          case "friend_request": 
+          console.log(parsedData);
+          return state;
          case "chat_request": 
           console.log(parsedData);
+            return state;
           default:
             return state;
         }
@@ -164,6 +169,10 @@ const socketReducer = (state = initialState, action) => {
           ],
         };
       }
+      return state;
+    case "ADDFRIEND":
+      console.log(action.payload);
+      state.socket.send(JSON.stringify(action.payload));
       return state; 
     default:
       return state;
