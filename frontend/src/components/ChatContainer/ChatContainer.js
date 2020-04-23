@@ -8,19 +8,19 @@ import { useDispatch, useSelector } from "react-redux";
 
 /**
  * ChatContainer holds the layout of the focused view of a selected chat
- *
+ * @property {string} focusedChat the name of the chat that we are currently focusing on
  * @returns a div containing the SearchBar, Chat and ChatInput components
  */
-const ChatContainer = () => {
+const ChatContainer = ({ focusedChat }) => {
   const dispatch = useDispatch();
 
   /* State and callback functions for the SearchBar */
+
   const [searchTerm, setSearchTerm] = React.useState("");
 
   /**
    * Set the state of searchTerm to the value of the input field when that changes
    * @param event the event object of the window
-   *
    */
   const handleSearchInput = (event) => {
     setSearchTerm(event.target.value);
@@ -30,7 +30,6 @@ const ChatContainer = () => {
    * Trigger the search of the searchTerm in the actuall focused chat
    * event parameter is displayed only to prevent he windows default action when pressing a submit button
    * @param event the event object of the window
-   *
    */
   const handleSearchSubmit = (event) => {
     /* TODO Actually search for chat messages containing the text in searchTerm and only allow that
@@ -46,22 +45,36 @@ const ChatContainer = () => {
 
   /* State and callback functions for Chat and ChatInput */
 
-  /*All old messages, these are hardcoded. The self field is if you've sent the message or not */
+  const listOfDms = useSelector((state) => state.socketState.listOfDms);
+
+  const rightChat = (list) => {
+    for (const chat of list) {
+      console.log(chat);
+      if (chat.chatName === focusedChat) {
+        return chat.messages;
+      }
+    }
+    return [];
+  };
+
   const [messages, setMessages] = React.useState([]);
+
   /*This is the state used when typing a new message*/
   const [newMessage, setNewMessage] = React.useState("");
+
   /**
    * Set the messages state by updating it with the "newMessage" message
    * @param event the event object of the window
    */
   const sendMessage = (event) => {
     event.preventDefault();
-    setMessages((prev) => [
-      ...prev,
-      { message: newMessage, username: myUsername },
-    ]);
+    setMessages([...messages, { message: newMessage, username: myUsername }]);
     dispatch(
-      actions.sendMessage({ message: newMessage, username: myUsername })
+      actions.sendMessage({
+        message: newMessage,
+        username: myUsername,
+        chatName: focusedChat,
+      })
     );
     setNewMessage("");
   };
@@ -74,22 +87,23 @@ const ChatContainer = () => {
     setNewMessage(event.target.value);
   };
 
-  /* HANDLING NEW MESSAGE FROM OTHER USER */
-  
-  /* userMessage will hold the latest message obj gotten from another user - will upadte when store updates 
-    TODO -- only for prototype!
-  */
-  const userMessage = useSelector((state) => state.socketState.latestMessage);
+  /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
 
   /* 
-  will render on mount - dependency list holds userMessage so whenever that changes we will fire everything inside useEffect
-    so when we get new message it will call seMessages!
-  */
+    will render on mount - dependency list holds focusedChat so whenever that changes we will fire everything inside useEffect
+    when focusedChat changes we change the messages that are displayed. 
+    
+    If state of listOfDms changes we will refire this aswell displaying the new chat messages 
+    ( this hapens when we get a response from someone or when we send a message and update listOfDms)
+  
+  TODO.. I dont know if this is bad performance wise when messages get really long to refire everything? :O 
+    */
   React.useEffect(() => {
-    if (userMessage != null) {
-      setMessages((prev) => [...prev, userMessage]);
+    console.log("fookus my man fookus")
+    if (listOfDms != null) {
+      setMessages(rightChat(listOfDms));
     }
-  }, [userMessage]);
+  }, [focusedChat, listOfDms]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
@@ -101,11 +115,11 @@ const ChatContainer = () => {
       />
 
       <Chat messages={messages} />
-      <ChatInput
+      {focusedChat ? <ChatInput
         message={newMessage}
         handleInputChange={handleMessage}
         handleButtonClick={sendMessage}
-      />
+      /> : null}
     </div>
   );
 };

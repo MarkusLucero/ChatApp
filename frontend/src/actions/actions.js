@@ -20,11 +20,12 @@ export function sendMessage(data) {
     type: SENDMESSAGE,
     payload: {
         action: "send_message",      // type of action 
-        chat_id: "0001",             // TODO . kan skippas nu för alla hamnar i samma chat i prototypen
+        chat_id: "",     
         user_id: data.username ,
         message: data.message , 
         timestamp: null
     },
+    identifier: data.chatName, /* used by helper function in socketReducer to get correct chat_id */
   };
 }
 /* action functions */
