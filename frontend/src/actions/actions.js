@@ -14,6 +14,7 @@ const SET = "SETSERVER";
 const SUCCESS = "SUCCESS";
 const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
+const CHAT_REQUEST = "CHAT_REQUEST";
 
 export function sendMessage(data) {
   return {
@@ -62,6 +63,18 @@ export function register( values ) {
   };
 }
 
+export function startChat(values){
+  console.log(values);
+  return {
+    type: CHAT_REQUEST,
+    payload: {
+      action: "chat_request",
+      chat_name: values.chatName,
+      from: values.from, 
+      members: values.members,
+    },
+  };
+}
 export function loginSuccess(data){
   return { type: SUCCESS, payload: data}
 }
@@ -76,5 +89,4 @@ export function response(data) {
 export function setServer(server){
   return {type: SET, payload: server};
 }
-
 
