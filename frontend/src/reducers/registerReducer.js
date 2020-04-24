@@ -10,12 +10,12 @@ const registerState = {}
  */
 const registerReducer = (state = registerState, action) => {
   switch (action.type) {
-    case "SUCCESS": { //TODO this is same as login right now... not good
+    case "SUCCESS": { //TODO this is same as login right now... have to something else
       
       //TODO
       return state;
     }
-    case "FAILURE": {
+    case "FAILURE": {  //TODO this is same as login right now... have to something else
         /* Failure simply returns loginState as false */
       //TODO
       return state;

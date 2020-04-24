@@ -46,6 +46,7 @@ const Container = () => {
 
   /*  Initiates the websocket client on mount (everything in useEffect is called on mount - like created/mounted in Vue) */
   useEffect(() => {
+
     /* if current prop of ref is null and ws url is set -> initialize new websocket connection (this happens first time) */
     if (!wsRef.current && url !== null) {
       dispatch(actions.connect()); 

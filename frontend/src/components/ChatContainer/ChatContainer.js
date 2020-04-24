@@ -41,7 +41,7 @@ const ChatContainer = ({ focusedChat }) => {
   };
 
   /* get my username from redux store */
-  const myUsername = useSelector((state) => state.loginState.username);
+  const myUsername = useSelector((state) => state.socketState.username);
 
   /* State and callback functions for Chat and ChatInput */
 
@@ -49,7 +49,6 @@ const ChatContainer = ({ focusedChat }) => {
 
   const rightChat = (list) => {
     for (const chat of list) {
-      console.log(chat);
       if (chat.chatName === focusedChat) {
         return chat.messages;
       }
@@ -95,11 +94,11 @@ const ChatContainer = ({ focusedChat }) => {
     
     If state of listOfDms changes we will refire this aswell displaying the new chat messages 
     ( this hapens when we get a response from someone or when we send a message and update listOfDms)
-  
-  TODO.. I dont know if this is bad performance wise when messages get really long to refire everything? :O 
     */
   React.useEffect(() => {
-    console.log("fookus my man fookus")
+    console.log("list of dms");
+    console.log(listOfDms);
+    console.log("fookus my man fookus");
     if (listOfDms != null) {
       setMessages(rightChat(listOfDms));
     }
@@ -115,11 +114,13 @@ const ChatContainer = ({ focusedChat }) => {
       />
 
       <Chat messages={messages} />
-      {focusedChat ? <ChatInput
-        message={newMessage}
-        handleInputChange={handleMessage}
-        handleButtonClick={sendMessage}
-      /> : null}
+      {focusedChat ? (
+        <ChatInput
+          message={newMessage}
+          handleInputChange={handleMessage}
+          handleButtonClick={sendMessage}
+        />
+      ) : null}
     </div>
   );
 };
