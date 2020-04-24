@@ -14,7 +14,7 @@ import MessagesList from './MessagesList';
 const InfoDisplayList = ({handleFocusedChat}) => {
 
     /* get the logged in  username from redux store */
-    const username = useSelector((state) => state.loginState.username);
+    const username = useSelector((state) => state.socketState.username);
 
     return (
         <div style={{backgroundColor: "#2C2F33"}} className="border-solid border-l-4 border-gray-700">

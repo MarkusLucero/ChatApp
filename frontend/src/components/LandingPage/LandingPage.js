@@ -16,14 +16,8 @@ const LandingPage = () => {
 
   /* callback function for getting the name of the direct message div that we are clicking on */
   const handleFocusedChat = (event) => {
-    console.log(event.target.innerHTML);
     setFocusedChat(event.target.innerHTML);
   };
-
-  /* TODO (REMOVE THIS?) a console log of what is focused ... just for debugging! */
-  React.useEffect(() => {
-    console.log({ focusedChat } ? { focusedChat } : "nothing");
-  }, [focusedChat]);
 
   return (
     /**

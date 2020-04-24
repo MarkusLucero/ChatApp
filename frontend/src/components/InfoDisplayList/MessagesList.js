@@ -1,17 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import add_chat from "../../img/add_chat.png";
 import StartChat from "./StartChat";
+import {useSelector} from "react-redux"
 
 /**
  * contains the list of available direct messages that we can chat in
  *
  * @param {function} callback function used to get the target of what we are clicking on
- * @property the username of the logged in user
+ * @property {string} username  username of the logged in user
  * returns a div containing all direct messages
  */
 const MessagesList = ({ handleFocusedChat, username }) => {
+
+    /* Get friendslist from redux store */
+    const friends = useSelector(
+      (state) => state.socketState.listOfFriends
+    );
+
   /* TODO actualy use the chat names from redux store */
   const [chats, setChats] = useState(["Skooben", "Grabbarna Grus"]);
+
   /* Determens if we're showing the add chat modal */
   const [showAddChat, setShowAddChat] = useState(false);
 
@@ -32,10 +40,9 @@ const MessagesList = ({ handleFocusedChat, username }) => {
     else{
       setShowAddChat(false);
     }
-  };
+  };  
   /*Keep track of the modal */
   const addChatModal = useRef();
-
 
 
   return (
@@ -46,7 +53,7 @@ const MessagesList = ({ handleFocusedChat, username }) => {
         Direct Messages
         <img onClick ={() => {setShowAddChat(true)}} src={add_chat} alt="Create a new chat!" className="h-6 w-6"/>
       </div>
-      <div ref ={addChatModal}>{showAddChat ? <StartChat setShowAddChat = {setShowAddChat} username={username} friends ={chats}/> : null}</div>
+      <div ref ={addChatModal}>{showAddChat ? <StartChat setShowAddChat = {setShowAddChat} username={username} friends ={friends}/> : null}</div>
       <div className="flex flex-col">
         {chats.map((chat, index) => {
           return (

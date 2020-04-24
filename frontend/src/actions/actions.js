@@ -15,6 +15,7 @@ const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
 const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
+
 export function sendMessage(data) {
   return {
     type: SENDMESSAGE,

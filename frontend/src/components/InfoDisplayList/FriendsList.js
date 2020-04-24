@@ -11,13 +11,19 @@ import * as actions from "../../actions/actions";
  */
 
 const FriendsList = () => {
-  const [friends, setFriends] = useState(["Skooben", "Travie", "Mustafa"]); //TODO: FIXA VÄNNER
+  /* Get friendslist from redux store */
+  const currentFriends = useSelector(
+    (state) => state.socketState.listOfFriends
+  );
+
+  const [friends, setFriends] = useState([]);
+
   /* state to toggle modal, state should preferably probably be handled
    inside modal for scalability and safety. Also refactor to use createPortal when as it is recommended.. */
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const dispatch = useDispatch();
-  const requester = useSelector((state) => state.loginState.username);
+  const requester = useSelector((state) => state.socketState.username);
 
   /* Sends a websocket request to add the specific user */
   const handleAddFriend = (event) => {
@@ -29,6 +35,14 @@ const FriendsList = () => {
   const handleInputChange = (event) => {
     setUsername(event.target.value);
   };
+
+  /* when currentFriends changes - refire useEffect and add the new friends to friends state */
+  React.useEffect(() => {
+    console.log("potato")
+    if (currentFriends != null) {
+      setFriends(currentFriends);
+    }
+  }, [currentFriends]);
 
   return (
     <div className="flex flex-col ml-2">
