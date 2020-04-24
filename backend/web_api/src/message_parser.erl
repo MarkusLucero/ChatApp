@@ -30,6 +30,15 @@ handle_message(Msg, PID) ->
                  {"chat_id", Chat_ID},
                  {"from", Username}]} ->
             chat_server:get_unread_messages(Chat_ID, Username, PID);
+	{struct,[{"action", "friend_request"},
+		 {"user_id", Friendname},
+		 {"from", Username}]} ->
+	    chat_server:send_friend_request(Username, Friendname);
+	{struct,[{"action", "chat_request"},
+                 {"chat_name", Chat_Name},
+                 {"from", Username},
+		 {"members", Members}]} ->
+            chat_server:send_chat(Chat_Name, Username, Members);
         _ -> erlang:error('unknown message')
     end,
     ok.
