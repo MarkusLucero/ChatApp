@@ -20,6 +20,25 @@ loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp} ->
 	    odbc:sql_query(Ref, "INSERT INTO users VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
+
+	{insert_friend, Username, Friend, From} ->
+	    UserExists = (catch odbc:sql_query(Ref, "SELECT * FROM users WHERE user_name = '" ++ Username ++ "';")),
+	    FriendExists = (catch odbc:sql_query(Ref, "SELECT * FROM users WHERE user_name = '" ++ Friend ++ "';")),
+	    case UserExists of
+		{selected, _, []} ->
+		    From ! {error, no_user},
+		    loop(Ref);
+		_ ->
+		    ok
+	    end,
+	    case FriendExists of
+		{selected, _, []} ->
+		    From ! {error, no_friend};
+		_ ->
+		    odbc:sql_query(Ref, "INSERT INTO friend_list VALUES('" ++ Username ++ "', '" ++ Friend ++ "')"),
+		    From ! ok
+	    end;
+	
 	{insert_chat, From_Username, Chat_ID, { Timestamp, Msg}, Status} ->
 	    
 	    odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS chat" ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
@@ -35,8 +54,22 @@ loop(Ref) ->
 		    From ! { Username, Password, stringify_timestamp( Timestamp)}
 	    end;
 
+	{fetch_friendlist, Username, From} ->
+	    Content = (catch odbc:sql_query(Ref, "SELECT friend FROM friend_list WHERE user_name = '" ++ Username ++ "';")),
+	    case Content of
+		{selected,_,[]} ->
+		    From ! {error, no_friendlist};
+		{selected,_,Friendlist} ->
+		    From ! {ok, Friendlist}
+	    end;
+
+
 	{fetch_chat, Chat_ID, From} ->
-	    Content = (catch odbc:sql_query(Ref, "SELECT from_user, message, status FROM " ++ Chat_ID ++ ";")),
+	    Content = (catch odbc:sql_query(Ref, "SELECT from_user, message, status FROM chat" ++ Chat_ID ++ ";")),
+	    From ! Content;
+
+	{fetch_chat_members, Chat_ID, From} ->
+	    Content = (catch odbc:sql_query(Ref, "SELECT from_user FROM chat" ++ Chat_ID ++ ";")),
 	    From ! Content;
 
 	stop ->
@@ -45,10 +78,13 @@ loop(Ref) ->
 	    exit(succeful_exit);
 
 	{remove_table, Table} ->
-	    odbc:sql_query(Ref, "DROP TABLE " ++ Table ++ ";");
+	    odbc:sql_query(Ref, "DROP TABLE chat" ++ Table ++ ";");
 
 	{remove_user, Username} ->
 	    odbc:sql_query(Ref, "DELETE FROM users WHERE user_name = '" ++ Username ++ "';");
+
+	{remove_friendlist, Username} ->
+	    odbc:sql_query(Ref, "DELETE FROM friend_list WHERE user_name = '" ++ Username ++ "';");
 	
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
