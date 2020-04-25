@@ -21,24 +21,25 @@ const FriendsList = () => {
   /* state to toggle modal, state should preferably probably be handled
    inside modal for scalability and safety. Also refactor to use createPortal when as it is recommended.. */
   const [show, setShow] = useState(false);
+  /* State that contains the username of the user we're trying to add */
   const [username, setUsername] = useState("");
-  const dispatch = useDispatch();
+  /* state controlling if the friend request was successful or not, TODO: addSuccessful must be set to false and username false once friend is added */
+  const [addSuccessful, setAddSuccessful] = useState(false);
+  /* Gets the username of the user doing the friend request */
   const requester = useSelector((state) => state.socketState.username);
-
-  /* Sends a websocket request to add the specific user */
-  const handleAddFriend = (event) => {
-    event.preventDefault();
-    dispatch(actions.addFriend({ user_id: username, from: requester }));
-    setUsername("");
-  };
-
   const handleInputChange = (event) => {
     setUsername(event.target.value);
   };
 
+  /* when addSuccesful changes and username is not null, refire and add a friend into the array of friends */
+  React.useEffect(() => {
+    if (addSuccessful && username) {
+      const addedFriend = [...currentFriends, username];
+    }
+  }, [addSuccessful]);
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
-    console.log("potato")
+    console.log("potato");
     if (currentFriends != null) {
       setFriends(currentFriends);
     }
@@ -61,9 +62,10 @@ const FriendsList = () => {
         <AddFriend
           userInput={username}
           handleInputChange={handleInputChange}
-          handleAddFriend={handleAddFriend}
+          setAddSuccessful={setAddSuccessful}
           show={show}
           setShow={setShow}
+          from={requester}
         ></AddFriend>
       </div>
       <div className="flex flex-col">

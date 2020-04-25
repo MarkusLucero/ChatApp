@@ -159,9 +159,6 @@ const socketReducer = (state = initialState, action) => {
                 }),
               ],
             };
-          case "friend_request":
-            console.log(parsedData);
-            return state;
           case "chat_request":
             console.log(parsedData);
             return state;

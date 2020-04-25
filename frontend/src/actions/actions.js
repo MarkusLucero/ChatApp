@@ -31,16 +31,6 @@ export function sendMessage(data) {
   };
 }
 
-export function addFriend(data) {
-  return {
-    type: ADDFRIEND,
-    payload: {
-      action: "friend_request",
-      user_id: data.user_id,
-      from: data.from,
-    },
-  };
-}
 
 export function connect() {
   return { type: CONNECT, payload: null };
