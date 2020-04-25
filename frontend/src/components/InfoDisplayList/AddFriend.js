@@ -13,6 +13,7 @@ function friendRequest({ setAddSuccessful, userInput, from, setErrorMsg }) {
         })
       )
       .then(function (response) {
+          console.log(response);
         switch (response.status) {
           /* addfriend accepted, state is passed up to friendsList to determine if the username should be added or not */
           case 200: {

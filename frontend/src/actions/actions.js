@@ -30,6 +30,9 @@ export function sendMessage(data) {
       data.chatName /* used by helper function in socketReducer to get correct chat_id */,
   };
 }
+export function addFriend(data) {
+  return{   type: ADDFRIEND, payload:{ username: data.username }}
+};
 
 
 export function connect() {

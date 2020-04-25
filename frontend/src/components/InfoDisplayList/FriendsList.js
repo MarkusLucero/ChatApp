@@ -27,6 +27,8 @@ const FriendsList = () => {
   const [addSuccessful, setAddSuccessful] = useState(false);
   /* Gets the username of the user doing the friend request */
   const requester = useSelector((state) => state.socketState.username);
+  const dispatch = useDispatch();
+
   const handleInputChange = (event) => {
     setUsername(event.target.value);
   };
@@ -34,9 +36,11 @@ const FriendsList = () => {
   /* when addSuccesful changes and username is not null, refire and add a friend into the array of friends */
   React.useEffect(() => {
     if (addSuccessful && username) {
-      const addedFriend = [...currentFriends, username];
+      dispatch(actions.addFriend({username}))
+      setUsername("");
+      setAddSuccessful(false);
     }
-  }, [addSuccessful]);
+  }, [addSuccessful]); 
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
     console.log("potato");
