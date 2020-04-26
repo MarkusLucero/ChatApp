@@ -11103,7 +11103,7 @@ video {
 .addFriend-custom-modal-body {
   padding: 20px 24px;
   border-radius: 4px;
-  background-color: grey;
+  background-color: #424549;
 }
 
 @media (min-width: 640px) {

@@ -86,6 +86,8 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: firstWelcome,
       };
+    case "ADDFRIEND":
+      return {...state, listOfFriends: state.listOfFriends.concat(action.payload.username)}
     case "CHAT_REQUEST":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
@@ -159,9 +161,6 @@ const socketReducer = (state = initialState, action) => {
                 }),
               ],
             };
-          case "friend_request":
-            console.log(parsedData);
-            return state;
           case "chat_request":
             console.log(parsedData);
             return state;
