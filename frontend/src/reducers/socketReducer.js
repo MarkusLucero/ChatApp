@@ -84,7 +84,7 @@ const socketReducer = (state = initialState, action) => {
         /* need to respond to socket with action = login, username, and magictoken to establish connection */
         state.socket.send(JSON.stringify(action.payload));
 
-        /* 
+        /* TODO TODO
           This if ann else cases handles the fact that we accidentely get 2 login responses from backend right now
           not to trigger useEffect in ChatContainer we have this case here.. TODO remove it after backend fixes it
         */
@@ -149,7 +149,6 @@ const socketReducer = (state = initialState, action) => {
             };
           case "chat_request":
             /* insert a new chat object to listOfDms */
-            console.log(parsedData);
             if (parsedData.status === "ok") {
               return {
                 ...state,
@@ -199,7 +198,7 @@ const socketReducer = (state = initialState, action) => {
           message: msgObject.message,
           username: msgObject.user_id,
         });
-        console.log(updateListOfDms);
+       
         return {
           ...state,
           listOfDms: updateListOfDms,
