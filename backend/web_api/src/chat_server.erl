@@ -98,6 +98,8 @@ chat_members(_Chat_ID) ->
 %% @param Friendname The name of the user that receives the friend request
 %% @returns ok.
 send_friend_request(Username, Friendname) ->
+    %database_api:insert_friend(Username, Friendname),
+    %database_api:insert_friend(Friendname, Username),
     chat_server ! {friend_request, Username, Friendname},
     ok.
 
@@ -117,9 +119,10 @@ create_chat_id() ->
 %% @param Creator The creator of the chat
 %% @param Members The members of the chat
 %% @returns ok.
-%% TODO: Save the chat id in backend
+%% TODO: Save the chat id in database
 send_chat(Chat_Name, Creator, Members) ->
     Chat_ID = create_chat_id(),
+    %[database_api:insert_chat_id(Username) || Username <- Members],
     chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
     ok.
     
