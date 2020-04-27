@@ -4,6 +4,12 @@
 -export([init/2]).
 -export([terminate/3]).
 
+get_magic_token() ->
+    tbi.
+
+hash_password(_Password) ->
+    tbi.
+
 -spec init(Req, State) -> {ok, Req, Opts} when
       Req :: cowboy_req:req(),
       State :: any(),
@@ -16,9 +22,26 @@ init(Req0, Opts) ->
     Method = cowboy_req:method(Req0),
     case Method of
         <<"POST">> ->
-            Body = <<"Sorry, client ID is not yet implemented">>,
-            Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-            {ok, Req3, Opts};
+	    {ok, Data, _} = cowboy_req:read_body(Req0),
+	    {struct,[{"action", "login"},
+		     {"username", Username},
+		     {"password", Password}]} = mochijson:decode(Data),
+
+	    Hashed_Password = hash_password(Password),
+	    Stored_Password = database_api:fetch_password(Username),
+	    case string:equal(Hashed_Password, Stored_Password) of
+		true ->
+		    Magic_Token = get_magic_token(),
+		    Body = mochijson:encode(
+                             {struct,[{"action", "login"},
+				      {"magic_token", Magic_Token}]}),
+		    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+		    {ok, Req3, Opts};
+		false ->
+		    Body = <<"Wrong password!">>,
+		    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+		    {ok, Req3, Opts}
+	    end;
         <<"GET">> ->
             Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
             Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),

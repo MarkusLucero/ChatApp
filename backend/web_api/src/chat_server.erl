@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -9,6 +9,8 @@
 new_connection(_PID) ->
     ok.
 
+hash_password(_Password) ->
+    tbi.
 
 -spec register_user(Username, Password, Timestamp, PID) -> ok when
       Username :: list(Integer),
@@ -22,23 +24,25 @@ new_connection(_PID) ->
 %% @param PID The PID for the websocket handler
 %% @returns ok For every registration.
 
-register_user(Username, _Password, _, PID) ->
-    database_api:insert_user(Username, _Password, "2020-05-05 16:00:00"),
-    chat_server ! {login_user, Username, PID},
+register_user(Username, Password, _, _PID) ->
+    Hashed_Password = hash_password(Password),
+    database_api:insert_user(Username, Hashed_Password, "2020-05-05 16:00:00"),
+    %chat_server ! {register_user, Username, PID},
     ok.
 
--spec login_user(Username, Password, PID) -> ok when
+-spec login_user(Username, Magic_token, PID) -> ok when
       Username :: list(Integer),
-      Password :: list(Integer),
+      Magic_token :: list(Integer),
       PID :: pid().
 %% @doc Logs a user in to the system on the current API node
 %% @param Username The username for the user
 %% @param Magic_token The magic token given by the authentication handler
 %% @param PID The PID for the websocket handler
 %% @returns ok For every login.
-login_user(Username, _Magic_token, PID) ->
-    %%TODO: Add actual password check
-    chat_server ! {login_user, Username, PID},
+login_user(Username, Magic_token, PID) ->
+    DMs = database_api:fetch_DMs(Username),
+    FriendList = database_api:fetch_friends(Username),
+    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID},
     ok.
 
 -spec send_message(Username, Chat_ID, Message, Timestamp, PID) -> ok when
@@ -59,7 +63,7 @@ send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
     %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
+    %database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID},
     ok.
 
@@ -98,8 +102,8 @@ chat_members(_Chat_ID) ->
 %% @param Friendname The name of the user that receives the friend request
 %% @returns ok.
 send_friend_request(Username, Friendname) ->
-    %database_api:insert_friend(Username, Friendname),
-    %database_api:insert_friend(Friendname, Username),
+    database_api:insert_friend(Username, Friendname),
+    database_api:insert_friend(Friendname, Username),
     chat_server ! {friend_request, Username, Friendname},
     ok.
 
@@ -108,7 +112,7 @@ send_friend_request(Username, Friendname) ->
 %% TODO: Better rand function?
 %% TODO: Make sure that chat id is unique
 create_chat_id() ->
-    random:uniform(1000000).
+    rand:uniform(1000000).
 
 -spec send_chat(Chat_Name, Creator, Members) -> ok when
       Chat_Name :: list(Integer),
@@ -122,7 +126,7 @@ create_chat_id() ->
 %% TODO: Save the chat id in database
 send_chat(Chat_Name, Creator, Members) ->
     Chat_ID = create_chat_id(),
-    %[database_api:insert_chat_id(Username) || Username <- Members],
+    [database_api:insert_chat_id(Username) || Username <- Members],
     chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
     ok.
     
@@ -145,8 +149,14 @@ start() ->
 loop(Connection_map) ->
     io:format("Connections: ~p~n", [Connection_map]),
     receive
-        {login_user, Username, PID} ->
-            loop(maps:put(Username, PID, Connection_map));
+        {login_user, Username, Magic_Token, DMs, FriendList, PID} ->
+	    JSON_Message = mochijson:encode(
+                             {struct,[{"action", "init_login"},
+                                      {"user_id", Username},
+                                      {"list_of_dms", DMs},
+                                      {"list_of_friends", FriendList}]}),
+	    PID ! {text, JSON_Message},
+            loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "send_message"},
@@ -186,6 +196,7 @@ loop(Connection_map) ->
 				      {"status", "ok"},
 				      {"chat_name", Chat_Name},
                                       {"chat_id", Chat_ID},
+				      {"members", Members},
                                       {"creator", Creator}]}),
 	    Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
 	    [PID ! {text, JSON_Message} || {ok, PID} <- Member_PIDs],
