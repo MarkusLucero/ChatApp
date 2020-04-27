@@ -14,9 +14,9 @@ const LandingPage = () => {
   /* state to check what chat we are currently focusing on */
   const [focusedChat, setFocusedChat] = React.useState(null);
 
-  /* callback function for getting the name of the direct message div that we are clicking on */
+  /* callback function for getting the id of the direct message div that we are clicking on */
   const handleFocusedChat = (event) => {
-    setFocusedChat(event.target.innerHTML);
+    setFocusedChat(event.target.id);
   };
 
   return (

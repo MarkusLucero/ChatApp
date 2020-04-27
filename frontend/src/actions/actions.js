@@ -21,13 +21,11 @@ export function sendMessage(data) {
     type: SENDMESSAGE,
     payload: {
       action: "send_message", // type of action
-      chat_id: "",
+      chat_id: data.chatID,
       user_id: data.username,
       message: data.message,
       timestamp: null,
-    },
-    identifier:
-      data.chatName /* used by helper function in socketReducer to get correct chat_id */,
+    }
   };
 }
 export function addFriend(data) {
