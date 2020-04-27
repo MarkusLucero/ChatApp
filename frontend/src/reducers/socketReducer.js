@@ -12,26 +12,6 @@ const initialState = {
 };
 
 /**
- * TODO!!! what if multiple chats have the same chatName? maybe not allow that? cause it will be problem to check if we get the
- * correct chatID in return
- * 
- * helper function used by action type SENDMESSAGE to locate the correct chat id
- * @param {array} list containing all direct messages of the user
- * @param {string} chatName used to identify the correct dm object
- *
- * @returns the chatID of the dm object
- */
-const getChatID = (list, chatName) => {
-  let index = 0;
-  for (const chat of list) {
-    if (chat.chatName === chatName) {
-      return [chat.chatID, index];
-    }
-    index++;
-  }
-  return [null, -1]; // this line will only be reached if we give an invalid chatName
-};
-/**
  * helper function used by action type "RESPONSE" and action "send_message" to locate the correct dm object index
  * @param {array} list containing all direct messages of the user
  * @param {string} chatID used to identify the correct dm object
@@ -65,7 +45,6 @@ const getChatIndex = (list, chatID) => {
  * @param {object} action contains the type and payload
  * @property {string} action.type what kind of action should the reducer do
  * @property {object} action.payload check actions.js for what it may contain
- * @property {object} action.identifier used for identifying something inside state object .. eg: chatID of specific chat
  *
  * @returns updated state
  */
@@ -87,7 +66,10 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: firstWelcome,
       };
     case "ADDFRIEND":
-      return {...state, listOfFriends: state.listOfFriends.concat(action.payload.username)}
+      return {
+        ...state,
+        listOfFriends: state.listOfFriends.concat(action.payload.username),
+      };
     case "CHAT_REQUEST":
       console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
@@ -102,11 +84,11 @@ const socketReducer = (state = initialState, action) => {
         /* need to respond to socket with action = login, username, and magictoken to establish connection */
         state.socket.send(JSON.stringify(action.payload));
 
-        /* 
+        /* TODO TODO
           This if ann else cases handles the fact that we accidentely get 2 login responses from backend right now
           not to trigger useEffect in ChatContainer we have this case here.. TODO remove it after backend fixes it
         */
-        if (state.firstWelcome == false) {
+        if (state.firstWelcome === false) {
           console.log("Duplicate welcome login response...");
           return state;
         } else {
@@ -129,6 +111,8 @@ const socketReducer = (state = initialState, action) => {
                 chatName: "Skooben",
                 chatID: "1a",
                 messages: [{ message: "test", username: "Markipie" }],
+                members: [],
+                creator: "",
               },
               {
                 chatName: "Grabbarna Grus",
@@ -137,6 +121,8 @@ const socketReducer = (state = initialState, action) => {
                   { message: "Axel mitt sexdjur?", username: "Anton" },
                   { message: "axel e arg på dig", username: "Axel" },
                 ],
+                members: [],
+                creator: "",
               },
             ],
             listOfFriends: ["Skooben", "Markipie", "Mustafa", "Pallerkan"],
@@ -162,7 +148,23 @@ const socketReducer = (state = initialState, action) => {
               ],
             };
           case "chat_request":
-            console.log(parsedData);
+            /* insert a new chat object to listOfDms */
+            if (parsedData.status === "ok") {
+              return {
+                ...state,
+                listOfDms: [
+                  ...state.listOfDms,
+                  /* newly inserted object */
+                  {
+                    chatName: parsedData.chat_name,
+                    chatID: parsedData.chat_id,
+                    messages: [],
+                    members: parsedData.members,
+                    creator: parsedData.creator,
+                  },
+                ],
+              };
+            }
             return state;
           default:
             return state;
@@ -184,27 +186,24 @@ const socketReducer = (state = initialState, action) => {
       return { ...state, socketServer: action.payload };
 
     case "SENDMESSAGE":
-      const [chatID, index] = getChatID(state.listOfDms, action.identifier);
+      const index = getChatIndex(state.listOfDms, action.payload.chat_id);
 
-      if (chatID !== null && index !== -1) {
-        const msgObject = { ...action.payload, chat_id: chatID };
+      if (index !== -1) {
+        const msgObject = action.payload;
         state.socket.send(JSON.stringify(msgObject));
+
         /* update listOfDms in state */
+        var updateListOfDms = state.listOfDms;
+        updateListOfDms[index].messages.push({
+          message: msgObject.message,
+          username: msgObject.user_id,
+        });
+       
         return {
           ...state,
-          listOfDms: [
-            ...state.listOfDms,
-            state.listOfDms[index].messages.push({
-              message: msgObject.message,
-              username: msgObject.user_id,
-            }),
-          ],
+          listOfDms: updateListOfDms,
         };
       }
-      return state;
-    case "ADDFRIEND":
-      console.log(action.payload);
-      state.socket.send(JSON.stringify(action.payload));
       return state;
     default:
       return state;

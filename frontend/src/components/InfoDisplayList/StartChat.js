@@ -35,11 +35,10 @@ const StartChat = ({ friends, username, setShowAddChat }) => {
 
   const startChat = () => {
     //only username in state, noone else chosen
-    if (chosen.length == 1) {
-      //TODO better showing of error?
+    if (chosen.length === 1) {
+      //TODO Display errors for the user???
       setShowAddChat(false);
     } else {
-        //TODO error handling - first check if chatName already is the name of another chat??
       const data = { chatName: chatName, from: username, members: chosen };
       dispatch(actions.startChat(data));
       setShowAddChat(false);
