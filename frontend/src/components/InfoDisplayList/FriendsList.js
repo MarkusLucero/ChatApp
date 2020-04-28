@@ -25,6 +25,8 @@ const FriendsList = () => {
   const [username, setUsername] = useState("");
   /* state controlling if the friend request was successful or not, TODO: addSuccessful must be set to false and username false once friend is added */
   const [addSuccessful, setAddSuccessful] = useState(false);
+  /*Used to toggle hover effect*/
+  const [hovered, setHovered] = useState(false);
   /* Gets the username of the user doing the friend request */
   const requester = useSelector((state) => state.socketState.username);
   const dispatch = useDispatch();
@@ -59,8 +61,10 @@ const FriendsList = () => {
         <img
           src={add_friend}
           alt=""
-          className="h-6 w-6"
+          className= {hovered ? 'h-6 w-6 plusIcon-custom-hover' : 'h-6 w-6'}
           onClick={() => setShow(true)}
+          onMouseEnter= {()=>{setHovered(!hovered)}}
+          onMouseLeave = {()=>{setHovered(!hovered)}}
         />{" "}
         {/*TODO ON CLICK, lägg till bild  */}
         <AddFriend

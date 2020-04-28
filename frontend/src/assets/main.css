@@ -11105,6 +11105,9 @@ video {
   border-radius: 4px;
   background-color: #424549;
 }
+.plusIcon-custom-hover {
+  filter: invert(77%) sepia(33%) saturate(148%) hue-rotate(174deg) brightness(84%) contrast(95%);
+}
 
 @media (min-width: 640px) {
   .sm\:sr-only {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import add_chat from "../../img/add_chat.png";
+import plus from "../../img/plus.svg";
 import StartChat from "./StartChat";
 import { useSelector } from "react-redux";
 
@@ -27,6 +27,8 @@ const MessagesList = ({ handleFocusedChat, username }) => {
 
   /* Determens if we're showing the add chat modal */
   const [showAddChat, setShowAddChat] = useState(false);
+  /* Used to highlight the add icon when hovered */
+  const [hovered, setHovered] = useState(false);
 
   /*On mount, add event listerner for click outside ref addChatModal*/
 
@@ -60,11 +62,14 @@ const MessagesList = ({ handleFocusedChat, username }) => {
           onClick={() => {
             setShowAddChat(true);
           }}
-          src={add_chat}
+          src={plus}
+          onMouseEnter= {()=> {setHovered (!hovered)}}
+          onMouseLeave ={()=>{setHovered(!hovered)}}
           alt="Create a new chat!"
-          className="h-6 w-6"
+          className={hovered ? 'plusIcon-custom-hover h-6 w-6' : '' + 'h-6 w-6' }
         />
-      </div>
+        </div>
+
       <div ref={addChatModal}>
         {showAddChat ? (
           <StartChat
