@@ -9,9 +9,6 @@
 new_connection(_PID) ->
     ok.
 
-hash_password(_Password) ->
-    tbi.
-
 -spec register_user(Username, Password, Timestamp, PID) -> ok when
       Username :: list(Integer),
       Password :: list(Integer),
@@ -25,7 +22,7 @@ hash_password(_Password) ->
 %% @returns ok For every registration.
 
 register_user(Username, Password, _, _PID) ->
-    Hashed_Password = hash_password(Password),
+    Hashed_Password = password_utils:hash_password(Password),
     database_api:insert_user(Username, Hashed_Password, "2020-05-05 16:00:00"),
     %chat_server ! {register_user, Username, PID},
     ok.
@@ -135,6 +132,7 @@ send_chat(Chat_Name, Creator, Members) ->
 %% @doc Starts a Web API node and registers the central process to the name chat_server
 %% @returns ok For every start.
 start() ->
+    crypto:rand_seed_s(),
     database_api:start(),
     case whereis(chat_server) of
         undefined -> 
@@ -150,12 +148,12 @@ loop(Connection_map) ->
     io:format("Connections: ~p~n", [Connection_map]),
     receive
         {login_user, Username, Magic_Token, DMs, FriendList, PID} ->
-	    JSON_Message = mochijson:encode(
+            JSON_Message = mochijson:encode(
                              {struct,[{"action", "init_login"},
                                       {"user_id", Username},
                                       {"list_of_dms", DMs},
                                       {"list_of_friends", FriendList}]}),
-	    PID ! {text, JSON_Message},
+            PID ! {text, JSON_Message},
             loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
@@ -182,24 +180,24 @@ loop(Connection_map) ->
                 true -> From ! {user_status_response, online};
                 _ -> From ! {user_status_response, offline}
             end;
-	{friend_request, Username, Friendname} ->
-	    JSON_Message = mochijson:encode(
-			     {struct, [{"action", "friend_request"},
-				       {"status", "ok"},
-				       {"friend", Username}]}),
-	    {ok, Friend_PID} = maps:find(Friendname, Connection_map),
-	    Friend_PID ! {text, JSON_Message},
-	    loop(Connection_map);
-	{chat_request, Chat_Name, Chat_ID, Creator, Members} ->
-	    JSON_Message = mochijson:encode(
+        {friend_request, Username, Friendname} ->
+            JSON_Message = mochijson:encode(
+                             {struct, [{"action", "friend_request"},
+                                       {"status", "ok"},
+                                       {"friend", Username}]}),
+            {ok, Friend_PID} = maps:find(Friendname, Connection_map),
+            Friend_PID ! {text, JSON_Message},
+            loop(Connection_map);
+        {chat_request, Chat_Name, Chat_ID, Creator, Members} ->
+            JSON_Message = mochijson:encode(
                              {struct,[{"action", "chat_request"},
-				      {"status", "ok"},
-				      {"chat_name", Chat_Name},
+                                      {"status", "ok"},
+                                      {"chat_name", Chat_Name},
                                       {"chat_id", Chat_ID},
-				      {"members", Members},
+                                      {"members", Members},
                                       {"creator", Creator}]}),
-	    Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
-	    [PID ! {text, JSON_Message} || {ok, PID} <- Member_PIDs],
-	    loop(Connection_map)
+            Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
+            [PID ! {text, JSON_Message} || {ok, PID} <- Member_PIDs],
+            loop(Connection_map)
             
     end.
