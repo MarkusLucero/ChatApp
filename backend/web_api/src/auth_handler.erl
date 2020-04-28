@@ -6,11 +6,14 @@
 
 
 login(Username, Password, Req0, Opts) ->
+    io:format("Logging in ~w~n", [Username]),
     Hashed_Password = password_utils:hash_password(Password),
     case database_api:fetch_user(Username) of
         {Username, Stored_Password, _} ->
+            io:format("Stored: ~w~nCalced: ~w~n", [Stored_Password, Hashed_Password]),
             case string:equal(Hashed_Password, Stored_Password) of
                 true ->
+                    io:format("AUTH SUCCESS FOR USER: ~w~n", [Username]),
                     Magic_Token = password_utils:get_magic_token(),
                     Body = mochijson:encode(
                              {struct,[{"action", "login"},
@@ -30,7 +33,8 @@ login(Username, Password, Req0, Opts) ->
 
 register_user(Username, Password, Req0, Opts) ->
     case database_api:fetch_user(Username) of
-        {error, no_user} -> 
+        {error, _} -> 
+            io:format("Registering user ~w~n", [Username]),
             database_api:insert_user(Username, password_utils:hash_password(Password), "FOO"),
             Body = <<"Registration success!">>,
             cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0);
