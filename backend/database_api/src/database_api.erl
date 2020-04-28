@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/4, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1]).
 
 
 %% @doc Initilize odbc connection and logs in to database.
@@ -60,6 +60,26 @@ insert_friend(Username, Friend) ->
 	    io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
      end.
 
+
+%% @doc Creates a new chat table in the database. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).
+%% @param From_Username The users ID that sent this message.
+%% @param Chat_ID ID of the chat.
+%% @param TimeStamp The time message was sent.
+%% @param Msg The message to store.
+%% @param Status An Integer indicator of if a the message has been delivered. 1/0 delivered/undelivered.
+%% @returns ok if write to database was successfull, {error, Reason} if not.
+-spec create_chat(From_Username, Chat_ID, {TimeStamp, Msg}, Status) -> ok when
+      From_Username::list(),
+      Chat_ID::list(),
+      Msg::list(),
+      TimeStamp::list(),
+      Status::term().
+
+create_chat(Chat_ID, Chat_Name, Creator, Members) ->
+%%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
+    database ! {create_chat, Chat_ID, Chat_Name, Creator, Members},
+    ok.
+
 %% @doc Store information about a chat in the database. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).5
 %% @param From_Username The users ID that sent this message.
 %% @param Chat_ID ID of the chat.
@@ -110,12 +130,14 @@ fetch_friendlist(Username) ->
     database ! {fetch_friendlist, Username, self()},
     
     receive
+	{error, no_user} ->
+	    {error, "No user id exists for that username"};
 	{error, no_friendlist} ->
 	    {error, "No friends exists for that username"};
 	{ok, Friends} ->
 	    {ok, {Username, Friends}};
 	Msg ->
-	    io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
+	    io:format("database_api:fetch_friendlist/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch information about a chat from the database. This function can be stuck waiting for a time when trying to fetch from database.
@@ -149,7 +171,7 @@ fetch_chat_members(Chat_ID) ->
 	{error, _} ->
 	    {error, "Chat_ID not found in database."};
 	Msg ->
-	    io:format("database_api:fetch_chat_menebers/1 Unhandled message: ~p~n", [Msg])
+	    io:format("database_api:fetch_chat_members/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch all undelivered messages of a certain chat. This function can be stuck waiting for a time when trying to fetch from database.
@@ -192,9 +214,13 @@ insert_friend_test() ->
     {error, "Friend not found in database."} = insert_friend("testuser1", "invalid friend"),
     {error, "Username not found in database."} = insert_friend("invalid username", "invalid friend").
 
+create_chat_test() ->
+    ok = create_chat("chat_id1", "festchatten","Boris", ["testuser1", "testfriend1"]),
+    ok = create_chat("chat_id2", "skolchatten","Anna", ["testuser1"]).
+
 insert_chat_test() ->
-    ok = insert_chat("testuser1", "chat_id_1",{"2020-10-19 01:00:00", "test message1!!!"}, 1),
-    ok = insert_chat("testuser2", "chat_id_1",{"2020-10-19 01:00:05", "test message2!!!"}, 0).
+    ok = insert_chat("testuser1", "festchatten",{"2020-10-19 01:00:00", "test message1!!!"}, 1),
+    ok = insert_chat("testfriend1", "skolchatten",{"2020-10-19 01:00:05", "test message2!!!"}, 0).
 
 fetch_user_test() ->
     {ok,{Username, Password, TimeStamp}} = fetch_user("testuser1"),
@@ -205,9 +231,10 @@ fetch_user_test() ->
     {error, "Username not found in database."} = fetch_user("Invalid username").
 
 fetch_chat_test() ->
-    {ok, [{Sender1, Msg1, Status1},{Sender2, Msg2, Status2}]} = fetch_chat("chat_id_1"),
+    {ok, [{Sender1, Msg1, Status1}]} = fetch_chat("festchatten"),
+    {ok, [{Sender2, Msg2, Status2}]} = fetch_chat("skolchatten"),
     "testuser1" = Sender1,
-    "testuser2" = Sender2,
+    "testfriend1" = Sender2,
     "test message1!!!" = Msg1,
     "test message2!!!" = Msg2,
     1 = Status1,
@@ -216,21 +243,24 @@ fetch_chat_test() ->
    
     {error, "Chat_ID not found in database."} = fetch_chat("Invalid chat_ID").
 
-fetch_chat_members_test() ->
-    {ok, [{"testuser1"}, {"testuser2"}]} = fetch_chat_members("chat_id_1"),
+
+
+ fetch_chat_members_test() ->
+    {ok, [{"testuser1"}, {"testfriend1"}]} = fetch_chat_members("festchatten"),
 
     {error, "Chat_ID not found in database."} = fetch_chat_members("Invalid chat_ID").
 
 fetch_friendlist_test() ->
     {ok, {_, [{Friend}]}} = fetch_friendlist("testuser1"),
     "testfriend1" = Friend,
-    {error,"No friends exists for that username"} = fetch_friendlist("Invalid username").
+    {error,"No user id exists for that username"} = fetch_friendlist("Invalid username").
 
 stop_test_() ->
-    database ! {remove_user, "testuser1"},
-    database ! {remove_user, "testfriend1"},
-    database ! {remove_table, "chat_id_1"},
-    database ! {remove_friendlist, "testuser1"}, 
+   %% database ! reset_tests,
+    %% database ! {remove_user, "testuser1"},
+    %% database ! {remove_user, "testfriend1"},
+    %% database ! {remove_table, "chat_id_1"},
+    %% database ! {remove_friendlist, "testuser1"}, 
     timer:sleep(1000),
     [?_assertEqual(stop(), ok)
     ].

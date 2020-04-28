@@ -19,34 +19,57 @@ loop(DSN, UID, PWD) ->
 loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp} ->
-	    odbc:sql_query(Ref, "INSERT INTO users VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
+	    odbc:sql_query(Ref, "INSERT INTO users (username, password, timestamp) VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
 
 	{insert_friend, Username, Friend, From} ->
-	    UserExists = (catch odbc:sql_query(Ref, "SELECT * FROM users WHERE user_name = '" ++ Username ++ "';")),
-	    FriendExists = (catch odbc:sql_query(Ref, "SELECT * FROM users WHERE user_name = '" ++ Friend ++ "';")),
-	    case UserExists of
-		{selected, _, []} ->
+	    User_ID = fetch_user_id(Ref, Username),
+	    Friend_ID = fetch_user_id(Ref, Friend),
+
+	    case User_ID of
+		{error, _} ->
 		    From ! {error, no_user},
 		    loop(Ref);
 		_ ->
 		    ok
 	    end,
-	    case FriendExists of
-		{selected, _, []} ->
+	    case Friend_ID of
+		{error, _} ->
 		    From ! {error, no_friend};
 		_ ->
-		    odbc:sql_query(Ref, "INSERT INTO friend_list VALUES('" ++ Username ++ "', '" ++ Friend ++ "')"),
+		    odbc:sql_query(Ref, "INSERT INTO friendlist (user_id, friend_id, username, friendname, status) VALUES('" ++ User_ID ++ "', '" ++ Friend_ID ++ "', '" ++ Username ++ "', '" ++ Friend ++ "', 0);"),
 		    From ! ok
 	    end;
-	
-	{insert_chat, From_Username, Chat_ID, { Timestamp, Msg}, Status} ->
-	    
-	    odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS chat" ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
 
-	    odbc:sql_query(Ref, "INSERT INTO chat" ++ Chat_ID ++ " VALUES ('"++ From_Username ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
+	{create_chat, _, Chat_Name, Creator, Members} ->
+	    odbc:sql_query(Ref, "INSERT INTO groups (groupname) VALUES ('"++ Chat_Name ++ "');"),
+	    Group_ID = fetch_group_id(Ref, Chat_Name),
+	    add_group_members(Ref, Group_ID, Members),
+	    ok;
+	    %% case Group_ID of
+	    %% 	{error, Reason} ->
+	    %% 	    From ! {error, Reason};
+	    %% 	_ ->
+	    %% 	    add_group_members(Ref, Group_ID, Members),
+	    %% 	    ok
+	    %% end;
+	
+	{insert_chat, From_Username, Chat_Name, { Timestamp, Msg}, Status} ->
+	    
+	    %% odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS chat" ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
+	    User_ID = fetch_user_id(Ref, From_Username),
+	    Group_ID = fetch_group_id(Ref, Chat_Name),
+	    odbc:sql_query(Ref, "INSERT INTO messages (username, groupname, user_id, group_id, message, status, timestamp) VALUES ('"++ From_Username ++"', '"++ Chat_Name ++"', '"++ User_ID ++ "', '" ++ Group_ID ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
+
+	    %% case Group_ID of
+	    %% 	{error, Reason} ->
+	    %% 	    From ! {error, Reason};
+	    %% 	_ ->
+	    %% 	    odbc:sql_query(Ref, "INSERT INTO messages (username, groupname, user_id, group_id, message, status, timestamp) VALUES ('"++ From_Username ++"', '"++ Chat_Name ++"', '"++ User_ID ++ "', '" ++ Group_ID ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');")
+
+	    %% end;
 
 	{fetch_user, Username, From} ->
-	    Content = odbc:sql_query(Ref, "SELECT user_name, password, registered FROM users WHERE user_name = '"++ Username ++ "';"),
+	    Content = odbc:sql_query(Ref, "SELECT username, password, timestamp FROM users WHERE username = '"++ Username ++ "';"),
 	    case Content of
 		{selected,_,[]} ->
 		    From ! {error, no_user};
@@ -55,7 +78,16 @@ loop(Ref) ->
 	    end;
 
 	{fetch_friendlist, Username, From} ->
-	    Content = (catch odbc:sql_query(Ref, "SELECT friend FROM friend_list WHERE user_name = '" ++ Username ++ "';")),
+	    User_ID = fetch_user_id(Ref, Username),
+	    case User_ID of
+		{error, _} ->
+		    From ! {error, no_user},
+		    loop(Ref);
+		_ ->
+		    
+		    ok
+	    end,
+	    Content = (catch odbc:sql_query(Ref, "SELECT friendname FROM friendlist WHERE user_id = '" ++ User_ID ++ "';")),
 	    case Content of
 		{selected,_,[]} ->
 		    From ! {error, no_friendlist};
@@ -64,24 +96,45 @@ loop(Ref) ->
 	    end;
 
 
-	{fetch_chat, Chat_ID, From} ->
-	    Content = (catch odbc:sql_query(Ref, "SELECT from_user, message, status FROM chat" ++ Chat_ID ++ ";")),
-	    From ! Content;
+	{fetch_chat, Chat_Name, From} ->
+	    Chat_ID = fetch_group_id(Ref, Chat_Name),
+	    
+	    case Chat_ID of
+		{error, Reason} ->
+		    From ! {error, Reason};
+		_ ->
+		    Content = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+		    From ! Content
+	    end;
 
-	{fetch_chat_members, Chat_ID, From} ->
-	    Content = (catch odbc:sql_query(Ref, "SELECT from_user FROM chat" ++ Chat_ID ++ ";")),
-	    From ! Content;
+	{fetch_chat_members, Chat_Name, From} ->
+	    Chat_ID = fetch_group_id(Ref, Chat_Name),
+	    
+	    case Chat_ID of
+		{error, Reason} ->
+		    From ! {error, Reason};
+		_ ->
+		    Content = (catch odbc:sql_query(Ref, "SELECT username FROM group_users WHERE group_id = '" ++ Chat_ID ++ "';")),
+		    From ! Content
+	    end;
 
 	stop ->
 	    odbc:disconnect(Ref),
 	    odbc:stop(),
 	    exit(succeful_exit);
+	
+	reset_tests ->
+	    odbc:sql_query(Ref, "DELETE FROM messages *;"),
+	    odbc:sql_query(Ref, "DELETE FROM group_users *;"),
+	    odbc:sql_query(Ref, "DELETE FROM groups *;"),
+	    odbc:sql_query(Ref, "DELETE FROM friendlist *;"),
+	    odbc:sql_query(Ref, "DELETE FROM users *;");
 
 	{remove_table, Table} ->
 	    odbc:sql_query(Ref, "DROP TABLE chat" ++ Table ++ ";");
 
 	{remove_user, Username} ->
-	    odbc:sql_query(Ref, "DELETE FROM users WHERE user_name = '" ++ Username ++ "';");
+	    odbc:sql_query(Ref, "DELETE FROM users WHERE username = '" ++ Username ++ "';");
 
 	{remove_friendlist, Username} ->
 	    odbc:sql_query(Ref, "DELETE FROM friend_list WHERE user_name = '" ++ Username ++ "';");
@@ -90,6 +143,34 @@ loop(Ref) ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
     end,
     loop(Ref).
+
+
+
+fetch_user_id(Ref, Username) ->
+    ID = odbc:sql_query(Ref, "SELECT user_id FROM users WHERE username = '" ++ Username ++ "';"),
+    case ID of	
+	{selected, _, [{User_ID}]} ->
+	User_ID;
+	_ ->
+	    {error, "Invalid username"}
+    end.
+fetch_group_id(Ref, Groupname) ->
+    ID = odbc:sql_query(Ref, "SELECT group_id FROM groups WHERE groupname = '" ++ Groupname ++ "';"),
+    
+    case ID of
+	{selected, _, [{Group_ID}]} ->
+	    Group_ID;
+	_ -> {error, "Invalid_groupname"}
+    end.
+
+add_group_members(Ref, Group_ID, [Member]) ->
+    M = fetch_user_id(Ref, Member),
+    odbc:sql_query(Ref, "INSERT INTO group_users (group_id, user_id, username) VALUES ('" ++ Group_ID ++ "', '" ++ M ++ "', '" ++ Member ++ "');");
+
+add_group_members(Ref, Group_ID, [X|Members]) ->
+    M = fetch_user_id(Ref, X),
+    odbc:sql_query(Ref, "INSERT INTO group_users (group_id, user_id, username) VALUES ('"++ Group_ID ++ "', '" ++ M ++ "', '" ++ X ++ "');"),
+    add_group_members(Ref, Group_ID, Members).
 
 %% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
 stringify_timestamp({Date,Time}) ->

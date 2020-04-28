@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_chat/3, send_friend_request/2]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -23,7 +23,7 @@ new_connection(_PID) ->
 %% @returns ok For every registration.
 
 register_user(Username, _Password, _, PID) ->
-    database_api:insert_user(Username, _Password, "2020-05-05 16:00:00"),
+%%  database_api:insert_user(Username, _Password, "2020-05-05 16:00:00"),
     chat_server ! {login_user, Username, PID},
     ok.
 
@@ -59,7 +59,7 @@ send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
     %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
+%%  database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID},
     ok.
 
@@ -98,6 +98,9 @@ chat_members(_Chat_ID) ->
 %% @param Friendname The name of the user that receives the friend request
 %% @returns ok.
 send_friend_request(Username, Friendname) ->
+%%  TODO: Modify table in database to store this in a memoryeffishent way
+%%  database_api:insert_friend(Username, Friendname),
+%%  database_api:insert_friend(Friendname, Username),
     chat_server ! {friend_request, Username, Friendname},
     ok.
 
@@ -106,7 +109,7 @@ send_friend_request(Username, Friendname) ->
 %% TODO: Better rand function?
 %% TODO: Make sure that chat id is unique
 create_chat_id() ->
-    random:uniform(1000000).
+    rand:uniform(1000000).
 
 -spec send_chat(Chat_Name, Creator, Members) -> ok when
       Chat_Name :: list(Integer),
@@ -120,6 +123,7 @@ create_chat_id() ->
 %% TODO: Save the chat id in backend
 send_chat(Chat_Name, Creator, Members) ->
     Chat_ID = create_chat_id(),
+%%  database_api:create_chat(Chat_ID, Chat_Name, Creator, Members),
     chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
     ok.
     
@@ -128,7 +132,7 @@ send_chat(Chat_Name, Creator, Members) ->
 %% @doc Starts a Web API node and registers the central process to the name chat_server
 %% @returns ok For every start.
 start() ->
-    database_api:start(),
+%%  database_api:start(),
     case whereis(chat_server) of
         undefined -> 
             ok;
