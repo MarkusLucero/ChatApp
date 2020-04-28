@@ -1,0 +1,79 @@
+[
+  {
+    "chatName": "Skooben",
+    "chatID": "1a",
+    "messages": [{ "message": "test", "username": "Markipie" }],
+    "members": [],
+    "creator": ""
+  },
+  {
+    "chatName": "Grabbarna Grus",
+    "chatID": "2a",
+    "messages": [
+      { "message": "Axel min son?", "username": "Anton" },
+      { "message": "ja pappa anton?", "username": "Axel" },
+      { "message": "det var inget?", "username": "Anton" },
+      { "message": "ok pappa?", "username": "Axel" },
+      { "message": "ska vi spela COD?!", "username": "Anton" },
+      { "message": "papppaaa bara om du later mig vinna", "username": "Axel" }
+    ],
+    "members": [],
+    "creator": ""
+  },
+  {
+    "chatName": "mark",
+    "chatID": "2a",
+    "messages": [
+      { "message": "Axel min son?", "username": "Anton" },
+      { "message": "ja pappa anton?", "username": "Axel" },
+      { "message": "det var inget?", "username": "Anton" },
+      { "message": "ok pappa?", "username": "Axel" },
+      { "message": "ska vi spela COD?!", "username": "Anton" },
+      { "message": "papppaaa bara om du later mig vinna", "username": "Axel" }
+    ],
+    "members": [],
+    "creator": ""
+  },
+  {
+    "chatName": "markus",
+    "chatID": "2a",
+    "messages": [
+      { "message": "Axel min son?", "username": "Anton" },
+      { "message": "ja pappa anton?", "username": "Axel" },
+      { "message": "det var inget?", "username": "Anton" },
+      { "message": "ok pappa?", "username": "Axel" },
+      { "message": "ska vi spela COD?!", "username": "Anton" },
+      { "message": "papppaaa bara om du later mig vinna", "username": "Axel" }
+    ],
+    "members": [],
+    "creator": ""
+  },
+  {
+    "chatName": "per",
+    "chatID": "2a",
+    "messages": [
+      { "message": "Axel min son?", "username": "Anton" },
+      { "message": "ja pappa anton?", "username": "Axel" },
+      { "message": "det var inget?", "username": "Anton" },
+      { "message": "ok pappa?", "username": "Axel" },
+      { "message": "ska vi spela COD?!", "username": "Anton" },
+      { "message": "papppaaa bara om du later mig vinna", "username": "Axel" }
+    ],
+    "members": [],
+    "creator": ""
+  },
+  {
+    "chatName": "alex",
+    "chatID": "2a",
+    "messages": [
+      { "message": "Axel min son?", "username": "Anton" },
+      { "message": "ja pappa anton?", "username": "Axel" },
+      { "message": "det var inget?", "username": "Anton" },
+      { "message": "ok pappa?", "username": "Axel" },
+      { "message": "ska vi spela COD?!", "username": "Anton" },
+      { "message": "papppaaa bara om du later mig vinna", "username": "Axel" }
+    ],
+    "members": [],
+    "creator": ""
+  }
+]
