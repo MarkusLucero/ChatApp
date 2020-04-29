@@ -40,18 +40,16 @@ loop(Ref) ->
 		    From ! ok
 	    end;
 
-	{create_chat, _, Chat_Name, Creator, Members} ->
+	{create_chat, Chat_Name, _, Members, From} ->
 	    odbc:sql_query(Ref, "INSERT INTO groups (groupname) VALUES ('"++ Chat_Name ++ "');"),
 	    Group_ID = fetch_group_id(Ref, Chat_Name),
-	    add_group_members(Ref, Group_ID, Members),
-	    ok;
-	    %% case Group_ID of
-	    %% 	{error, Reason} ->
-	    %% 	    From ! {error, Reason};
-	    %% 	_ ->
-	    %% 	    add_group_members(Ref, Group_ID, Members),
-	    %% 	    ok
-	    %% end;
+	    case Group_ID of
+	    	{error, Reason} ->
+	    	    From ! {error, Reason};
+	    	_ ->
+	    	    add_group_members(Ref, Group_ID, Members),
+	    	    From ! {ok, Group_ID}
+	    end;
 	
 	{insert_chat, From_Username, Chat_Name, { Timestamp, Msg}, Status} ->
 	    

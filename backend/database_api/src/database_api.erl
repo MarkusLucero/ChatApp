@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/4, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1]).
 
 
 %% @doc Initilize odbc connection and logs in to database.
@@ -34,7 +34,7 @@ stop() ->
       TimeStamp::list().
 
 insert_user(Username, Password, TimeStamp) ->
-%%  io:format("Insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
+    io:format("database_api:insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
     database ! {insert_user,Username, Password, TimeStamp},
     ok.
 
@@ -61,24 +61,30 @@ insert_friend(Username, Friend) ->
      end.
 
 
-%% @doc Creates a new chat table in the database. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).
+%% @doc Creates a new chat table in the database.
 %% @param From_Username The users ID that sent this message.
 %% @param Chat_ID ID of the chat.
 %% @param TimeStamp The time message was sent.
 %% @param Msg The message to store.
 %% @param Status An Integer indicator of if a the message has been delivered. 1/0 delivered/undelivered.
 %% @returns ok if write to database was successfull, {error, Reason} if not.
--spec create_chat(From_Username, Chat_ID, {TimeStamp, Msg}, Status) -> ok when
+-spec create_chat(From_Username, {TimeStamp, Msg}, Status) -> ok when
       From_Username::list(),
-      Chat_ID::list(),
       Msg::list(),
       TimeStamp::list(),
       Status::term().
 
-create_chat(Chat_ID, Chat_Name, Creator, Members) ->
+create_chat(Chat_Name, Creator, Members) ->
 %%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
-    database ! {create_chat, Chat_ID, Chat_Name, Creator, Members},
-    ok.
+    database ! {create_chat, Chat_Name, Creator, Members, self()},
+    receive
+	{ok, Chat_ID} ->
+	    {ok, Chat_ID};
+	{error, Reason} ->
+	    {error, Reason};
+	Msg ->
+	    io:format("databse_api:create_chat/3 Unhandeled message ~p~n", [Msg])
+    end.
 
 %% @doc Store information about a chat in the database. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).5
 %% @param From_Username The users ID that sent this message.
@@ -94,9 +100,9 @@ create_chat(Chat_ID, Chat_Name, Creator, Members) ->
       TimeStamp::list(),
       Status::term().
 
-insert_chat(From_Username, Chat_ID, {TimeStamp, Msg}, Status) ->
+insert_chat(From_Username, Chat_Name, {TimeStamp, Msg}, Status) ->
 %%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
-    database ! {insert_chat, From_Username, Chat_ID, {TimeStamp, Msg}, Status},
+    database ! {insert_chat, From_Username, Chat_Name, {TimeStamp, Msg}, Status},
     ok.
 
 
@@ -215,8 +221,8 @@ insert_friend_test() ->
     {error, "Username not found in database."} = insert_friend("invalid username", "invalid friend").
 
 create_chat_test() ->
-    ok = create_chat("chat_id1", "festchatten","Boris", ["testuser1", "testfriend1"]),
-    ok = create_chat("chat_id2", "skolchatten","Anna", ["testuser1"]).
+    {ok, _} = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
+    {ok, _} = create_chat("skolchatten","testuser1", ["testuser1"]).
 
 insert_chat_test() ->
     ok = insert_chat("testuser1", "festchatten",{"2020-10-19 01:00:00", "test message1!!!"}, 1),
