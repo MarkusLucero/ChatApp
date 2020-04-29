@@ -20,7 +20,7 @@ search_term = ""  # global variabel for search term
 
 """ on fetch to localhost:5000/search this func will trigger """
 @app.route('/search', methods=['POST'])
-def hello():
+def search():
 
     # POST request
     if request.method == 'POST':
