@@ -124,13 +124,13 @@ send_friend_request(Username, Friendname) ->
 send_chat(Chat_Name, Creator, Members) ->
     Chat = database_api:create_chat(Chat_Name, Creator, Members),
     case Chat of
-	{error, Reason} ->
-	    %% TODO: Fix error handeling
-	    {error, Reason};
-	{ok, Chat_ID} ->
-	    %%[database_api:insert_chat_id(Username) || Username <- Members],
-	    chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
-	    ok
+        {error, Reason} ->
+            %% TODO: Fix error handeling
+            {error, Reason};
+        {ok, Chat_ID} ->
+            %%[database_api:insert_chat_id(Username) || Username <- Members],
+            chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
+            ok
     end.
     
 
@@ -147,8 +147,17 @@ start() ->
             unregister(chat_server)
     end,
     register(chat_server, spawn(fun() -> loop(maps:new()) end)),
+    auth_handler:start_token_server(),
     ok.
 
+check_token(User, Token) ->
+    token_server ! {check_token, Token, User, self()},
+    receive
+        token_ok ->
+            true;
+        _ ->
+            false
+    end.
 
 loop(Connection_map) ->
     io:format("Connections: ~p~n", [Connection_map]),
@@ -160,7 +169,10 @@ loop(Connection_map) ->
                                       {"list_of_dms", DMs},
                                       {"list_of_friends", FriendList}]}),
             PID ! {text, JSON_Message},
-            loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
+            case check_token(Username, Magic_Token) of
+                true -> loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
+                _ -> loop(Connection_map)
+                end;
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "send_message"},
