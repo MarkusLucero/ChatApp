@@ -256,7 +256,7 @@ fetch_friendlist_test() ->
     {error,"No user id exists for that username"} = fetch_friendlist("Invalid username").
 
 stop_test_() ->
-   %% database ! reset_tests,
+    database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
     %% database ! {remove_user, "testfriend1"},
     %% database ! {remove_table, "chat_id_1"},
