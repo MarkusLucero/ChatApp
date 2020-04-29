@@ -1,39 +1,40 @@
 import React, { useState } from "react";
 const axios = require("axios");
 
-function friendRequest({ setAddSuccessful, userInput, from, setErrorMsg }) {
+async function friendRequest({
+  setAddSuccessful,
+  userInput,
+  from,
+  setErrorMsg,
+}) {
   if (userInput !== "") {
-    axios
-      .post(
+    try {
+      const response = await axios.post(
         "/",
         JSON.stringify({
           action: "friend_request",
           username: userInput,
           password: from,
         })
-      )
-      .then(function (response) {
-          console.log(response);
-        switch (response.status) {
-          /* addfriend accepted, state is passed up to friendsList to determine if the username should be added or not */
-          case 200: {
-            setAddSuccessful(true);
-            setErrorMsg(false);
-            break;
-          }
-          /* addfriend denied, we simply display an error message */
-          case 404: {
-            setErrorMsg(true);
-            break;
-          }
-          default:
-            setErrorMsg(true);
-            break;
+      );
+      const data = await response;
+      switch (data.status) {
+        case 200: {
+          setAddSuccessful(true);
+          setErrorMsg(false);
+          break;
         }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+        case 404: {
+          setErrorMsg(true);
+          break;
+        }
+        default:
+          setErrorMsg(true);
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     setErrorMsg(true);
   }
