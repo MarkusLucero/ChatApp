@@ -40,7 +40,7 @@ register_user(Username, Password, Req0, Opts) ->
             cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0);
                 _ ->
             Body = <<"User exists!">>,
-            Req3 = cowboy_req:reply(418, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+            Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
             {ok, Req3, Opts}
     end.    
 
