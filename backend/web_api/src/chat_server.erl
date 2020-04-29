@@ -22,8 +22,8 @@ new_connection(_PID) ->
 %% @returns ok For every registration.
 
 register_user(Username, Password, _, _PID) ->
-    Hashed_Password =  password_utils:hash_password(Password),
-    database_api:insert_user(Username, Hashed_Password, "2020-05-05 16:00:00"),
+   %% Hashed_Password =  password_utils:hash_password(Password),
+    database_api:insert_user(Username, Password, "2020-05-05 16:00:00"),
     %chat_server ! {register_user, Username, PID},
     ok.
 

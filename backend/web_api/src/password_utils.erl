@@ -6,7 +6,7 @@
 %%32 chars should be enough
 %%33 126
 get_magic_token() ->
-    [33 + crypto:rand_uniform(93) || _ <- lists:seq(1, 32)].
+    [33 + rand:uniform(93) || _ <- lists:seq(1, 32)].
 
 hash_password(Password) ->
     Hash = crypto:hash(sha3_256, Password),
