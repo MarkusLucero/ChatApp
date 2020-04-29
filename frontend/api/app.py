@@ -69,8 +69,8 @@ def handle_search(term):
     search_term=term  # change the global variable
 
 
-    # construct workers -- it will default to the number of processors on the machine
-    ex=futures.ThreadPoolExecutor(1)
+    # construct workers -- if param is empty it uses default value
+    ex=futures.ThreadPoolExecutor()
    # print('main: starting')
    # print("searching for : '{}'".format(search_term))
     # map the task func with lenght of data array as arg to each worker
