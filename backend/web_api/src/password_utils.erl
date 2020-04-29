@@ -11,4 +11,4 @@ get_magic_token() ->
 hash_password(Password) ->
     Hash = crypto:hash(sha3_256, Password),
     io:format("Hash: ~p~n", [Hash]),
-    io_lib:format("~p", [binary:bin_to_list(Hash)]).
+    lists:flatten([integer_to_list(X, 16) || <<X>> <= Hash]).

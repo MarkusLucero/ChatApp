@@ -11,10 +11,8 @@ login(Username, Password, Req0, Opts) ->
     case database_api:fetch_user(Username) of
         {ok, {Username, Stored_Password, _}} ->
             io:format("Stored: ~w~nCalced: ~w~n", [Stored_Password, Hashed_Password]),
-            %%case binary:match(Hashed_Password, Stored_Password) of
-            if  
-	    %%nomatch ->
-		Stored_Password =/= Password ->%%Hashed_Password ->
+            case string:equal(Hashed_Password, Stored_Password) of
+                false ->
                     Body = <<"Wrong password!">>,
                     Req3 = cowboy_req:reply(401, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
                     {ok, Req3, Opts};
@@ -38,7 +36,7 @@ register_user(Username, Password, Req0, Opts) ->
     case database_api:fetch_user(Username) of
         {error, _} -> 
             io:format("Registering user ~w~n", [Username]),
-            database_api:insert_user(Username, Password, "2020-10-10 00:00:00"),
+            database_api:insert_user(Username, password_utils:hash_password(Password), "2020-10-10 00:00:00"),
             Body = <<"Registration success!">>,
             cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0);
                 _ ->
