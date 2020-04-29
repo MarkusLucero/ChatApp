@@ -1,41 +1,45 @@
-
 /**
  * Contains actions that can be called by a dispatcher
- * 
+ *
  */
 
- /* action types */
+/* action types */
 const CONNECT = "CONNECT";
 const LOGIN = "LOGIN";
-const RESPONSE = "RESPONSE"
+const RESPONSE = "RESPONSE";
 const REGISTER = "REGISTER";
 const DISCONNECTED = "DISCONNECTED";
 const SET = "SETSERVER";
 const SUCCESS = "SUCCESS";
 const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
+const ADDFRIEND = "ADDFRIEND";
+const CHAT_REQUEST = "CHAT_REQUEST";
 
 export function sendMessage(data) {
   return {
     type: SENDMESSAGE,
     payload: {
-        action: "send_message",      // type of action 
-        chat_id: "0001",             // TODO . kan skippas nu för alla hamnar i samma chat i prototypen
-        user_id: data.username ,
-        message: data.message , 
-        timestamp: null
-    },
+      action: "send_message", // type of action
+      chat_id: data.chatID,
+      user_id: data.username,
+      message: data.message,
+      timestamp: null,
+    }
   };
 }
-/* action functions */
+export function addFriend(data) {
+  return{   type: ADDFRIEND, payload:{ username: data.username }}
+};
+
+
 export function connect() {
   return { type: CONNECT, payload: null };
-}  
+}
 
-/* action functions */
 export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
-}  
+}
 
 export function login({ values }) {
   console.log(values);
@@ -49,7 +53,7 @@ export function login({ values }) {
   };
 }
 
-export function register( values ) {
+export function register(values) {
   console.log(values);
   return {
     type: REGISTER,
@@ -61,19 +65,31 @@ export function register( values ) {
   };
 }
 
+export function startChat(values){
+  console.log(values);
+  return {
+    type: CHAT_REQUEST,
+    payload: {
+      action: "chat_request",
+      chat_name: values.chatName,
+      from: values.from, 
+      members: values.members,
+    },
+  };
+}
 export function loginSuccess(data){
   return { type: SUCCESS, payload: data}
 }
-export function loginFailure(data){
-  return {type: FAILURE, payload: data}
+  
+export function loginFailure(data) {
+  return { type: FAILURE, payload: data };
 }
 
 export function response(data) {
-  return { type: RESPONSE, payload: data};
+  return { type: RESPONSE, payload: data };
 }
 
-export function setServer(server){
-  return {type: SET, payload: server};
+export function setServer(server) {
+  return { type: SET, payload: server };
 }
-
 

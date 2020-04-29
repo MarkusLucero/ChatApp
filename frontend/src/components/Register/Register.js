@@ -2,7 +2,10 @@ import React from "react";
 import { useFormik } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
+import * as Notifications from "../Notifications/Notifications";
 
+/* import Notifications from "../Notifications/Notifications";
+ */
 const axios = require("axios");
 
 const validate = (values) => {
@@ -23,7 +26,6 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Register = ({ history }) => {
- 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
@@ -40,34 +42,30 @@ const Register = ({ history }) => {
         )
         .then(function (response) {
           console.log(response);
-          
+
           /* The response contains: status and a payload data: server/token */
           switch (response.status) {
             /* Register accepted */
 
             case 200: {
-              const data = response.data;
-              /* Data should contain token & server */
-              console.log(values.Username, values.Password);
-              
-                /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+              /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
+              Notifications.registerSuccess();
               history.push("/");
               break;
             }
             case 404: {
-              console.log("Error: "+ response);          
+              Notifications.accountExistsFailure();
+              console.log("Error: " + response);
               break;
             }
             default:
-              alert("missing memberid");
+              Notifications.unknownFailure();
               break;
           }
-          console.log(response);
         })
         .catch(function (error) {
           console.log(error);
         });
-    
     },
   });
   return (
@@ -92,9 +90,11 @@ const Register = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Username}
           ></input>
-          <div>{formik.touched.Password && formik.errors.Password ? (
-            <div className="text-red-600">{formik.errors.Username}</div>
-          ) : null}</div>
+          <div>
+            {formik.touched.Password && formik.errors.Password ? (
+              <div className="text-red-600">{formik.errors.Username}</div>
+            ) : null}
+          </div>
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="Password"
@@ -110,9 +110,11 @@ const Register = ({ history }) => {
             onBlur={formik.handleBlur}
             value={formik.values.Password}
           ></input>
-          <div>{formik.touched.Password && formik.errors.Password ? (
-            <div className="text-red-600">{formik.errors.Password}</div>
-          ) : null}</div>
+          <div>
+            {formik.touched.Password && formik.errors.Password ? (
+              <div className="text-red-600">{formik.errors.Password}</div>
+            ) : null}
+          </div>
           <button
             className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
             type="submit"
