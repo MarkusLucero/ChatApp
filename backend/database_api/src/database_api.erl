@@ -115,7 +115,7 @@ insert_chat(From_Username, Chat_Name, {TimeStamp, Msg}, Status) ->
 
 fetch_user(Username) ->
     database ! {fetch_user,Username, self()},
-    
+    io:format("~p~n", [Username]),
     receive
 	{error, no_user} ->
 	    {error, "Username not found in database."};
