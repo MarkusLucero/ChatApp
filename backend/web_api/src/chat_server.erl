@@ -37,7 +37,8 @@ register_user(Username, Password, _, _PID) ->
 %% @param PID The PID for the websocket handler
 %% @returns ok For every login.
 login_user(Username, Magic_token, PID) ->
-    DMs = database_api:fetch_DMs(Username),
+    %DMs = database_api:fetch_DMs(Username),
+    DMs = tbi,
     FriendList = database_api:fetch_friends(Username),
     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID},
     ok.
