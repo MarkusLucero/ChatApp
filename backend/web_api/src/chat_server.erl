@@ -38,9 +38,15 @@ register_user(Username, Password, _, _PID) ->
 %% @returns ok For every login.
 login_user(Username, Magic_token, PID) ->
     %DMs = database_api:fetch_DMs(Username),
-    DMs = tbi,
-    FriendList = database_api:fetch_friends(Username),
-    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID},
+    DMs = "",
+    case database_api:fetch_friendlist(Username) of 
+	{ok, {Username, Friends}} ->
+	    FriendList = [Friendname || {Friendname} <- Friends],
+	    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID};
+	{error, Reason} ->
+	    io:format("ERROR: ~p ~n", [Reason]),
+	    chat_server ! {login_user, Username, Magic_token, DMs, "", PID}
+    end,
     ok.
 
 -spec send_message(Username, Chat_ID, Message, Timestamp, PID) -> ok when
@@ -100,8 +106,8 @@ chat_members(_Chat_ID) ->
 %% @param Friendname The name of the user that receives the friend request
 %% @returns ok.
 send_friend_request(Username, Friendname) ->
-    database_api:insert_friend(Username, Friendname),
-    database_api:insert_friend(Friendname, Username),
+    %database_api:insert_friend(Username, Friendname),
+    %database_api:insert_friend(Friendname, Username),
     chat_server ! {friend_request, Username, Friendname},
     ok.
 
@@ -160,19 +166,25 @@ check_token(User, Token) ->
             false
     end.
 
+	    
+
 loop(Connection_map) ->
     io:format("Connections: ~p~n", [Connection_map]),
     receive
         {login_user, Username, Magic_Token, DMs, FriendList, PID} ->
-            JSON_Message = mochijson:encode(
-                             {struct,[{"action", "init_login"},
-                                      {"user_id", Username},
-                                      {"list_of_dms", DMs},
-                                      {"list_of_friends", FriendList}]}),
-            PID ! {text, JSON_Message},
+	    io:format("In login_user loop~n DMs: ~p FriendList: ~p ~n", [DMs, FriendList]),
+            %JSON_Message = mochijson:encode(
+            %                 {struct,[{"action", "init_login"},
+            %                          {"user_id", Username},
+            %                          {"list_of_dms", DMs},
+            %                          {"list_of_friends", FriendList}]}),
+	    io:format("Encoded message init_login~n"),
+            %PID ! {text, JSON_Message},
             case check_token(Username, Magic_Token) of
-                true -> loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
-                _ -> loop(Connection_map)
+                true ->
+		    loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
+                _ -> 
+		    loop(Connection_map)
                 end;
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
@@ -182,7 +194,7 @@ loop(Connection_map) ->
                                       {"message", Message},
                                       {"timestamp", Timestamp}]}),
             Send = 
-                fun(_Username, Connected_PID) -> 
+                fun(_Username, {Connected_PID, _}) -> 
                         case Connected_PID of 
                             PID -> 
                                 ok;
@@ -204,7 +216,7 @@ loop(Connection_map) ->
                              {struct, [{"action", "friend_request"},
                                        {"status", "ok"},
                                        {"friend", Username}]}),
-            {ok, Friend_PID} = maps:find(Friendname, Connection_map),
+            {ok, {Friend_PID, _}} = maps:find(Friendname, Connection_map),
             Friend_PID ! {text, JSON_Message},
             loop(Connection_map);
         {chat_request, Chat_Name, Chat_ID, Creator, Members} ->
@@ -216,7 +228,7 @@ loop(Connection_map) ->
                                       {"members", {array, Members}},
                                       {"creator", Creator}]}),
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
-            [PID ! {text, JSON_Message} || {ok, PID} <- Member_PIDs],
+            [PID ! {text, JSON_Message} || {ok, {PID, _}} <- Member_PIDs],
             loop(Connection_map)
             
     end.

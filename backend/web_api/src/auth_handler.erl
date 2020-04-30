@@ -47,6 +47,17 @@ register_user(Username, Password, Req0, Opts) ->
             {ok, Req3, Opts}
     end.    
 
+friend_request(Username, Friendname, Req0, Opts) ->
+    database_api:insert_friend(Username, Friendname),
+    database_api:insert_friend(Friendname, Username),
+    %chat_server:send_friend_request(Username, Friendname),
+    Body = mochijson:encode(
+	     {struct, [{"action", "friend_request"},
+		       {"status", "ok"},
+		       {"friend", Friendname}]}),
+    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+    {ok, Req3, Opts}.
+
 
 -spec init(Req, State) -> {ok, Req, Opts} when
       Req :: cowboy_req:req(),
@@ -71,6 +82,11 @@ init(Req0, Opts) ->
                          {"password", Password}]} ->
                     io:format("REGISTER~n"),
                     register_user(Username, Password, Req0, Opts);
+		{struct,[{"action", "friend_request"},
+                         {"username", Friendname},
+                         {"password", Username}]} ->
+                    io:format("FRIEND REQUEST~n"),
+                    friend_request(Username, Friendname, Req0, Opts);
                 _ -> 
                     Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),

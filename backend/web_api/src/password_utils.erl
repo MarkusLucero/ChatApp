@@ -9,6 +9,7 @@ get_magic_token() ->
     [33 + rand:uniform(93) || _ <- lists:seq(1, 32)].
 
 hash_password(Password) ->
-    Hash = crypto:hash(sha3_256, Password),
-    io:format("Hash: ~p~n", [Hash]),
-    lists:flatten([integer_to_list(X, 16) || <<X>> <= Hash]).
+    %Hash = crypto:hash(sha3_256, Password),
+    %io:format("Hash: ~p~n", [Hash]),
+    %lists:flatten([integer_to_list(X, 16) || <<X>> <= Hash]).
+    Password.
