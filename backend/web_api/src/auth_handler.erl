@@ -3,6 +3,7 @@
 
 -export([init/2]).
 -export([terminate/3, register_user/4]).
+-export([start_token_server/0]).
 
 
 login(Username, Password, Req0, Opts) ->
@@ -11,20 +12,19 @@ login(Username, Password, Req0, Opts) ->
     case database_api:fetch_user(Username) of
         {ok, {Username, Stored_Password, _}} ->
             io:format("Stored: ~w~nCalced: ~w~n", [Stored_Password, Hashed_Password]),
-            %%case binary:match(Hashed_Password, Stored_Password) of
-            if  
-	    %%nomatch ->
-		Stored_Password =/= Password ->%%Hashed_Password ->
+            case string:equal(Hashed_Password, Stored_Password) of
+                false ->
                     Body = <<"Wrong password!">>,
                     Req3 = cowboy_req:reply(401, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
                     {ok, Req3, Opts};
                 true ->
-                    io:format("AUTH SUCCESS FOR USER: ~p~n", [Username]),
                     Magic_Token = password_utils:get_magic_token(),
+                    io:format("AUTH SUCCESS FOR USER: ~p with token ~p~n", [Username, Magic_Token]),
                     Body = mochijson:encode(
                              {struct,[{"action", "login"},
                                       {"magic_token", Magic_Token}]}),
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    token_server ! {add_token, Magic_Token, Username},
                     {ok, Req3, Opts}
             end;
         {error, Reason} ->
@@ -38,7 +38,7 @@ register_user(Username, Password, Req0, Opts) ->
     case database_api:fetch_user(Username) of
         {error, _} -> 
             io:format("Registering user ~w~n", [Username]),
-            database_api:insert_user(Username, Password, "2020-10-10 00:00:00"),
+            database_api:insert_user(Username, password_utils:hash_password(Password), "2020-10-10 00:00:00"),
             Body = <<"Registration success!">>,
             cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0);
                 _ ->
@@ -100,3 +100,38 @@ init(Req0, Opts) ->
 %% @returns ok For all terminations.
 terminate(_Reason, _Req, _State) ->
         ok.
+
+-spec start_token_server() -> ok.
+%% @doc Starts the token server
+%% @returns ok.
+start_token_server() ->
+    case whereis(token_server) of
+        undefined -> 
+            ok;
+        _PID -> 
+            unregister(token_server)
+    end,
+    register(token_server, spawn(fun() -> token_server_loop(maps:new()) end)),
+    ok.
+
+
+token_server_loop(Token_map) ->
+    receive
+        {add_token, Token, User} ->
+            io:format("Adding token: ~p~n", [Token]),
+            New_map = maps:put(User, Token, Token_map),
+            token_server_loop(New_map);
+        {check_token, Token, User, From} ->
+            io:format("Checking token: ~p~n", [Token]),
+            case maps:find(User, Token_map) of
+                {ok, Token} ->
+                    From ! token_ok;
+                error ->
+                    From ! token_not_ok;
+                _ ->
+                    From ! token_not_ok
+            end,
+            token_server_loop(Token_map);
+        _ ->
+            token_server_loop(Token_map)
+    end.
