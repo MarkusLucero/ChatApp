@@ -60,7 +60,7 @@ send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
     %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    %database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
+    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID},
     ok.
 
@@ -200,7 +200,7 @@ loop(Connection_map) ->
                                       {"status", "ok"},
                                       {"chat_name", Chat_Name},
                                       {"chat_id", Chat_ID},
-                                      {"members", Members},
+                                      {"members", {array, Members}},
                                       {"creator", Creator}]}),
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
             [PID ! {text, JSON_Message} || {ok, PID} <- Member_PIDs],

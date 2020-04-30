@@ -135,7 +135,7 @@ loop(Ref) ->
 	    odbc:sql_query(Ref, "DELETE FROM users WHERE username = '" ++ Username ++ "';");
 
 	{remove_friendlist, Username} ->
-	    odbc:sql_query(Ref, "DELETE FROM friend_list WHERE user_name = '" ++ Username ++ "';");
+	    odbc:sql_query(Ref, "DELETE FROM friendlist WHERE username = '" ++ Username ++ "';");
 	
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])

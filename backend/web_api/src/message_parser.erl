@@ -37,7 +37,7 @@ handle_message(Msg, PID) ->
 	{struct,[{"action", "chat_request"},
                  {"chat_name", Chat_Name},
                  {"from", Username},
-		 {"members", Members}]} ->
+		 {"members", {array,Members}}]} ->
             chat_server:send_chat(Chat_Name, Username, Members);
         _ -> erlang:error('unknown message')
     end,
