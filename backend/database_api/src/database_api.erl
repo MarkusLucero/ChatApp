@@ -34,7 +34,7 @@ stop() ->
       TimeStamp::list().
 
 insert_user(Username, Password, TimeStamp) ->
-    io:format("database_api:insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
+%%    io:format("database_api:insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
     database ! {insert_user,Username, Password, TimeStamp},
     ok.
 
@@ -225,8 +225,16 @@ create_chat_test() ->
     {ok, _} = create_chat("skolchatten","testuser1", ["testuser1"]).
 
 insert_chat_test() ->
-    ok = insert_chat("testuser1", "festchatten",{"2020-10-19 01:00:00", "test message1!!!"}, 1),
-    ok = insert_chat("testfriend1", "skolchatten",{"2020-10-19 01:00:05", "test message2!!!"}, 0).
+ database ! {get_group_id,"festchatten", self()},
+    receive
+	Group_ID1 ->
+	    ok = insert_chat("testuser1", Group_ID1,{"2020-10-19 01:00:00", "test message1!!!"}, 1)
+    end,
+    database ! {get_group_id, "skolchatten", self()},
+    receive
+	Group_ID2 ->
+	    ok = insert_chat("testfriend1", Group_ID2,{"2020-10-19 01:00:05", "test message2!!!"}, 0)
+    end.
 
 fetch_user_test() ->
     {ok,{Username, Password, TimeStamp}} = fetch_user("testuser1"),
@@ -237,15 +245,22 @@ fetch_user_test() ->
     {error, "Username not found in database."} = fetch_user("Invalid username").
 
 fetch_chat_test() ->
-    {ok, [{Sender1, Msg1, Status1}]} = fetch_chat("festchatten"),
-    {ok, [{Sender2, Msg2, Status2}]} = fetch_chat("skolchatten"),
-    "testuser1" = Sender1,
-    "testfriend1" = Sender2,
-    "test message1!!!" = Msg1,
-    "test message2!!!" = Msg2,
-    1 = Status1,
-    0 = Status2,
-
+    database ! {get_group_id,"festchatten", self()},
+    receive
+	Group_ID1 ->
+	    {ok, [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),	    
+	    "testuser1" = Sender1,
+	    "test message1!!!" = Msg1,
+	    1 = Status1
+    end,
+     database ! {get_group_id, "skolchatten", self()},
+    receive
+	Group_ID2 ->
+	    {ok, [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),	    
+	    "testfriend1" = Sender2,
+	    "test message2!!!" = Msg2,
+	    0 = Status2
+    end,
    
     {error, "Chat_ID not found in database."} = fetch_chat("Invalid chat_ID").
 

@@ -51,12 +51,11 @@ loop(Ref) ->
                     From ! {ok, Group_ID}
             end;
         
-        {insert_chat, From_Username, Chat_Name, { Timestamp, Msg}, Status} ->
+        {insert_chat, From_Username, Chat_ID, { Timestamp, Msg}, Status} ->
             
             %% odbc:sql_query(Ref, "CREATE TABLE IF NOT EXISTS chat" ++ Chat_ID ++ "  (from_user VARCHAR(50) NOT NULL, message TEXT NOT NULL, status INT, time_stamp TIMESTAMP NOT NULL);"),
             User_ID = fetch_user_id(Ref, From_Username),
-            Group_ID = fetch_group_id(Ref, Chat_Name),
-            odbc:sql_query(Ref, "INSERT INTO messages (username, groupname, user_id, group_id, message, status, timestamp) VALUES ('"++ From_Username ++"', '"++ Chat_Name ++"', '"++ User_ID ++ "', '" ++ Group_ID ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
+            odbc:sql_query(Ref, "INSERT INTO messages (username, user_id, group_id, message, status, timestamp) VALUES ('"++ From_Username ++"', '"++ User_ID ++ "', '" ++ Chat_ID ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');");
 
             %% case Group_ID of
             %%  {error, Reason} ->
@@ -94,9 +93,8 @@ loop(Ref) ->
             end;
 
 
-        {fetch_chat, Chat_Name, From} ->
-            Chat_ID = fetch_group_id(Ref, Chat_Name),
-            
+        {fetch_chat, Chat_ID, From} ->
+	 %%  io:format("------------ ~p~n", [Chat_ID]),
             case Chat_ID of
                 {error, Reason} ->
                     From ! {error, Reason};
@@ -136,6 +134,9 @@ loop(Ref) ->
 
         {remove_friendlist, Username} ->
             odbc:sql_query(Ref, "DELETE FROM friend_list WHERE username = '" ++ Username ++ "';");
+	
+	{get_group_id, Username, From} ->
+	    From ! fetch_group_id(Ref, Username);
         
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
@@ -158,7 +159,8 @@ fetch_group_id(Ref, Groupname) ->
     case ID of
         {selected, _, [{Group_ID}]} ->
             Group_ID;
-        _ -> {error, "Invalid_groupname"}
+        _ ->
+	    {error, "Invalid_groupname"}
     end.
 
 add_group_members(Ref, Group_ID, [Member]) ->

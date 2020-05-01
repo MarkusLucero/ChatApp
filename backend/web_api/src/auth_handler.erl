@@ -48,15 +48,22 @@ register_user(Username, Password, Req0, Opts) ->
     end.    
 
 friend_request(Username, Friendname, Req0, Opts) ->
-    database_api:insert_friend(Username, Friendname),
-    database_api:insert_friend(Friendname, Username),
-    %chat_server:send_friend_request(Username, Friendname),
-    Body = mochijson:encode(
-	     {struct, [{"action", "friend_request"},
-		       {"status", "ok"},
-		       {"friend", Friendname}]}),
-    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-    {ok, Req3, Opts}.
+   case database_api:insert_friend(Username, Friendname) of
+       ok ->
+	   
+	   database_api:insert_friend(Friendname, Username),
+	   %%chat_server:send_friend_request(Username, Friendname),
+	   Body = mochijson:encode(
+		    {struct, [{"action", "friend_request"},
+			      {"status", "ok"},
+			      {"friend", Friendname}]}),
+	   Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+	   {ok, Req3, Opts};
+       _ ->
+	   Body = <<"Friend request failed!">>,
+	   Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+	   {ok, Req3, Opts}
+   end.    
 
 
 -spec init(Req, State) -> {ok, Req, Opts} when
