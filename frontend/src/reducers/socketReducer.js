@@ -101,31 +101,13 @@ const socketReducer = (state = initialState, action) => {
             in accordance with doc it should be a response with action "init_login" but we will do 
             it here right now
 
-                        each user gets 2 hard coded chatrooms on login
-                        each user gets 4 hard coded friends on login
+                        each user gets empty array of dms
+                        each user gets empty friends list
                         user get's its username  ( not hardcoded it comes from action.payload.username )
 
             */
-            listOfDms: [
-              {
-                chatName: "Skooben",
-                chatID: "1a",
-                messages: [{ message: "test", username: "Markipie" }],
-                members: [],
-                creator: "",
-              },
-              {
-                chatName: "Grabbarna Grus",
-                chatID: "2a",
-                messages: [
-                  { message: "Axel mitt sexdjur?", username: "Anton" },
-                  { message: "axel e arg på dig", username: "Axel" },
-                ],
-                members: [],
-                creator: "",
-              },
-            ],
-            listOfFriends: ["Skooben", "Markipie", "Mustafa", "Pallerkan"],
+            listOfDms: [],
+            listOfFriends: [],
             username: action.payload.username,
           };
         }
