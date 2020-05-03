@@ -73,7 +73,7 @@ const StartChat = ({ friends, username, setShowAddChat }) => {
         value={chatName}
         placeholder="Chat name..."
       />
-      <button className="rounded w-full bg-blue-600 mt-4" onClick={startChat}>
+      <button className="rounded w-full bg-blue-600 mt-4 cursor-pointer" onClick={startChat}>
         Create chat
       </button>
     </div>

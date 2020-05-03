@@ -10,7 +10,6 @@ import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
  * @returns a div containing the SideDisplayList, InfoDisplayList and FocusedView components
  */
 const LandingPage = () => {
-
   /* state to check what chat we are currently focusing on */
   const [focusedChat, setFocusedChat] = React.useState(null);
 
@@ -19,16 +18,25 @@ const LandingPage = () => {
     setFocusedChat(event.target.id);
   };
 
+  /* state to check what page we are focusing on - some server or the home page*/
+  /* Focusing on Home always on start*/
+  const [focusedPage, setFocusedPage] = React.useState("Home");
+
+  /* callback function for getting the id of the page that we are clicking on */
+  const handleFocusedPage = (event) => {
+    setFocusedPage(event.target.id)
+  };
+
   return (
     /**
      *  The styling is made up of Tailwind css classes
      *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
      */
     <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList />
-      <InfoDisplayList handleFocusedChat={handleFocusedChat} />
+      <SideDisplayList handleFocusedPage={handleFocusedPage} />
+      <InfoDisplayList handleFocusedChat={handleFocusedChat} focusedPage={focusedPage} />
 
-      <FocusedView focusedChat={focusedChat} />
+      <FocusedView focusedChat={focusedChat} focusedPage={focusedPage} />
     </div>
   );
 };
