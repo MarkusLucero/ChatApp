@@ -50,8 +50,6 @@ register_user(Username, Password, Req0, Opts) ->
 friend_request(Username, Friendname, Req0, Opts) ->
    case database_api:insert_friend(Username, Friendname) of
        ok ->
-	   
-	   database_api:insert_friend(Friendname, Username),
 	   %%chat_server:send_friend_request(Username, Friendname),
 	   Body = mochijson:encode(
 		    {struct, [{"action", "friend_request"},
