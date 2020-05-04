@@ -178,17 +178,21 @@ loop(Connection_map) ->
             io:format("In login_user loop~n DMs: ~p FriendList: ~p ~n", [DMs, FriendList]),
             case check_token(Username, Magic_Token) of
                 true ->
+                    io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
                     List_of_DMs = [mochijson:encode({struct, [{"chatName", Chat_Name}, 
                                                               {"chatID", Chat_ID}, 
                                                               {"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
-                                                             ]}) || {Chat_ID, Chat_Name, Messages} <- DMs],
+                                                             ]}) || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
+                    io:format("MADE IT PAST LIST OF DMs: ~s~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(
                                      {struct,[{"action", "init_login"},
                                               {"user_id", Username},
                                               {"list_of_dms", List_of_DMs},
                                               {"list_of_friends", FriendList}]}),
+                    io:format("ABOUT TO SEND INIT_LOGIN~n"),
                     PID ! {text, JSON_Message},
+                    io:format("SENT INIT_LOGIN~n"),
                     loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
                 _ -> 
                     loop(Connection_map)
