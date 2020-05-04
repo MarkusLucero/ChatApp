@@ -39,7 +39,16 @@ register_user(Username, Password, _, _PID) ->
 login_user(Username, Magic_token, PID) ->
     case database_api:fetch_all_chats(Username) of
         {error, _} ->
-            erlang:error('Error fetching chats');
+            %erlang:error('Error fetching chats');
+	    DMs = [],
+	    case database_api:fetch_friendlist(Username) of 
+                {error, _} ->
+                    %erlang:error('Error fetching friends'),
+		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
+                Friends ->
+                    FriendList = [Friendname || {Friendname} <- Friends],
+                    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
+            end;
         DMs ->
             ok,
             case database_api:fetch_friendlist(Username) of 
