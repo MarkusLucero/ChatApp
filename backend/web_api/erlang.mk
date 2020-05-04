@@ -12,14 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-.PHONY: fetch_database_src all app apps deps search rel relup docs install-docs check tests clean distclean help erlang-mk remove_database_src
+.PHONY: all app apps deps search rel relup docs install-docs check tests clean distclean help erlang-mk
 
-fetch_database_src:
-	cp ./../database_api/src/database_api.erl ./src/
-	cp ./../database_api/src/erl_to_sql.erl ./src/
-
-remove_database_src:
-	rm src/database_api.erl src/erl_to_sql.erl
 
 ERLANG_MK_FILENAME := $(realpath $(lastword $(MAKEFILE_LIST)))
 export ERLANG_MK_FILENAME
@@ -107,7 +101,7 @@ endif
 
 # Core targets.
 
-all:: fetch_database_src deps app rel remove_database_src
+all:: deps app rel
 
 # Noop to avoid a Make warning when there's nothing to do.
 rel::
