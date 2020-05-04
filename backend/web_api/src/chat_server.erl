@@ -181,7 +181,7 @@ loop(Connection_map) ->
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
                     List_of_DMs = [mochijson:encode({struct, [{"chatName", Chat_Name}, 
                                                               {"chatID", Chat_ID}, 
-                                                              {"messages", lists:map(fun({Src, Msg}) -> {Msg, Src} end, Messages)}
+                                                              {"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
                                                              ]}) || {Chat_ID, Chat_Name, Messages} <- DMs],
                     JSON_Message = mochijson:encode(
                                      {struct,[{"action", "init_login"},
