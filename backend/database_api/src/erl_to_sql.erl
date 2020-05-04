@@ -119,7 +119,7 @@ loop(Ref) ->
 	{fetch_all_chats, Username, From} ->
 	    {selected, _, Chat_IDS} = (catch odbc:sql_query(Ref, "SELECT group_id FROM group_users WHERE username = '" ++ Username ++ "';")),
 	    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
-	    From ! All_Chats;
+	    From ! {ok, All_Chats};
 
         stop ->
             odbc:disconnect(Ref),
@@ -180,15 +180,15 @@ add_group_members(Ref, Group_ID, [X|Members]) ->
     add_group_members(Ref, Group_ID, Members).
 
 fetch_all_chats_helper([{Chat_ID}], All_Chats, Ref) ->
-    {_,_,Messages} = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+    {_,_,Messages} = (catch odbc:sql_query(Ref, "SELECT username, message FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
     {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
-    New_Chat_List = All_Chats ++ {Chat_ID, Chat_Name, Messages},
+    New_Chat_List = All_Chats ++ [{Chat_ID, Chat_Name, Messages}],
     New_Chat_List;
 
 fetch_all_chats_helper([{Chat_ID}|Tail], All_Chats, Ref) ->
     {_,_,Messages} = (catch odbc:sql_query(Ref, "SELECT username, message FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
     {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
-    New_Chat_List = All_Chats ++ {Chat_ID, Chat_Name, Messages},
+    New_Chat_List = All_Chats ++ [{Chat_ID, Chat_Name, Messages}],
     fetch_all_chats_helper(Tail, New_Chat_List, Ref).
 
 %% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
