@@ -37,15 +37,18 @@ register_user(Username, Password, _, _PID) ->
 %% @param PID The PID for the websocket handler
 %% @returns ok For every login.
 login_user(Username, Magic_token, PID) ->
-    %DMs = database_api:fetch_DMs(Username),
-    DMs = "",
-    case database_api:fetch_friendlist(Username) of 
-	{error, Reason} ->
-	    io:format("ERROR: ~p ~n", [Reason]),
-	    chat_server ! {login_user, Username, Magic_token, DMs, "", PID};
-	Friends ->
-	    FriendList = [Friendname || {Friendname} <- Friends],
-	    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
+    case database_api:fetch_all_chats(Username) of
+        {error, _} ->
+            erlang:error('Error fetching chats');
+        DMs ->
+            ok,
+            case database_api:fetch_friendlist(Username) of 
+                {error, _} ->
+                    erlang:error('Error fetching friends');
+                Friends ->
+                    FriendList = [Friendname || {Friendname} <- Friends],
+                    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
+            end
     end,
     ok.
 
@@ -166,25 +169,29 @@ check_token(User, Token) ->
             false
     end.
 
-	    
+            
 
 loop(Connection_map) ->
     io:format("Connections: ~p~n", [Connection_map]),
     receive
         {login_user, Username, Magic_Token, DMs, FriendList, PID} ->
-	    io:format("In login_user loop~n DMs: ~p FriendList: ~p ~n", [DMs, FriendList]),
-            %JSON_Message = mochijson:encode(
-            %                 {struct,[{"action", "init_login"},
-            %                          {"user_id", Username},
-            %                          {"list_of_dms", DMs},
-            %                          {"list_of_friends", FriendList}]}),
-	    io:format("Encoded message init_login~n"),
-            %PID ! {text, JSON_Message},
+            io:format("In login_user loop~n DMs: ~p FriendList: ~p ~n", [DMs, FriendList]),
             case check_token(Username, Magic_Token) of
                 true ->
-		    loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
+                    %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
+                    List_of_DMs = [mochijson:encode({struct, [{"chatName", Chat_Name}, 
+                                                              {"chatID", Chat_ID}, 
+                                                              {"messages", lists:map(fun({Src, Msg}) -> {Msg, Src} end, Messages)}
+                                                             ]}) || {Chat_ID, Chat_Name, Messages} <- DMs],
+                    JSON_Message = mochijson:encode(
+                                     {struct,[{"action", "init_login"},
+                                              {"user_id", Username},
+                                              {"list_of_dms", List_of_DMs},
+                                              {"list_of_friends", FriendList}]}),
+                    PID ! {text, JSON_Message},
+                    loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
                 _ -> 
-		    loop(Connection_map)
+                    loop(Connection_map)
                 end;
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
