@@ -44,7 +44,8 @@ login_user(Username, Magic_token, PID) ->
             ok,
             case database_api:fetch_friendlist(Username) of 
                 {error, _} ->
-                    erlang:error('Error fetching friends');
+                    %erlang:error('Error fetching friends'),
+		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
                 Friends ->
                     FriendList = [Friendname || {Friendname} <- Friends],
                     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
@@ -180,16 +181,16 @@ loop(Connection_map) ->
                 true ->
                     io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
-                    List_of_DMs = [mochijson:encode({struct, [{"chatName", Chat_Name}, 
+                    List_of_DMs = [{array, mochijson:encode({struct, [{"chatName", Chat_Name}, 
                                                               {"chatID", Chat_ID}, 
                                                               {"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
-                                                             ]}) || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
-                    io:format("MADE IT PAST LIST OF DMs: ~s~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
+                                                             ]})} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
+                    io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(
                                      {struct,[{"action", "init_login"},
                                               {"user_id", Username},
-                                              {"list_of_dms", List_of_DMs},
-                                              {"list_of_friends", FriendList}]}),
+                                              {"list_of_dms", {array, List_of_DMs}},
+                                              {"list_of_friends", {array, FriendList}}]}),
                     io:format("ABOUT TO SEND INIT_LOGIN~n"),
                     PID ! {text, JSON_Message},
                     io:format("SENT INIT_LOGIN~n"),
