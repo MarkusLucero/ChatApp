@@ -118,9 +118,13 @@ loop(Ref) ->
 
 	{fetch_all_chats, Username, From} ->
 	    {selected, _, Chat_IDS} = (catch odbc:sql_query(Ref, "SELECT group_id FROM group_users WHERE username = '" ++ Username ++ "';")),
-	    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
-	    From ! {ok, All_Chats};
-
+	    case Chat_IDS of 
+		[] ->
+		    From ! {error, "No chats found in database"};
+		_ ->
+		    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
+		    From ! {ok, All_Chats}
+	    end;
         stop ->
             odbc:disconnect(Ref),
             odbc:stop(),
