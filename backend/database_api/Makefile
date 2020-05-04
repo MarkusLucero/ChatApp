@@ -9,7 +9,7 @@ ebin/%.beam : src/%.erl $(HEADERS) Makefile
 	erlc $(ERLC_FLAGS) -o ebin/ $<
 clean:
 	-rm $(OBJECTS)
-test:
+test:	all
 	erl -noshell -pa ebin -eval 'eunit:test("ebin/database_api.beam",[verbose])' -s init stop
 
 .PHONY: doc
@@ -18,4 +18,4 @@ doc:
 	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl", "src/database_master.erl", "src/database_workers.erl"], [{dir, doc}])' -s init stop
 
 test_workers:
-	erl -noshell -pa ebin -eval 'database_master:start(10, 10)' -s init stop
+	erl -noshell -pa ebin -eval 'database_master:start(1000, 10)' -s init stop

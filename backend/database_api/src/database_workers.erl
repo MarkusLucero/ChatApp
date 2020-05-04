@@ -13,8 +13,12 @@
 %% @param NumInserts The number of insert messages the worker will perform to the database.
 %% @returns The PID of the created worker.
 start(Master, NumInserts) ->
-    database_api:insert_user("testuser1", "12345", "2020-10-19 01:00:00"),
-    Worker = spawn(fun() -> loop(NumInserts, "testuser1", Master) end),
+    X = rand:uniform(1000000),
+    Username = "testuser" ++ integer_to_list(X),
+    Chat_Name = "chat" ++ integer_to_list(X),
+    database_api:insert_user(Username, "12345", "2020-10-19 01:00:00"),
+    Chat_ID = database_api:create_chat(Chat_Name, Username, [Username]),
+    Worker = spawn(fun() -> loop(NumInserts, Username, Chat_ID, Master) end),
     Worker.
 
 
@@ -22,13 +26,13 @@ start(Master, NumInserts) ->
 stop() ->
     ok.
 
-loop(InsertsLeft, Username, Master) ->
-    database_api:insert_chat(Username, "chat_id_1", {"2020-10-19 02:00:00", "Hejsan svejsan"}, 1),
+loop(InsertsLeft, Username, Chat_ID, Master) ->
+    database_api:insert_chat(Username, Chat_ID, {"2020-10-19 02:00:00", "Hejsan svejsan"}, 1),
     NewInsertsLeft = InsertsLeft - 1,
     Master ! {insert, NewInsertsLeft, self()},
     receive
 	continue ->
-	    loop(NewInsertsLeft, Username, Master);
+	    loop(NewInsertsLeft, Username, Chat_ID, Master);
 	kill ->
 	    stop()
     end.

@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1]).
 
 
 %% @doc Initilize odbc connection and logs in to database.
@@ -79,7 +79,7 @@ create_chat(Chat_Name, Creator, Members) ->
     database ! {create_chat, Chat_Name, Creator, Members, self()},
     receive
 	{ok, Chat_ID} ->
-	    {ok, Chat_ID};
+	    Chat_ID;
 	{error, Reason} ->
 	    {error, Reason};
 	Msg ->
@@ -120,7 +120,7 @@ fetch_user(Username) ->
 	{error, no_user} ->
 	    {error, "Username not found in database."};
 	{Username, Password, TimeStamp} ->
-	    {ok, {Username, Password, TimeStamp}};
+	    {Username, Password, TimeStamp};
 	Msg ->
 	    io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
     end.
@@ -141,14 +141,14 @@ fetch_friendlist(Username) ->
 	{error, no_friendlist} ->
 	    {error, "No friends exists for that username"};
 	{ok, Friends} ->
-	    {ok, {Username, Friends}};
+	    Friends;
 	Msg ->
 	    io:format("database_api:fetch_friendlist/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch information about a chat from the database. This function can be stuck waiting for a time when trying to fetch from database.
 %% @param Chat_ID The chat ID..
-%% @returns {ok,[{Sender, Msg, Status}]} if fetch from database was successfull, {error, Reason} if not.
+%% @returns {Chat_ID, Chat_Name, [{Sender, Msg, Status}]} if fetch from database was successfull, {error, Reason} if not.
 -spec fetch_chat(Chat_ID) -> Chat_Data when 
       Chat_ID::list(),
       Chat_Data::term().
@@ -157,10 +157,12 @@ fetch_chat(Chat_ID) ->
     database ! {fetch_chat, Chat_ID, self()},
     
     receive
-	{_,_,Content} ->
-	    {ok, Content};
 	{error, _} ->
 	    {error, "Chat_ID not found in database."};
+	
+	{Chat_ID, Chat_Name, Content} ->
+	    {Chat_ID, Chat_Name, Content};
+
 	Msg ->
 	    io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
     end.
@@ -172,8 +174,8 @@ fetch_chat_members(Chat_ID) ->
     database ! {fetch_chat_members, Chat_ID, self()},
     
     receive
-	{_,_,Content} ->
-	    {ok, Content};
+	{_,_, Members} ->
+	    Members;
 	{error, _} ->
 	    {error, "Chat_ID not found in database."};
 	Msg ->
@@ -192,6 +194,20 @@ fetch_chat_undelivered(Chat_ID) ->
 	    {error, "Chat_ID not found in database."};
 	Msg ->
 	    io:format("database_api:fetch_chat_undelivered/1 Unhandled message: ~p~n", [Msg])
+    end.
+
+fetch_all_chats(Username) ->
+    database ! {fetch_all_chats, Username, self()},
+    
+    receive
+	{error, _} ->
+	    {error, "No chats for this username."};
+	
+	{ok, Chats} ->
+	    Chats;
+
+	Msg ->
+	    io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
     end.
 
 
@@ -221,8 +237,8 @@ insert_friend_test() ->
     {error, "Username not found in database."} = insert_friend("invalid username", "invalid friend").
 
 create_chat_test() ->
-    {ok, _} = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
-    {ok, _} = create_chat("skolchatten","testuser1", ["testuser1"]).
+     _ = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
+     _ = create_chat("skolchatten","testuser1", ["testuser1"]).
 
 insert_chat_test() ->
  database ! {get_group_id,"festchatten", self()},
@@ -237,7 +253,7 @@ insert_chat_test() ->
     end.
 
 fetch_user_test() ->
-    {ok,{Username, Password, TimeStamp}} = fetch_user("testuser1"),
+    {Username, Password, TimeStamp} = fetch_user("testuser1"),
     "testuser1" = Username,
     "testpassword1" = Password,
     "2020-10-19 1:0:0" = TimeStamp,
@@ -248,7 +264,7 @@ fetch_chat_test() ->
     database ! {get_group_id,"festchatten", self()},
     receive
 	Group_ID1 ->
-	    {ok, [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),	    
+	    {_, "festchatten", [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),	    
 	    "testuser1" = Sender1,
 	    "test message1!!!" = Msg1,
 	    1 = Status1
@@ -256,28 +272,28 @@ fetch_chat_test() ->
      database ! {get_group_id, "skolchatten", self()},
     receive
 	Group_ID2 ->
-	    {ok, [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),	    
+	   {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),	    
 	    "testfriend1" = Sender2,
 	    "test message2!!!" = Msg2,
 	    0 = Status2
     end,
    
-    {error, "Chat_ID not found in database."} = fetch_chat("Invalid chat_ID").
+    {error, "Chat_ID not found in database."} = fetch_chat("Invalid Chat_ID").
 
 
 
  fetch_chat_members_test() ->
-    {ok, [{"testuser1"}, {"testfriend1"}]} = fetch_chat_members("festchatten"),
+    [{"testuser1"}, {"testfriend1"}] = fetch_chat_members("festchatten"),
 
     {error, "Chat_ID not found in database."} = fetch_chat_members("Invalid chat_ID").
 
 fetch_friendlist_test() ->
-    {ok, {_, [{Friend}]}} = fetch_friendlist("testuser1"),
+    [{Friend}] = fetch_friendlist("testuser1"),
     "testfriend1" = Friend,
     {error,"No user id exists for that username"} = fetch_friendlist("Invalid username").
 
 stop_test_() ->
-    database ! reset_tests,
+    %% database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
     %% database ! {remove_user, "testfriend1"},
     %% database ! {remove_table, "chat_id_1"},

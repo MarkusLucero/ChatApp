@@ -20,7 +20,7 @@ loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp} ->
 	    odbc:sql_query(Ref, "INSERT INTO users (username, password, timestamp) VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
-
+	
         {insert_friend, Username, Friend, From} ->
             User_ID = fetch_user_id(Ref, Username),
             Friend_ID = fetch_user_id(Ref, Friend),
@@ -42,13 +42,13 @@ loop(Ref) ->
 
         {create_chat, Chat_Name, _, Members, From} ->
             odbc:sql_query(Ref, "INSERT INTO groups (groupname) VALUES ('"++ Chat_Name ++ "');"),
-            Group_ID = fetch_group_id(Ref, Chat_Name),
-            case Group_ID of
+            Chat_ID = fetch_group_id(Ref, Chat_Name),
+            case Chat_ID of
                 {error, Reason} ->
                     From ! {error, Reason};
                 _ ->
-                    add_group_members(Ref, Group_ID, Members),
-                    From ! {ok, Group_ID}
+                    add_group_members(Ref, Chat_ID, Members),
+                    From ! {ok, Chat_ID}
             end;
         
         {insert_chat, From_Username, Chat_ID, { Timestamp, Msg}, Status} ->
@@ -95,12 +95,14 @@ loop(Ref) ->
 
         {fetch_chat, Chat_ID, From} ->
 	 %%  io:format("------------ ~p~n", [Chat_ID]),
-            case Chat_ID of
+	    Content = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+                   
+            case Content of
                 {error, Reason} ->
                     From ! {error, Reason};
-                _ ->
-                    Content = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
-                    From ! Content
+                {_,_,Messages} ->
+		    {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
+		    From ! {Chat_ID, Chat_Name, Messages}
             end;
 
         {fetch_chat_members, Chat_Name, From} ->
@@ -113,6 +115,11 @@ loop(Ref) ->
                     Content = (catch odbc:sql_query(Ref, "SELECT username FROM group_users WHERE group_id = '" ++ Chat_ID ++ "';")),
                     From ! Content
             end;
+
+	{fetch_all_chats, Username, From} ->
+	    {selected, _, Chat_IDS} = (catch odbc:sql_query(Ref, "SELECT group_id FROM group_users WHERE username = '" ++ Username ++ "';")),
+	    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
+	    From ! All_Chats;
 
         stop ->
             odbc:disconnect(Ref),
@@ -171,6 +178,18 @@ add_group_members(Ref, Group_ID, [X|Members]) ->
     M = fetch_user_id(Ref, X),
     odbc:sql_query(Ref, "INSERT INTO group_users (group_id, user_id, username) VALUES ('"++ Group_ID ++ "', '" ++ M ++ "', '" ++ X ++ "');"),
     add_group_members(Ref, Group_ID, Members).
+
+fetch_all_chats_helper([{Chat_ID}], All_Chats, Ref) ->
+    {_,_,Messages} = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+    {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
+    New_Chat_List = All_Chats ++ {Chat_ID, Chat_Name, Messages},
+    New_Chat_List;
+
+fetch_all_chats_helper([{Chat_ID}|Tail], All_Chats, Ref) ->
+    {_,_,Messages} = (catch odbc:sql_query(Ref, "SELECT username, message FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+    {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
+    New_Chat_List = All_Chats ++ {Chat_ID, Chat_Name, Messages},
+    fetch_all_chats_helper(Tail, New_Chat_List, Ref).
 
 %% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
 stringify_timestamp({Date,Time}) ->

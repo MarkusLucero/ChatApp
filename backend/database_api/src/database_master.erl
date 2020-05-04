@@ -15,10 +15,10 @@
 start(NumWorkers, NumInserts) ->
     database_api:start(),
     Master = spawn_link(fun() -> loop(NumWorkers, 0) end),
-    [database_workers:start(Master, NumInserts, ID) || ID <- lists:seq(1, NumWorkers)],
+    [database_workers:start(Master, NumInserts) || _ <- lists:seq(1, NumWorkers)],
     receive
 	    {'EXIT', Master, _} ->
-	    timer:sleep(NumWorkers*200),
+%%	    timer:sleep(NumWorkers*200),
 	    database_api:stop()
     end.
 

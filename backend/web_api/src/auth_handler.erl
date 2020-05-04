@@ -10,7 +10,7 @@ login(Username, Password, Req0, Opts) ->
     io:format("Logging in ~p~n", [Username]),
     Hashed_Password = password_utils:hash_password(Password),
     case database_api:fetch_user(Username) of
-        {ok, {Username, Stored_Password, _}} ->
+        {Username, Stored_Password, _} ->
             io:format("Stored: ~w~nCalced: ~w~n", [Stored_Password, Hashed_Password]),
             case string:equal(Hashed_Password, Stored_Password) of
                 false ->

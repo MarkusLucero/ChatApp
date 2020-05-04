@@ -40,12 +40,12 @@ login_user(Username, Magic_token, PID) ->
     %DMs = database_api:fetch_DMs(Username),
     DMs = "",
     case database_api:fetch_friendlist(Username) of 
-	{ok, {Username, Friends}} ->
-	    FriendList = [Friendname || {Friendname} <- Friends],
-	    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID};
 	{error, Reason} ->
 	    io:format("ERROR: ~p ~n", [Reason]),
-	    chat_server ! {login_user, Username, Magic_token, DMs, "", PID}
+	    chat_server ! {login_user, Username, Magic_token, DMs, "", PID};
+	Friends ->
+	    FriendList = [Friendname || {Friendname} <- Friends],
+	    chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
     end,
     ok.
 
@@ -129,12 +129,12 @@ send_friend_request(Username, Friendname) ->
 %% @returns ok.
 %% TODO: Save the chat id in database
 send_chat(Chat_Name, Creator, Members) ->
-    Chat = database_api:create_chat(Chat_Name, Creator, Members),
-    case Chat of
+    Chat_ID = database_api:create_chat(Chat_Name, Creator, Members),
+    case Chat_ID of
         {error, Reason} ->
             %% TODO: Fix error handeling
             {error, Reason};
-        {ok, Chat_ID} ->
+        _ ->
             %%[database_api:insert_chat_id(Username) || Username <- Members],
             chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
             ok
