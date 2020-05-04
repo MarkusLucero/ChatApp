@@ -75,6 +75,8 @@ const socketReducer = (state = initialState, action) => {
       state.socket.send(JSON.stringify(action.payload));
       return state;
     case "RESPONSE":
+      console.log("payload:::")
+      console.log(action.payload)
       /* if data is ack or welcome there's nothning we need to do */
       if (action.payload.data === "Welcome" || action.payload.data === "ACK") {
         return state;
@@ -82,6 +84,8 @@ const socketReducer = (state = initialState, action) => {
         /* first response */
       } else if (action.payload.action === "login") {
         /* need to respond to socket with action = login, username, and magictoken to establish connection */
+
+        console.log(JSON.stringify(action.payload))
         state.socket.send(JSON.stringify(action.payload));
 
         /* TODO TODO
@@ -96,26 +100,23 @@ const socketReducer = (state = initialState, action) => {
           return {
             ...state,
             firstWelcome: false, // no longer first welcome..
-            /* 
-            TESTING -- TODO - HARDCODED the login object that we should get in accordance with doc
-            in accordance with doc it should be a response with action "init_login" but we will do 
-            it here right now
-
-                        each user gets empty array of dms
-                        each user gets empty friends list
-                        user get's its username  ( not hardcoded it comes from action.payload.username )
-
-            */
-            listOfDms: [],
-            listOfFriends: [],
-            username: action.payload.username,
           };
         }
       } else {
         const parsedData = JSON.parse(action.payload.data);
-
+        console.log("Parsed Data:: ");
+        console.log(parsedData);
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "init_login":
+            console.log( "INSIDE INIT LOGIN - set up user object in state")
+            return {
+              ...state,
+
+              listOfDms: parsedData.list_of_dms,
+              listOfFriends: parsedData.list_of_friends,
+              username: parsedData.user_id,
+            };
           case "send_message":
             /* add the new msg object to the right dm object */
             const index = getChatIndex(state.listOfDms, parsedData.chat_id);

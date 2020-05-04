@@ -96,8 +96,6 @@ const ChatContainer = ({ focusedChat }) => {
     ( this hapens when we get a response from someone or when we send a message and update listOfDms)
     */
   React.useEffect(() => {
-    console.log(listOfDms);
-    console.log("fookus my man fookus");
 
     if (listOfDms != null) {
       setMessages(rightChat(listOfDms));
