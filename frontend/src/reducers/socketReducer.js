@@ -109,7 +109,9 @@ const socketReducer = (state = initialState, action) => {
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
           case "init_login":
+
             console.log( "INSIDE INIT LOGIN - set up user object in state")
+            console.log(parsedData.list_of_dms[0])
             return {
               ...state,
 
