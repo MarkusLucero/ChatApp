@@ -79,6 +79,7 @@ websocket_info({timeout, _Ref, Msg}, State) ->
     erlang:start_timer(1000, self(), <<"Are you still there?">>),
     {[{text, Msg}], State, hibernate};
 websocket_info({text, Text}, State) ->
+    io:format("SENDING MESSAGE TO: ~p~n", [self()]),
     {reply, {text, Text}, State, hibernate};
 websocket_info(_Info, State) ->
     {[], State, hibernate}.

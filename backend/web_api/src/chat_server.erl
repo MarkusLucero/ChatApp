@@ -40,11 +40,11 @@ login_user(Username, Magic_token, PID) ->
     case database_api:fetch_all_chats(Username) of
         {error, _} ->
             %erlang:error('Error fetching chats');
-	    DMs = [],
-	    case database_api:fetch_friendlist(Username) of 
+            DMs = [],
+            case database_api:fetch_friendlist(Username) of 
                 {error, _} ->
                     %erlang:error('Error fetching friends'),
-		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
+                    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
                 Friends ->
                     FriendList = [Friendname || {Friendname} <- Friends],
                     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
@@ -54,7 +54,7 @@ login_user(Username, Magic_token, PID) ->
             case database_api:fetch_friendlist(Username) of 
                 {error, _} ->
                     %erlang:error('Error fetching friends'),
-		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
+                    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
                 Friends ->
                     FriendList = [Friendname || {Friendname} <- Friends],
                     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
@@ -190,11 +190,11 @@ loop(Connection_map) ->
                 true ->
                     io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
-		    %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
+                    %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
                     List_of_DMs = [{struct, [{"chatName", Chat_Name}, 
-					     {"chatID", Chat_ID},
-					     {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
-					    ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
+                                             {"chatID", Chat_ID},
+                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
+                                            ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
                     io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(
                                      {struct,[{"action", "init_login"},
@@ -207,7 +207,7 @@ loop(Connection_map) ->
                     loop(maps:put(Username, {PID, Magic_Token}, Connection_map));
                 _ -> 
                     loop(Connection_map)
-                end;
+            end;
         {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "send_message"},
@@ -215,20 +215,32 @@ loop(Connection_map) ->
                                       {"user_id", From_Username},
                                       {"message", Message},
                                       {"timestamp", Timestamp}]}),
-            Send = 
-                fun(_Username, {Connected_PID, _}) -> 
-                        case Connected_PID of 
-                            PID -> 
-                                ok;
-                            _ ->
-                                io:format("Sending to: ~p~n", [Connected_PID]),
-                                Connected_PID ! {text, JSON_Message},
-                                ok
-                        end
-                end,
-            maps:map(Send, Connection_map),
+            case database_api:fetch_chat_members(Chat_ID) of
+                {error, _} -> io:format("FAILED TO FIND CHAT MEMBERS: ~s~n", [Chat_ID]), loop(Connection_map);
+                Members -> 
+                    io:format("CHAT MEMBERS: ~p~n", [Members]),
+                    Is_member = 
+                        fun(Username,  {Connected_PID, _}) ->
+                                io:format("Checking user ~s ", [Username]),
+                                case lists:keyfind(Username, 1, Members) of
+                                    false -> io:format("FALSE~n"), false;
+                                    _ -> 
+                                        case Connected_PID of
+                                            PID -> false;
+                                            _ -> true
+                                        end
+                                end
+                        end,
+                    Member_map = maps:filter(Is_member, Connection_map),
+                    maps:map(
+                      fun(_Username, {Send_PID, _}) -> 
+                              io:format("PID: ~p~n", [Send_PID]), 
+                              Send_PID ! {text, JSON_Message} 
+                      end, Member_map),
+                    loop(Connection_map)
+            end,
             loop(Connection_map);
-        {user_status_request, Username, From} ->
+                {user_status_request, Username, From} ->
             case maps:is_key(Username) of
                 true -> From ! {user_status_response, online};
                 _ -> From ! {user_status_response, offline}
