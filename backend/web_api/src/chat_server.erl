@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -40,11 +40,11 @@ login_user(Username, Magic_token, PID) ->
     case database_api:fetch_all_chats(Username) of
         {error, _} ->
             %erlang:error('Error fetching chats');
-	    DMs = [],
-	    case database_api:fetch_friendlist(Username) of 
+            DMs = [],
+            case database_api:fetch_friendlist(Username) of 
                 {error, _} ->
                     %erlang:error('Error fetching friends'),
-		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
+                    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
                 Friends ->
                     FriendList = [Friendname || {Friendname} <- Friends],
                     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
@@ -54,7 +54,7 @@ login_user(Username, Magic_token, PID) ->
             case database_api:fetch_friendlist(Username) of 
                 {error, _} ->
                     %erlang:error('Error fetching friends'),
-		    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
+                    chat_server ! {login_user, Username, Magic_token, DMs, [], PID};
                 Friends ->
                     FriendList = [Friendname || {Friendname} <- Friends],
                     chat_server ! {login_user, Username, Magic_token, DMs, FriendList, PID}
@@ -124,6 +124,18 @@ send_friend_request(Username, Friendname) ->
     chat_server ! {friend_request, Username, Friendname},
     ok.
 
+
+-spec logout_user(Username, Token) -> ok when
+      Username :: list(Integer),
+      Token :: list(Integer).
+%% @doc Logs a user out if Username and Token are correct
+%% @param Username The username of the user that gets logged out
+%% @param Token The magic token corresponding to the user's session
+%% @returns ok.
+logout_user(Username, Token) ->
+    chat_server ! {logout_user, Username, Token},
+    ok.
+
 %% @doc Generates a unique chat id
 %% @returns A chat id
 %% TODO: Better rand function?
@@ -190,11 +202,11 @@ loop(Connection_map) ->
                 true ->
                     io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
-		    %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
+                    %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
                     List_of_DMs = [{struct, [{"chatName", Chat_Name}, 
-					     {"chatID", Chat_ID},
-					     {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
-					    ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
+                                             {"chatID", Chat_ID},
+                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
+                                            ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
                     io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(
                                      {struct,[{"action", "init_login"},
@@ -251,6 +263,12 @@ loop(Connection_map) ->
                                       {"creator", Creator}]}),
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
             [PID ! {text, JSON_Message} || {ok, {PID, _}} <- Member_PIDs],
-            loop(Connection_map)
-            
+            loop(Connection_map);
+        {logout_user, Username, Token} ->
+            case maps:get(Username, Connection_map) of
+                {_PID, Token} -> 
+                    token_server ! {remove_token, Token, Username},
+                    loop(maps:remove(Username, Connection_map));
+                _ -> loop(Connection_map)
+            end
     end.
