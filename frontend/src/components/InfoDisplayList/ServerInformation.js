@@ -1,6 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 const ServerInformation = ({ focusedPage }) => {
+
+  const serverDescription = useSelector(state => state.socketReducer.server.ServerInformation)
+  
   return (
     <div className="flex flex-col ml-2">
       <div
@@ -10,7 +14,7 @@ const ServerInformation = ({ focusedPage }) => {
         Beskrivning
       </div>
       <div id="serverInformation" className="text-white">
-        HÄR FINNS DET INFORMATION OM SERVERN
+        {serverDescription}
       </div>
     </div>
   );
