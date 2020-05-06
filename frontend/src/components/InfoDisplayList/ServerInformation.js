@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 
 const ServerInformation = ({ focusedPage }) => {
 
-  const serverDescription = useSelector(state => state.socketReducer.server.ServerInformation)
-  
+  const serverDescription = useSelector(state => state.socketState.server.serverInformation)
+
   return (
     <div className="flex flex-col ml-2">
       <div

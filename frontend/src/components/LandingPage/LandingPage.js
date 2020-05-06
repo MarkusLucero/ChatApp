@@ -21,8 +21,16 @@ const LandingPage = () => {
     setFocusedChat(event.target.id);
   };
 
-  //we dont have a list of servers but only one server we can get this obj from redux store and pass it down
-  const server = useSelector(state => state.socketState.server)
+  const [server, setServer] = React.useState({});
+
+  //server object from redux
+  const serverObject = useSelector(state => state.socketState.server);
+
+  React.useEffect(() => {
+    if (serverObject !== null) {
+      setServer(serverObject);
+    }
+  }, [serverObject]);
 
   /* state to check what page we are focusing on - some server or the home page*/
   /* Focusing on Home always on start*/
