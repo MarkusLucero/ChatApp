@@ -208,7 +208,7 @@ loop(Connection_map) ->
                 _ -> 
                     loop(Connection_map)
             end;
-        {send_message, From_Username, Chat_ID, Message, Timestamp, _PID} ->
+        {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "send_message"},
                                       {"chat_id", Chat_ID},
@@ -220,12 +220,16 @@ loop(Connection_map) ->
                 Members -> 
                     io:format("CHAT MEMBERS: ~p~n", [Members]),
                     Is_member = 
-                        fun(Username,  {_Connected_PID, _}) ->
+                        fun(Username,  {Connected_PID, _}) ->
                                 io:format("Checking user ~s ", [Username]),
                                 case lists:keyfind(Username, 1, Members) of
-                                        false -> io:format("FALSE~n"), false;
-                                        _ -> io:format("TRUE~n"), true
-                                    end
+                                    false -> io:format("FALSE~n"), false;
+                                    _ -> 
+                                        case Connected_PID of
+                                            PID -> false;
+                                            _ -> true
+                                        end
+                                end
                         end,
                     Member_map = maps:filter(Is_member, Connection_map),
                     maps:map(
