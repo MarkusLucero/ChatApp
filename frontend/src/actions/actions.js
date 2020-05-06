@@ -84,11 +84,12 @@ export function createThread(values){
     type: CREATE_THREAD,
     payload: {
       serverName: values.server, 
-      thread_id: null, 
+      thread_id: null, //TODO: ? kanske todo, kanske rätt
       username: values.user, 
       root_post: {root_header: values.summary, 
         root_cooment: values.details,
       },
+      //TODO: Vet inte om detta är ok eller ej, tänkte initialt att det kanske är lättare att sätta timestamp i backend
       timestamp: null, 
       commentList: [],
     },
