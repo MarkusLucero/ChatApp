@@ -98,7 +98,7 @@ const Container = () => {
           {loginSuccess ? <Redirect to="/start" /> : <Login />}
         </Route>
         <Route path="/start">
-          {loginSuccess ? <LandingPage /> : <Redirect to="/" />}
+          {true ? <LandingPage /> : <Redirect to="/" />}
         </Route>
         <Route path="/register" render={(props) => <Register {...props} />} />
       </Switch>
