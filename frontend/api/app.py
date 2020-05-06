@@ -78,9 +78,6 @@ def handle_search(term):
     return real_results
 
 
-""" uncoment below and coment above to use search without thread based concurrency """
-
-
 def handle_search_normal(term):
     start = time.time()
     global search_term  # get the global variabel call search_term
