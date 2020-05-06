@@ -19,8 +19,8 @@ loop(DSN, UID, PWD) ->
 loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp} ->
-	    odbc:sql_query(Ref, "INSERT INTO users (username, password, timestamp) VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
-	
+            odbc:sql_query(Ref, "INSERT INTO users (username, password, timestamp) VALUES('" ++ Username ++ "', '" ++ Password ++ "' ,'" ++ Timestamp ++"')");
+        
         {insert_friend, Username, Friend, From} ->
             User_ID = fetch_user_id(Ref, Username),
             Friend_ID = fetch_user_id(Ref, Friend),
@@ -94,37 +94,30 @@ loop(Ref) ->
 
 
         {fetch_chat, Chat_ID, From} ->
-	 %%  io:format("------------ ~p~n", [Chat_ID]),
-	    Content = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
+         %%  io:format("------------ ~p~n", [Chat_ID]),
+            Content = (catch odbc:sql_query(Ref, "SELECT username, message, status FROM messages WHERE group_id = '" ++ Chat_ID ++ "';")),
                    
             case Content of
                 {error, Reason} ->
                     From ! {error, Reason};
                 {_,_,Messages} ->
-		    {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
-		    From ! {Chat_ID, Chat_Name, Messages}
+                    {selected,_,[{Chat_Name}]} = odbc:sql_query(Ref, "SELECT groupname FROM groups WHERE group_id = '" ++ Chat_ID ++ "';"),
+                    From ! {Chat_ID, Chat_Name, Messages}
             end;
 
-        {fetch_chat_members, Chat_Name, From} ->
-            Chat_ID = fetch_group_id(Ref, Chat_Name),
-            
-            case Chat_ID of
-                {error, Reason} ->
-                    From ! {error, Reason};
+        {fetch_chat_members, Chat_ID, From} -> 
+            Content = (catch odbc:sql_query(Ref, "SELECT username FROM group_users WHERE group_id = '" ++ Chat_ID ++ "';")),
+            From ! Content;
+
+        {fetch_all_chats, Username, From} ->
+            {selected, _, Chat_IDS} = (catch odbc:sql_query(Ref, "SELECT group_id FROM group_users WHERE username = '" ++ Username ++ "';")),
+            case Chat_IDS of 
+                [] ->
+                    From ! {error, "No chats found in database"};
                 _ ->
-                    Content = (catch odbc:sql_query(Ref, "SELECT username FROM group_users WHERE group_id = '" ++ Chat_ID ++ "';")),
-                    From ! Content
+                    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
+                    From ! {ok, All_Chats}
             end;
-
-	{fetch_all_chats, Username, From} ->
-	    {selected, _, Chat_IDS} = (catch odbc:sql_query(Ref, "SELECT group_id FROM group_users WHERE username = '" ++ Username ++ "';")),
-	    case Chat_IDS of 
-		[] ->
-		    From ! {error, "No chats found in database"};
-		_ ->
-		    All_Chats = fetch_all_chats_helper(Chat_IDS, [], Ref),
-		    From ! {ok, All_Chats}
-	    end;
         stop ->
             odbc:disconnect(Ref),
             odbc:stop(),
@@ -145,9 +138,9 @@ loop(Ref) ->
 
         {remove_friendlist, Username} ->
             odbc:sql_query(Ref, "DELETE FROM friend_list WHERE username = '" ++ Username ++ "';");
-	
-	{get_group_id, Username, From} ->
-	    From ! fetch_group_id(Ref, Username);
+        
+        {get_group_id, Username, From} ->
+            From ! fetch_group_id(Ref, Username);
         
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
@@ -171,7 +164,7 @@ fetch_group_id(Ref, Groupname) ->
         {selected, _, [{Group_ID}]} ->
             Group_ID;
         _ ->
-	    {error, "Invalid_groupname"}
+            {error, "Invalid_groupname"}
     end.
 
 add_group_members(Ref, Group_ID, [Member]) ->

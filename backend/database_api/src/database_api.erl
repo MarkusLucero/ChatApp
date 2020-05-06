@@ -11,7 +11,7 @@
 -spec start() -> ok.
 
 start() ->
-    DB = erl_to_sql:init("PostgreSQL test", "testuser1", "1234"),
+    DB = erl_to_sql:init("PostgreSQL test", "postgres", "1234"),
 %%  io:format("database:start() -> DB = ~p~n", [DB]),
     register(database, DB),
     ok.
@@ -50,14 +50,14 @@ insert_friend(Username, Friend) ->
 %%  io:format("Insert_friend(~p, ~p)~n", [Username, Friend]),
     database ! {insert_friend,Username, Friend, self()},
     receive
-	{error, no_user} ->
-	     {error, "Username not found in database."};
-	{error, no_friend} ->
-	     {error, "Friend not found in database."};
-	ok ->
-	    ok;
-	Msg ->
-	    io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
+        {error, no_user} ->
+             {error, "Username not found in database."};
+        {error, no_friend} ->
+             {error, "Friend not found in database."};
+        ok ->
+            ok;
+        Msg ->
+            io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
      end.
 
 
@@ -78,12 +78,12 @@ create_chat(Chat_Name, Creator, Members) ->
 %%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
     database ! {create_chat, Chat_Name, Creator, Members, self()},
     receive
-	{ok, Chat_ID} ->
-	    Chat_ID;
-	{error, Reason} ->
-	    {error, Reason};
-	Msg ->
-	    io:format("databse_api:create_chat/3 Unhandeled message ~p~n", [Msg])
+        {ok, Chat_ID} ->
+            Chat_ID;
+        {error, Reason} ->
+            {error, Reason};
+        Msg ->
+            io:format("databse_api:create_chat/3 Unhandeled message ~p~n", [Msg])
     end.
 
 %% @doc Store information about a chat in the database. This function is asyncronous (the caller will not have to waite for the actual write to database to happen).5
@@ -117,12 +117,12 @@ fetch_user(Username) ->
     database ! {fetch_user,Username, self()},
     io:format("~p~n", [Username]),
     receive
-	{error, no_user} ->
-	    {error, "Username not found in database."};
-	{Username, Password, TimeStamp} ->
-	    {Username, Password, TimeStamp};
-	Msg ->
-	    io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
+        {error, no_user} ->
+            {error, "Username not found in database."};
+        {Username, Password, TimeStamp} ->
+            {Username, Password, TimeStamp};
+        Msg ->
+            io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch the firendlist of a user from the database. This function can be stuck waiting for a time when trying to fetch from database.
@@ -136,14 +136,14 @@ fetch_friendlist(Username) ->
     database ! {fetch_friendlist, Username, self()},
     
     receive
-	{error, no_user} ->
-	    {error, "No user id exists for that username"};
-	{error, no_friendlist} ->
-	    {error, "No friends exists for that username"};
-	{ok, Friends} ->
-	    Friends;
-	Msg ->
-	    io:format("database_api:fetch_friendlist/1 Unhandled message: ~p~n", [Msg])
+        {error, no_user} ->
+            {error, "No user id exists for that username"};
+        {error, no_friendlist} ->
+            {error, "No friends exists for that username"};
+        {ok, Friends} ->
+            Friends;
+        Msg ->
+            io:format("database_api:fetch_friendlist/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch information about a chat from the database. This function can be stuck waiting for a time when trying to fetch from database.
@@ -157,29 +157,29 @@ fetch_chat(Chat_ID) ->
     database ! {fetch_chat, Chat_ID, self()},
     
     receive
-	{error, _} ->
-	    {error, "Chat_ID not found in database."};
-	
-	{Chat_ID, Chat_Name, Content} ->
-	    {Chat_ID, Chat_Name, Content};
+        {error, _} ->
+            {error, "Chat_ID not found in database."};
+        
+        {Chat_ID, Chat_Name, Content} ->
+            {Chat_ID, Chat_Name, Content};
 
-	Msg ->
-	    io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
+        Msg ->
+            io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch the usernames from all mebers of a chat. This function can be stuck waiting for a time when trying to fetch from database.
 %% @param Chat_ID The chat ID..
-%% @returns {ok,[{"member1"}, {"member2"},..]} if fetch from database was successfull, {error, Reason} if not.
+%% @returns [{"member1", "member2",..}] if fetch from database was successfull, {error, Reason} if not.
 fetch_chat_members(Chat_ID) ->
     database ! {fetch_chat_members, Chat_ID, self()},
     
     receive
-	{_,_, Members} ->
-	    Members;
-	{error, _} ->
-	    {error, "Chat_ID not found in database."};
-	Msg ->
-	    io:format("database_api:fetch_chat_members/1 Unhandled message: ~p~n", [Msg])
+        {_,_, Members} ->
+            Members;
+        {error, _} ->
+            {error, "Chat_ID not found in database."};
+        Msg ->
+            io:format("database_api:fetch_chat_members/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Fetch all undelivered messages of a certain chat. This function can be stuck waiting for a time when trying to fetch from database.
@@ -188,26 +188,26 @@ fetch_chat_members(Chat_ID) ->
 fetch_chat_undelivered(Chat_ID) ->
     database ! {fetch_chat_undelivered, Chat_ID, self()},
     receive
-	{_,_,Content} ->
-	    {ok, Content};
-	{error, no_chat} ->
-	    {error, "Chat_ID not found in database."};
-	Msg ->
-	    io:format("database_api:fetch_chat_undelivered/1 Unhandled message: ~p~n", [Msg])
+        {_,_,Content} ->
+            {ok, Content};
+        {error, no_chat} ->
+            {error, "Chat_ID not found in database."};
+        Msg ->
+            io:format("database_api:fetch_chat_undelivered/1 Unhandled message: ~p~n", [Msg])
     end.
 
 fetch_all_chats(Username) ->
     database ! {fetch_all_chats, Username, self()},
     
     receive
-	{error, _} ->
-	    [];
-	
-	{ok, Chats} ->
-	    Chats;
+        {error, _} ->
+            [];
+        
+        {ok, Chats} ->
+            Chats;
 
-	Msg ->
-	    io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
+        Msg ->
+            io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
     end.
 
 
@@ -243,13 +243,13 @@ create_chat_test() ->
 insert_chat_test() ->
  database ! {get_group_id,"festchatten", self()},
     receive
-	Group_ID1 ->
-	    ok = insert_chat("testuser1", Group_ID1,{"2020-10-19 01:00:00", "test message1!!!"}, 1)
+        Group_ID1 ->
+            ok = insert_chat("testuser1", Group_ID1,{"2020-10-19 01:00:00", "test message1!!!"}, 1)
     end,
     database ! {get_group_id, "skolchatten", self()},
     receive
-	Group_ID2 ->
-	    ok = insert_chat("testfriend1", Group_ID2,{"2020-10-19 01:00:05", "test message2!!!"}, 0)
+        Group_ID2 ->
+            ok = insert_chat("testfriend1", Group_ID2,{"2020-10-19 01:00:05", "test message2!!!"}, 0)
     end.
 
 fetch_user_test() ->
@@ -263,19 +263,19 @@ fetch_user_test() ->
 fetch_chat_test() ->
     database ! {get_group_id,"festchatten", self()},
     receive
-	Group_ID1 ->
-	    {_, "festchatten", [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),	    
-	    "testuser1" = Sender1,
-	    "test message1!!!" = Msg1,
-	    1 = Status1
+        Group_ID1 ->
+            {_, "festchatten", [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),         
+            "testuser1" = Sender1,
+            "test message1!!!" = Msg1,
+            1 = Status1
     end,
      database ! {get_group_id, "skolchatten", self()},
     receive
-	Group_ID2 ->
-	   {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),	    
-	    "testfriend1" = Sender2,
-	    "test message2!!!" = Msg2,
-	    0 = Status2
+        Group_ID2 ->
+           {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
+            "testfriend1" = Sender2,
+            "test message2!!!" = Msg2,
+            0 = Status2
     end,
    
     {error, "Chat_ID not found in database."} = fetch_chat("Invalid Chat_ID").

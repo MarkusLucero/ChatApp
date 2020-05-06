@@ -208,7 +208,7 @@ loop(Connection_map) ->
                 _ -> 
                     loop(Connection_map)
             end;
-        {send_message, From_Username, Chat_ID, Message, Timestamp, PID} ->
+        {send_message, From_Username, Chat_ID, Message, Timestamp, _PID} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "send_message"},
                                       {"chat_id", Chat_ID},
@@ -216,21 +216,23 @@ loop(Connection_map) ->
                                       {"message", Message},
                                       {"timestamp", Timestamp}]}),
             case database_api:fetch_chat_members(Chat_ID) of
-                {error, _} -> loop(Connection_map);
-                {ok, Members} -> 
+                {error, _} -> io:format("FAILED TO FIND CHAT MEMBERS: ~s~n", [Chat_ID]), loop(Connection_map);
+                Members -> 
+                    io:format("CHAT MEMBERS: ~p~n", [Members]),
                     Is_member = 
-                        fun(Username,  {Connected_PID, _}) ->
-                                case Connected_PID of
-                                    PID -> false;
-                                    Connected_PID -> 
-                                        case lists:keyfind(Username, 1, Members) of
-                                            false -> false;
-                                            _ -> true
-                                        end
-                                end
+                        fun(Username,  {_Connected_PID, _}) ->
+                                io:format("Checking user ~s ", [Username]),
+                                case lists:keyfind(Username, 1, Members) of
+                                        false -> io:format("FALSE~n"), false;
+                                        _ -> io:format("TRUE~n"), true
+                                    end
                         end,
                     Member_map = maps:filter(Is_member, Connection_map),
-                    maps:map(fun(_Username, {Send_PID, _}) -> Send_PID ! JSON_Message end, Member_map),
+                    maps:map(
+                      fun(_Username, {Send_PID, _}) -> 
+                              io:format("PID: ~p~n", [Send_PID]), 
+                              Send_PID ! {text, JSON_Message} 
+                      end, Member_map),
                     loop(Connection_map)
             end,
             loop(Connection_map);
