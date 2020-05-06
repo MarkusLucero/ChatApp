@@ -15,6 +15,7 @@ const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
 const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
+const CREATE_THREAD = "CREATE_THREAD";
 
 export function sendMessage(data) {
   return {
@@ -74,6 +75,22 @@ export function startChat(values){
       chat_name: values.chatName,
       from: values.from, 
       members: values.members,
+    },
+  };
+}
+
+export function createThread(values){
+  return {
+    type: CREATE_THREAD,
+    payload: {
+      serverName: values.server, 
+      thread_id: null, 
+      username: values.user, 
+      root_post: {root_header: values.summary, 
+        root_cooment: values.details,
+      },
+      timestamp: null, 
+      commentList: [],
     },
   };
 }

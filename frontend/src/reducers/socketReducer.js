@@ -65,6 +65,9 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: firstWelcome,
       };
+    case "CREATE_THREAD":
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "ADDFRIEND":
       return {
         ...state,
@@ -198,7 +201,7 @@ const socketReducer = (state = initialState, action) => {
           message: msgObject.message,
           username: msgObject.user_id,
         });
-       
+
         return {
           ...state,
           listOfDms: updateListOfDms,

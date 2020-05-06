@@ -66,15 +66,21 @@ const FriendsList = () => {
           onMouseEnter= {()=>{setHovered(!hovered)}}
           onMouseLeave = {()=>{setHovered(!hovered)}}
         />{" "}
-        {/*TODO ON CLICK, lägg till bild  */}
-        <AddFriend
-          userInput={username}
-          handleInputChange={handleInputChange}
-          setAddSuccessful={setAddSuccessful}
-          show={show}
-          setShow={setShow}
-          from={requester}
-        ></AddFriend>
+        {show ? (
+
+    <div className="addFriend-custom-overlay">
+
+          <AddFriend
+            userInput={username}
+            handleInputChange={handleInputChange}
+            setAddSuccessful={setAddSuccessful}
+            show={show}
+            setShow={setShow}
+            from={requester}
+          ></AddFriend>
+          </div>
+        ) : null 
+        }
       </div>
       <div className="flex flex-col">
         {friends.map((friend, index) => {

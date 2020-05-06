@@ -1,12 +1,19 @@
-import React, {useRef} from "react";
+import React, { useRef, useEffect } from "react";
 import plus from "../../img/plus.svg";
 import CreateThread from "./CreateThread";
 
+/**
+ * ThreadList is the component which lists all threads the user has access to
+ * @property {String} focusedPage - a string used to check what page we are focusing on
+ * @property {string} username  username of the logged in user
+ * @returns A div containing all threads that the logged in user can access
+ */
 const ThreadList = ({ focusedPage, username }) => {
+ 
+ 
   /* used for the hover effect on + sign */
   const [hovered, setHovered] = React.useState(false);
   const [showCreateThread, setShowCreateThread] = React.useState(false);
-  const createThread = useRef();
   return (
     <div className="flex flex-col ml-2">
       <div
@@ -23,15 +30,27 @@ const ThreadList = ({ focusedPage, username }) => {
             setHovered(!hovered);
           }}
           alt="Create a new thread!"
-          className={hovered ? "plusIcon-custom-hover h-6 w-6 cursor-pointer" : "h-6 w-6 cursor-pointer"}
-          onClick ={()=>{setShowCreateThread(true)}}
+          className={
+            hovered
+              ? "plusIcon-custom-hover h-6 w-6 cursor-pointer"
+              : "h-6 w-6 cursor-pointer"
+          }
+          onClick={() => {
+            setShowCreateThread(true);
+          }}
         />
       </div>
-      <div ref={createThread} >
-        {showCreateThread ? <CreateThread/> : null}
+      <div>
+        {showCreateThread ? (
+          <div className="addFriend-custom-overlay">
+            <div className="w-1/2">
+              <CreateThread showCreateThread ={showCreateThread} setShowCreateThread={setShowCreateThread} />
+            </div>
+          </div>
+        ) : null}
       </div>
       <div id="threadList" className="text-white pt-1">
-        list of threads created by you 
+        list of threads created by you
         {/* MAP a list of thread components here */}
       </div>
     </div>
