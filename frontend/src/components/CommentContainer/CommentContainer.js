@@ -53,16 +53,18 @@ const CommentContainer = () => {
 
   React.useEffect(() => {
     if (addReply === true) {
-      setComments((comments) => [
+      /*  setComments((comments) => [
         ...comments,
         comments[index].replies.push(assembleComment(poster, reply)),
-      ]);
+      ]); */
+
+      comments[index].replies.push(assembleComment(poster, reply));
+      setComments((comments) => [...comments]);
+      console.log(index)
     }
     setAddReply(false);
     setReply("");
   }, [addReply]);
-
-  console.log(comments);
 
   const handleInputChange = (event) => {
     setComment(event.target.value);
@@ -71,10 +73,8 @@ const CommentContainer = () => {
   const handleReplyChange = (event) => {
     setReply(event.target.value);
   };
-  console.log("DATA");
-  console.log(reply);
-  console.log(addReply);
   console.log(index);
+  console.log(comments);
 
   /* When submitting a reply we must create a new Posted Comment field and concatinate this new pushed comment field with
   the parrent reply [] array. */
@@ -102,6 +102,7 @@ const CommentContainer = () => {
               setAddReply={setAddReply}
               username={poster}
               comments={comments}
+              setComments={setComments}
             ></CommentField>
           </div>
         </div>

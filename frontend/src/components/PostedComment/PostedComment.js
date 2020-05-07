@@ -7,6 +7,7 @@ const PostedComment = ({
   inputHandler,
   setAddReply,
   comments,
+  setComments,
   setIndex,
 }) => {
   return (
@@ -24,7 +25,18 @@ const PostedComment = ({
               setAddReply={setAddReply}
               username={username}
               comments={comments}
+              setComments={setComments}
             ></Reply>
+            {comment.replies && (
+              <PostedComment
+                setIndex={setIndex}
+                username={username}
+                inputHandler={inputHandler}
+                setAddReply={setAddReply}
+                setComments={setComments}
+                comments={comment.replies}
+              ></PostedComment>
+            )}
           </div>
         ))}
       </div>

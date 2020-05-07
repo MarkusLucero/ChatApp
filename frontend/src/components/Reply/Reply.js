@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../assets/main.css";
 import Comment from "../Comment/Comment";
 
-const Reply = ({ username, inputHandler, setAddReply, index, setIndex }) => {
+const Reply = ({ username, inputHandler, setAddReply, index, comments, setComments,setIndex }) => {
   const [replyBox, setReplyBox] = useState(false);
 
   function ToggleReplyBox() {

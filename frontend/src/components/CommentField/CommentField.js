@@ -11,6 +11,7 @@ const CommentField = ({
   username,
   comments,
   setIndex,
+  setComments,
 }) => {
   return (
     <div className=" pl-20 pr-20 pb-20  pt-10">
@@ -21,6 +22,7 @@ const CommentField = ({
           inputHandler={inputHandler}
           setAddReply={setAddReply}
           comments={comments}
+          setComments={setComments}
         ></PostedComment>
       </div>
     </div>
