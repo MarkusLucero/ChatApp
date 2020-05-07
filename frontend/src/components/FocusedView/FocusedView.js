@@ -9,13 +9,13 @@ import ThreadContainer from "../ThreadContainer/ThreadContainer";
  * @property {String} focusedPage - a string used to check what page we are focusing on
  * @returns the appropriate component that should be displayed
  */
-const FocusedView = ({ focusedChat, focusedPage }) => {
+const FocusedView = ({ focusedChat, focusedPage, focusedThread }) => {
   return (
     <>
       {focusedPage === "Home" ? (
         <ChatContainer focusedChat={focusedChat} />
       ) : (
-        <ThreadContainer focusedPage={focusedPage} />
+        <ThreadContainer focusedThread={focusedThread} />
       )}
     </>
   );

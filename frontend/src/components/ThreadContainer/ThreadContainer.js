@@ -1,8 +1,13 @@
 import React from "react";
 import SearchBar from "../SearchBar/SearchBar";
+import OriginalPost from "./OriginalPost";
 
-const ThreadContainer = ({ focusedPage }) => {
-
+/**
+ * ThreadContainer holds all information about a thread; rootpost, comments etc
+ * @property {string} focusedThread the threadId of the thread we're currently focusing on 
+ * @returns a div with the Originalpost and comments
+ */
+const ThreadContainer = ({focusedThread }) => {
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -29,7 +34,7 @@ const ThreadContainer = ({ focusedPage }) => {
   };
 
   /* TODO! fix that we display a certain thread here or all threads of server to pick from?? */
-  
+
   return (
     <div className="focused-view-custom-bg text-white flex flex-col content-center ">
       <SearchBar
@@ -38,7 +43,10 @@ const ThreadContainer = ({ focusedPage }) => {
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
       />
-      focuse page/server is : {focusedPage}
+      <div className="h-screen75">
+
+      {focusedThread ? <OriginalPost focusedThread={focusedThread} /> : null}
+      </div>
     </div>
   );
 };
