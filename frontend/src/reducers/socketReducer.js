@@ -66,6 +66,9 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: firstWelcome,
       };
+    case "CREATE_THREAD":
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "ADDFRIEND":
       return {
         ...state,

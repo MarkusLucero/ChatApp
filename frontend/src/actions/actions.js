@@ -15,6 +15,7 @@ const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
 const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
+const CREATE_THREAD = "CREATE_THREAD";
 
 export function sendMessage(data) {
   return {
@@ -74,6 +75,23 @@ export function startChat(values){
       chat_name: values.chatName,
       from: values.from, 
       members: values.members,
+    },
+  };
+}
+
+export function createThread(values){
+  return {
+    type: CREATE_THREAD,
+    payload: {
+      serverName: values.server, 
+      thread_id: null, //TODO: ? kanske todo, kanske rätt
+      username: values.user, 
+      root_post: {root_header: values.summary, 
+        root_cooment: values.details,
+      },
+      //TODO: Vet inte om detta är ok eller ej, tänkte initialt att det kanske är lättare att sätta timestamp i backend
+      timestamp: null, 
+      commentList: [],
     },
   };
 }

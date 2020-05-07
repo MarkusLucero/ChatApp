@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef} from "react";
 const axios = require("axios");
 
 async function friendRequest({
@@ -51,9 +51,28 @@ const AddFriend = ({
   /* This state is local to the modal and displays error text if failed attempt */
   const [errorMsg, setErrorMsg] = useState(false);
 
-  const content = show && (
-    <div className="addFriend-custom-overlay">
-      <div className="addFriend-custom-modal">
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, []);
+
+  const monad = useRef();
+  /*Handle click outside createThread modal */
+  const handleClick = (e) => {
+    if (show == true) {
+      if (monad.current.contains(e.target)) {
+        // inside click
+        return;
+      } else {
+        setShow(false);
+      }
+    }
+  };
+  return(
+ 
+      <div className="addFriend-custom-modal" ref={monad}>
         <div className="addFriend-custom-modal-body">
           <h1>ADD FRIEND</h1>
 
@@ -93,9 +112,8 @@ const AddFriend = ({
           </button>
         </div>
       </div>
-    </div>
+
   );
 
-  return content;
 };
 export default AddFriend;
