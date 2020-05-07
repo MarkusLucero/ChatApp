@@ -1,5 +1,5 @@
 **STEG 1:**
-Hitta din "odbcinst.ini" fil. Min ligger i "/usr/local/etc/odbcinst.ini" men ni kan ha den någon annan stans.
+Hitta din _odbcinst.ini_ fil. Min ligger i _/usr/local/etc/odbcinst.ini_ men ni kan ha den någon annan stans.
 TIPS:
 ```
 whereis odbcinst.ini
@@ -16,10 +16,10 @@ Debug=0
 CommLog=1  
 UsageCount=  
 ```
-OBS!! DRIVER= "din sökväg till filen psqlodbca.so" (det finns en möjlighet att din driver fil heter något annat)
+OBS!! DRIVER= _din sökväg till filen psqlodbca.so_ (det finns en möjlighet att din driver fil heter något annat)
 
 **STEG 3:**
-Hitta din "odbc.ini" fil. Min ligger i "/usr/local/etc/odbc.ini" men ni kan ha den någon annan stans.
+Hitta din _odbc.ini_ fil. Min ligger i _/usr/local/etc/odbc.ini_ men ni kan ha den någon annan stans.
 
 TIPS:
 ```
@@ -61,7 +61,7 @@ kör följande kommando när du är inloggad i postgres:
 ```
 <psql -f Init.sql
 ```
-OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex /home/skooben/adrenaline/backend/database_api/postgres/Init.sql
+OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Init.sql_
 
 **STEG 7:**
 kör följande kommando när du är inloggad i postgres:  
@@ -69,7 +69,7 @@ kör följande kommando när du är inloggad i postgres:
 ```
 psql -d adrenaline_db -a -f Setup.sql
 ```
-OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex /home/skooben/adrenaline/backend/database_api/postgres/Setup.sql
+OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Setup.sql_
 
 **STEG 8:**
 Kör kommandot 
