@@ -6,6 +6,7 @@ const initialState = {
   wsOnline: false,
   socketServer: null,
   firstWelcome: null,
+  magicToken: null,
   username: null,
   listOfDms: null,
   listOfFriends: null,
@@ -71,12 +72,9 @@ const socketReducer = (state = initialState, action) => {
         listOfFriends: state.listOfFriends.concat(action.payload.username),
       };
     case "CHAT_REQUEST":
-      console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
       return state;
     case "RESPONSE":
-      console.log("payload:::")
-      console.log(action.payload)
       /* if data is ack or welcome there's nothning we need to do */
       if (action.payload.data === "Welcome" || action.payload.data === "ACK") {
         return state;
@@ -85,11 +83,10 @@ const socketReducer = (state = initialState, action) => {
       } else if (action.payload.action === "login") {
         /* need to respond to socket with action = login, username, and magictoken to establish connection */
 
-        console.log(JSON.stringify(action.payload))
         state.socket.send(JSON.stringify(action.payload));
 
         /* TODO TODO
-          This if ann else cases handles the fact that we accidentely get 2 login responses from backend right now
+          This if and else cases handles the fact that we accidentely get 2 login responses from backend right now
           not to trigger useEffect in ChatContainer we have this case here.. TODO remove it after backend fixes it
         */
         if (state.firstWelcome === false) {
@@ -100,18 +97,15 @@ const socketReducer = (state = initialState, action) => {
           return {
             ...state,
             firstWelcome: false, // no longer first welcome..
+            magicToken: action.payload.magictoken.magic_token,
           };
         }
       } else {
         const parsedData = JSON.parse(action.payload.data);
-        console.log("Parsed Data:: ");
-        console.log(parsedData);
+
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
           case "init_login":
-
-            console.log( "INSIDE INIT LOGIN - set up user object in state")
-            console.log(parsedData.list_of_dms[0])
             return {
               ...state,
 
@@ -183,13 +177,26 @@ const socketReducer = (state = initialState, action) => {
           message: msgObject.message,
           username: msgObject.user_id,
         });
-       
+
         return {
           ...state,
           listOfDms: updateListOfDms,
         };
       }
       return state;
+    case "LOGOUT":
+      /* RESET STATE */
+      return {
+        ...state,
+        socket: null,
+        wsOnline: false,
+        socketServer: null,
+        firstWelcome: null,
+        magicToken: null,
+        username: null,
+        listOfDms: null,
+        listOfFriends: null,
+      };
     default:
       return state;
   }
