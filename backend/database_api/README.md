@@ -19,6 +19,7 @@ UsageCount=
 OBS!! DRIVER= _din sökväg till filen psqlodbca.so_ (det finns en möjlighet att din driver fil heter något annat)
 
 **STEG 3:**
+
 Hitta din _odbc.ini_ fil. Min ligger i _/usr/local/etc/odbc.ini_ men ni kan ha den någon annan stans.
 
 TIPS:
@@ -27,6 +28,7 @@ whereis odbc.ini
 ```
 
 **STEG 4:**
+
 Lägg in följande text i odbc.ini:
 ```
 [PostgreSQL test]
@@ -47,6 +49,7 @@ FakeOidIndex=No
 ConnSettings=  
 ```  
 **STEG 5:**
+
 Logga in i postgres som root user.
 
 Linux:
@@ -63,7 +66,8 @@ kör följande kommando när du är inloggad i postgres:
 ```
 OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Init.sql_
 
-**STEG 7:**
+**STEG 7:**  
+
 kör följande kommando när du är inloggad i postgres:  
 
 ```
@@ -71,7 +75,8 @@ psql -d adrenaline_db -a -f Setup.sql
 ```
 OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Setup.sql_
 
-**STEG 8:**
+**STEG 8:** 
+
 Kör kommandot 
 ```
 make test
