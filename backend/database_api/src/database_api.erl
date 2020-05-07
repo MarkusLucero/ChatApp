@@ -11,7 +11,7 @@
 -spec start() -> ok.
 
 start() ->
-    DB = erl_to_sql:init("PostgreSQL test", "postgres", "1234"),
+    DB = erl_to_sql:init("PostgreSQL test", "adrenaline", "1234"),
 %%  io:format("database:start() -> DB = ~p~n", [DB]),
     register(database, DB),
     ok.
@@ -34,9 +34,19 @@ stop() ->
       TimeStamp::list().
 
 insert_user(Username, Password, TimeStamp) ->
-%%    io:format("database_api:insert_user(~p, ~p, ~p)~n", [Username, Password, TimeStamp]),
-    database ! {insert_user,Username, Password, TimeStamp},
-    ok.
+    database ! {insert_user,Username, Password, TimeStamp, self()},
+
+    receive
+	ok ->
+	    ok;
+	{error, user_exist} ->
+%%	    io:format("database_api:insert_user/3 Error, Username already exist in database."),
+	    {error, "Username already exist in database"};
+	Msg ->
+%%	    io:format("database_api:insert_user/3 Unhandled message: ~p~n", [Msg]),
+	    {error, Msg}
+    end.
+		
 
 %% @doc Insert a friend to a users friendlist. This function is asyncronous.
 %% @param Username The users ID.
@@ -50,12 +60,10 @@ insert_friend(Username, Friend) ->
 %%  io:format("Insert_friend(~p, ~p)~n", [Username, Friend]),
     database ! {insert_friend,Username, Friend, self()},
     receive
-        {error, no_user} ->
-             {error, "Username not found in database."};
-        {error, no_friend} ->
-             {error, "Friend not found in database."};
         ok ->
             ok;
+	{error, Reason} ->
+             {error, Reason};
         Msg ->
             io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
      end.
@@ -102,8 +110,13 @@ create_chat(Chat_Name, Creator, Members) ->
 
 insert_chat(From_Username, Chat_Name, {TimeStamp, Msg}, Status) ->
 %%  io:format("Insert_chat(~p, ~p, ~p, ~p, ~p)~n", [From_Username, Chat_ID, TimeStamp, Msg, Status]),
-    database ! {insert_chat, From_Username, Chat_Name, {TimeStamp, Msg}, Status},
-    ok.
+    database ! {insert_chat, From_Username, Chat_Name, {TimeStamp, Msg}, Status, self()},
+    receive
+	ok ->
+	    ok;
+	{error, Reason} ->
+	    {error, Reason}
+    end.
 
 
 %% @doc Fetch information about a user from the database. This function can be stuck waiting for a time when trying to fetch from database.
@@ -226,22 +239,25 @@ start_test_() ->
     ].
 
 insert_user_test() ->
+    database ! reset_tests,
     %% This will produce a badmatch error if left hand side (ok) dont match with the right hand side (return value of insert_user). i.e this test will fail if they dont match. 
     ok = insert_user("testuser1", "testpassword1","2020-10-19 01:00:00"),
-    ok = insert_user("testfriend1", "testpassword1","2020-10-19 01:00:00").
+    ok = insert_user("testfriend1", "testpassword1","2020-10-19 01:00:00"),
+    {error, _} = insert_user("testuser1", "testpassword1","2020-10-19 01:00:00").
 
 insert_friend_test() ->
     ok = insert_friend("testuser1", "testfriend1"),
-    {error, "Username not found in database."} = insert_friend("invalid username", "testfriend1"),
-    {error, "Friend not found in database."} = insert_friend("testuser1", "invalid friend"),
-    {error, "Username not found in database."} = insert_friend("invalid username", "invalid friend").
+    {error, _} = insert_friend("invalid username", "testfriend1"),
+    {error, _} = insert_friend("testuser1", "invalid friend"),
+    {error, _} = insert_friend("invalid username", "invalid friend").
 
 create_chat_test() ->
-     _ = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
-     _ = create_chat("skolchatten","testuser1", ["testuser1"]).
+  
+    _ = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
+    _ = create_chat("skolchatten","testuser1", ["testuser1"]).
 
 insert_chat_test() ->
- database ! {get_group_id,"festchatten", self()},
+    database ! {get_group_id,"festchatten", self()},
     receive
         Group_ID1 ->
             ok = insert_chat("testuser1", Group_ID1,{"2020-10-19 01:00:00", "test message1!!!"}, 1)
@@ -258,7 +274,7 @@ fetch_user_test() ->
     "testpassword1" = Password,
     "2020-10-19 1:0:0" = TimeStamp,
     
-    {error, "Username not found in database."} = fetch_user("Invalid username").
+    {error, _} = fetch_user("Invalid username").
 
 fetch_chat_test() ->
     database ! {get_group_id,"festchatten", self()},
@@ -283,7 +299,11 @@ fetch_chat_test() ->
 
 
  fetch_chat_members_test() ->
-    [{"testuser1"}, {"testfriend1"}] = fetch_chat_members("festchatten"),
+    database ! {get_group_id,"festchatten", self()},
+    receive
+        Group_ID ->
+	    [{"testuser1"}, {"testfriend1"}] = fetch_chat_members(Group_ID)
+    end,
 
     {error, "Chat_ID not found in database."} = fetch_chat_members("Invalid chat_ID").
 
