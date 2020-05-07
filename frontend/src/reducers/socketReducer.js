@@ -9,6 +9,7 @@ const initialState = {
   username: null,
   listOfDms: null,
   listOfFriends: null,
+  server: null,
 };
 
 /**
@@ -101,32 +102,18 @@ const socketReducer = (state = initialState, action) => {
             in accordance with doc it should be a response with action "init_login" but we will do 
             it here right now
 
-                        each user gets 2 hard coded chatrooms on login
-                        each user gets 4 hard coded friends on login
-                        user get's its username  ( not hardcoded it comes from action.payload.username )
-
             */
-            listOfDms: [
-              {
-                chatName: "Skooben",
-                chatID: "1a",
-                messages: [{ message: "test", username: "Markipie" }],
-                members: [],
-                creator: "",
-              },
-              {
-                chatName: "Grabbarna Grus",
-                chatID: "2a",
-                messages: [
-                  { message: "Axel mitt sexdjur?", username: "Anton" },
-                  { message: "axel e arg på dig", username: "Axel" },
-                ],
-                members: [],
-                creator: "",
-              },
-            ],
-            listOfFriends: ["Skooben", "Markipie", "Mustafa", "Pallerkan"],
+            listOfDms: [],
+            listOfFriends: [],
             username: action.payload.username,
+            /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
+            server: {
+              serverName: "GLOBAL",
+              serverInformation:
+                "This is the global server that everyone joins. Make threads, comment and be happy peeps.",
+              listOfThreads: [],
+              members: [action.payload.username],
+            },
           };
         }
       } else {
@@ -198,7 +185,7 @@ const socketReducer = (state = initialState, action) => {
           message: msgObject.message,
           username: msgObject.user_id,
         });
-       
+
         return {
           ...state,
           listOfDms: updateListOfDms,

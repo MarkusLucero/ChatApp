@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import Servers from "./Servers";
+import Server from "./Server";
 
 /**
  * SideDisplayList holds all components in the side display - servers, add server, profile
  * @property {function} handleFocusedPage Callback function passed down from LandingPage - Used to get id of what page we click on
  * @returns A div containing the servers, add server, logout and profile buttons
  */
-const SideDisplayList = ({handleFocusedPage}) => {
 
-  // hardcoded server called GEN -- only one for now.
-  const servers = [{name: "GEN"}];
+const SideDisplayList = ({handleFocusedPage, server}) => {
 
   return (
     <div style={{backgroundColor: '#23272A' }} className="flex flex-col">
@@ -20,9 +18,7 @@ const SideDisplayList = ({handleFocusedPage}) => {
       </div>
       <div className=" h-auto">
         <div className="flex flex-col justify-between">
-          {servers.map((server, index) => (
-            <Servers key={index} server={server} handleFocusedPage={handleFocusedPage} />
-          ))}
+            <Server server={server} handleFocusedPage = {handleFocusedPage} />
         </div>
       </div>
     </div>

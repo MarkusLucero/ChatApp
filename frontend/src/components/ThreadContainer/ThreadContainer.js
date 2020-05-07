@@ -28,6 +28,7 @@ const ThreadContainer = ({ focusedPage }) => {
     event.preventDefault();
   };
 
+  /* TODO! fix that we display a certain thread here or all threads of server to pick from?? */
   
   return (
     <div className="focused-view-custom-bg text-white flex flex-col content-center ">
