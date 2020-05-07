@@ -4,7 +4,10 @@ import Reply from "../Reply/Reply";
 
 const PostedComment = ({
   username,
+  inputHandler,
+  setAddReply,
   comments,
+  setIndex,
 }) => {
   return (
     <div className="w-full">
@@ -15,7 +18,12 @@ const PostedComment = ({
             <div className="  mt-4 ml-4 text-blue-700">{comment.username}</div>
             <div className=" ml-4 "> {comment.text}</div>
             <Reply
+              setIndex={setIndex}
+              inputHandler={inputHandler}
+              index={index}
+              setAddReply={setAddReply}
               username={username}
+              comments={comments}
             ></Reply>
           </div>
         ))}

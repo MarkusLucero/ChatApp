@@ -26,26 +26,55 @@ const CommentContainer = () => {
   const [comment, setComment] = useState("");
   /* This state handles if comment was posted or not */
   const [addComment, setAddComment] = useState(false);
+  /* This state handles reply input */
+  const [reply, setReply] = useState("");
+  /* This state handles if reply was posted or not */
+  const [addReply, setAddReply] = useState(false);
   /* Gets the username of the person posting the comment*/
   const poster = useSelector((state) => state.socketState.username);
   /* The recursive comment obj array */
   const [comments, setComments] = useState([]);
+  /* Index to the comment we reply to */
+  const [index, setIndex] = useState(0);
 
   /* When we successfully change the value of comment, i.e someone comment button is pressed, we update the Array holding all comments */
   React.useEffect(() => {
     if (addComment === true) {
-      console.log("IN HERE");
       setComments((comments) =>
         comments.concat(assembleComment(poster, comment))
       );
       setAddComment(false);
       setComment("");
     }
+    /*         comments[index].replies.concat(assembleComment(poster, reply))
+    
+ */
   }, [addComment]);
+
+  React.useEffect(() => {
+    if (addReply === true) {
+      setComments((comments) => [
+        ...comments,
+        comments[index].replies.push(assembleComment(poster, reply)),
+      ]);
+    }
+    setAddReply(false);
+    setReply("");
+  }, [addReply]);
+
+  console.log(comments);
 
   const handleInputChange = (event) => {
     setComment(event.target.value);
   };
+
+  const handleReplyChange = (event) => {
+    setReply(event.target.value);
+  };
+  console.log("DATA");
+  console.log(reply);
+  console.log(addReply);
+  console.log(index);
 
   /* When submitting a reply we must create a new Posted Comment field and concatinate this new pushed comment field with
   the parrent reply [] array. */
@@ -68,6 +97,9 @@ const CommentContainer = () => {
               username={poster}
             ></Comment>
             <CommentField
+              setIndex={setIndex}
+              inputHandler={handleReplyChange}
+              setAddReply={setAddReply}
               username={poster}
               comments={comments}
             ></CommentField>
