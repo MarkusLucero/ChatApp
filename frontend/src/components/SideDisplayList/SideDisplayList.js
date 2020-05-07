@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Logout from "./Logout/Logout.js"
 import Servers from "./Servers";
 
 /**
@@ -29,6 +30,7 @@ const SideDisplayList = (props) => {
           <h1 className="text-6xl flex items-center justify-center pb-3">+</h1>
         </div>
       </div>
+      <Logout/>
     </div>
   );
 };

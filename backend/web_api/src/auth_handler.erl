@@ -50,17 +50,17 @@ register_user(Username, Password, Req0, Opts) ->
 friend_request(Username, Friendname, Req0, Opts) ->
    case database_api:insert_friend(Username, Friendname) of
        ok ->
-	   %%chat_server:send_friend_request(Username, Friendname),
-	   Body = mochijson:encode(
-		    {struct, [{"action", "friend_request"},
-			      {"status", "ok"},
-			      {"friend", Friendname}]}),
-	   Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-	   {ok, Req3, Opts};
+           %%chat_server:send_friend_request(Username, Friendname),
+           Body = mochijson:encode(
+                    {struct, [{"action", "friend_request"},
+                              {"status", "ok"},
+                              {"friend", Friendname}]}),
+           Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+           {ok, Req3, Opts};
        _ ->
-	   Body = <<"Friend request failed!">>,
-	   Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-	   {ok, Req3, Opts}
+           Body = <<"Friend request failed!">>,
+           Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+           {ok, Req3, Opts}
    end.    
 
 
@@ -87,11 +87,15 @@ init(Req0, Opts) ->
                          {"password", Password}]} ->
                     io:format("REGISTER~n"),
                     register_user(Username, Password, Req0, Opts);
-		{struct,[{"action", "friend_request"},
+                {struct,[{"action", "friend_request"},
                          {"username", Friendname},
                          {"password", Username}]} ->
                     io:format("FRIEND REQUEST~n"),
                     friend_request(Username, Friendname, Req0, Opts);
+                {struct,[{"action", "logout"},
+                         {"username", Username},
+                         {"magic_token", Token}]} ->
+                    chat_server:logout_user(Username, Token);
                 _ -> 
                     Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
@@ -138,6 +142,13 @@ start_token_server() ->
 
 token_server_loop(Token_map) ->
     receive
+        {remove_token, Token, Username} ->
+            case maps:get(Username, Token_map) of
+                Token -> 
+                    token_server_loop(maps:remove(Username, Token_map));
+                _ -> 
+                    token_server_loop(Token_map)
+            end;
         {add_token, Token, User} ->
             io:format("Adding token: ~p~n", [Token]),
             New_map = maps:put(User, Token, Token_map),

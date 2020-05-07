@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -122,6 +122,18 @@ send_friend_request(Username, Friendname) ->
     %database_api:insert_friend(Username, Friendname),
     %database_api:insert_friend(Friendname, Username),
     chat_server ! {friend_request, Username, Friendname},
+    ok.
+
+
+-spec logout_user(Username, Token) -> ok when
+      Username :: list(Integer),
+      Token :: list(Integer).
+%% @doc Logs a user out if Username and Token are correct
+%% @param Username The username of the user that gets logged out
+%% @param Token The magic token corresponding to the user's session
+%% @returns ok.
+logout_user(Username, Token) ->
+    chat_server ! {logout_user, Username, Token},
     ok.
 
 %% @doc Generates a unique chat id
@@ -263,6 +275,12 @@ loop(Connection_map) ->
                                       {"creator", Creator}]}),
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
             [PID ! {text, JSON_Message} || {ok, {PID, _}} <- Member_PIDs],
-            loop(Connection_map)
-            
+            loop(Connection_map);
+        {logout_user, Username, Token} ->
+            case maps:get(Username, Connection_map) of
+                {_PID, Token} -> 
+                    token_server ! {remove_token, Token, Username},
+                    loop(maps:remove(Username, Connection_map));
+                _ -> loop(Connection_map)
+            end
     end.
