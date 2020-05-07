@@ -50,7 +50,7 @@ const Logout = () => {
 
   return (
     <div
-      className="text-white"
+      className="text-white cursor-pointer"
       onClick={() => logoutHandler(username, magicToken, setLogoutSuccess)}
     >
       LOGOUT
