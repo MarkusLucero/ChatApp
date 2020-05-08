@@ -1,9 +1,14 @@
 **STEG 1:**
+
 Hitta din _odbcinst.ini_ fil. Min ligger i _/usr/local/etc/odbcinst.ini_ men ni kan ha den någon annan stans.
-TIPS:
+TIPS LINUX:
 ```
 whereis odbcinst.ini
 ```
+TIPS MAC:
+
+Öppna Finder sen välj "this mac" och sök efter filen.
+
 **STEG 2:**  
 Lägg in följande text i odbcinst.ini:
 
@@ -22,10 +27,13 @@ OBS!! DRIVER= _din sökväg till filen psqlodbca.so_ (det finns en möjlighet at
 
 Hitta din _odbc.ini_ fil. Min ligger i _/usr/local/etc/odbc.ini_ men ni kan ha den någon annan stans.
 
-TIPS:
+TIPS LINUX:
 ```
 whereis odbc.ini
 ```
+TIPS MAC:
+
+Öppna Finder sen välj "this mac" och sök efter filen.
 
 **STEG 4:**
 
@@ -56,13 +64,19 @@ Linux:
 ```
 sudo su postgres
 ```
-MAC: ????
+MAC: Hoppa direkt till steg 6.
 
 **STEG 6:**
 
-kör följande kommando när du är inloggad i postgres:  
+kör följande kommando när du är inloggad i postgres: 
+
+LINUX:
 ```
-<psql -f Init.sql
+psql -f Init.sql
+```
+MAC:
+```
+psql -f Init.sql -U postgres
 ```
 OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Init.sql_
 
