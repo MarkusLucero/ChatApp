@@ -36,6 +36,24 @@ const ChatContainer = ({ focusedChat }) => {
        to be displayed in the chat
     */
     console.log(searchTerm);
+
+    /* IF YOU WANT TO TRY OUT THE PYTHON SEARCH API UNCOMMENT THE FETCH STATEMENT BELOW */
+    // Send the same request
+/*     fetch("http://localhost:5000/search", {
+      // Specify the method
+      method: "POST",
+      // A JSON payload
+      body: JSON.stringify({
+        "search_term": searchTerm,
+      }),
+    })
+      .then(function (response) {
+        return response.json(); //parse result as JSON
+      })
+      .then(function (json) {
+        console.log("Search results: ");
+        console.log(json); // Here’s our JSON object
+      }); */
     setSearchTerm("");
     event.preventDefault();
   };

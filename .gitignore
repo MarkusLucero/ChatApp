@@ -5,6 +5,7 @@ tus# See https://help.github.com/articles/ignoring-files/ for more about ignorin
 /frontend/.pnp
 /frontend/.pnp.js
 /frontend/docs
+/frontend/api/__pycache__
 
 # production
 /frontend/build
