@@ -1,11 +1,13 @@
 import React from "react";
 import "../../assets/main.css";
 import Reply from "../Reply/Reply";
+import placeholder from "../../img/placeholder.png";
 
 const PostedComment = ({
   username,
   inputHandler,
   setAddReply,
+  addReply,
   comments,
   setComments,
   setIndex,
@@ -15,28 +17,42 @@ const PostedComment = ({
       <div>{comments.username}</div>
       <div className="text-white w-full">
         {comments.map((comment, index) => (
-          <div className="border-l  w-full " key={index}>
-            <div className="  mt-4 ml-4 text-blue-700">{comment.username}</div>
-            <div className=" ml-4 "> {comment.text}</div>
-            <Reply
-              setIndex={setIndex}
-              inputHandler={inputHandler}
-              index={index}
-              setAddReply={setAddReply}
-              username={username}
-              comments={comments}
-              setComments={setComments}
-            ></Reply>
-            {comment.replies && (
-              <PostedComment
+          <div className=" w-full " key={index}>
+            <span className="">
+              <img
+                className="rounded-full w-12 h-auto  mb-4 mr-4 float-left"
+                alt=""
+                src={placeholder}
+              ></img>
+            </span>
+            <div className="break-words ml-12">
+              <div className="  mt-4 ml-4 text-blue-700">
+                {comment.username}
+              </div>
+              {Object.keys(comment.reply).length !== 0 ? (
+                <div className="quote">
+                  <div className=" font-bold ml-4">
+                    Originally posted by {""}
+                    <span className="font-bold text-blue-700">
+                      {comment.reply.username}
+                    </span>
+                  </div>
+                  <div className="break"></div>
+                  <div className="ml-4 ">{comment.reply.text}</div>
+                </div>
+              ) : null}
+              <div className=" ml-4 "> {comment.text}
+              <Reply
                 setIndex={setIndex}
-                username={username}
                 inputHandler={inputHandler}
+                index={index}
                 setAddReply={setAddReply}
+                username={username}
+                comments={comments}
                 setComments={setComments}
-                comments={comment.replies}
-              ></PostedComment>
-            )}
+              ></Reply>
+              </div>
+            </div>
           </div>
         ))}
       </div>

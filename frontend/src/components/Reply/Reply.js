@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../assets/main.css";
 import Comment from "../Comment/Comment";
 
-const Reply = ({ username, inputHandler, setAddReply, index, comments, setComments,setIndex }) => {
+const Reply = ({ username, inputHandler, setAddReply, index, setIndex }) => {
   const [replyBox, setReplyBox] = useState(false);
 
   function ToggleReplyBox() {
@@ -14,11 +14,12 @@ const Reply = ({ username, inputHandler, setAddReply, index, comments, setCommen
   }
   return (
     <div>
-      <button className="ml-4 text-gray-600" onClick={ToggleReplyBox}>
+      <button className="text-gray-600" onClick={ToggleReplyBox}>
         reply
       </button>
       {replyBox ? (
         <Comment
+          setReplyBox={setReplyBox}
           inputHandler={inputHandler}
           setAddComment={setAddReply}
           username={username}

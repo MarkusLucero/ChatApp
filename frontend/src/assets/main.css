@@ -11153,6 +11153,23 @@ textarea {
   border-radius: 10px;
 }
 
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+.quote {
+  display:flex;
+  flex-wrap: wrap;
+  margin-left: 30px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+  background: #1e2124;
+  width: 70%;
+  border-radius: 8px;
+  border-width: 1px;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;

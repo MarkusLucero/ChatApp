@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import "../../assets/main.css";
-import Comment from "../Comment/Comment";
 import PostedComment from "../PostedComment/PostedComment";
 
 /* Each reply must have its own replyBox state */
@@ -8,6 +7,7 @@ import PostedComment from "../PostedComment/PostedComment";
 const CommentField = ({
   inputHandler,
   setAddReply,
+  addReply,
   username,
   comments,
   setIndex,
@@ -17,7 +17,9 @@ const CommentField = ({
     <div className=" pl-20 pr-20 pb-20  pt-10">
       <div className="commentField">
         <PostedComment
+         className="text-black"
           setIndex={setIndex}
+          addReply={addReply}
           username={username}
           inputHandler={inputHandler}
           setAddReply={setAddReply}

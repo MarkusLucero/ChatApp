@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import "../../assets/main.css";
 import Comment from "../Comment/Comment";
@@ -17,7 +17,14 @@ function assembleComment(poster, comment) {
   return {
     username: poster,
     text: comment,
-    replies: [],
+    reply: [],
+  };
+}
+function assembleReply(poster, comment, reply) {
+  return {
+    username: poster,
+    text: comment,
+    reply: reply,
   };
 }
 
@@ -37,6 +44,11 @@ const CommentContainer = () => {
   /* Index to the comment we reply to */
   const [index, setIndex] = useState(0);
 
+  /* This state is used as a dummy, we must always pass a dummy function to comment to allow it to use setReplyBox */
+  const [dummyReply, setDummyReply] = useState([]);
+
+  const [commentCounter, setCommentCounter] = useState(0);
+
   /* When we successfully change the value of comment, i.e someone comment button is pressed, we update the Array holding all comments */
   React.useEffect(() => {
     if (addComment === true) {
@@ -44,23 +56,22 @@ const CommentContainer = () => {
         comments.concat(assembleComment(poster, comment))
       );
       setAddComment(false);
+      setCommentCounter(commentCounter + 1);
       setComment("");
     }
-    /*         comments[index].replies.concat(assembleComment(poster, reply))
-    
- */
   }, [addComment]);
 
   React.useEffect(() => {
     if (addReply === true) {
-      /*  setComments((comments) => [
-        ...comments,
-        comments[index].replies.push(assembleComment(poster, reply)),
-      ]); */
-
-      comments[index].replies.push(assembleComment(poster, reply));
-      setComments((comments) => [...comments]);
-      console.log(index)
+      setComments((comments) =>
+        comments.concat(
+          assembleReply(poster, reply, {
+            username: comments[index].username,
+            text: comments[index].text,
+          })
+        )
+      );
+      setCommentCounter(commentCounter + 1);
     }
     setAddReply(false);
     setReply("");
@@ -73,7 +84,6 @@ const CommentContainer = () => {
   const handleReplyChange = (event) => {
     setReply(event.target.value);
   };
-  console.log(index);
   console.log(comments);
 
   /* When submitting a reply we must create a new Posted Comment field and concatinate this new pushed comment field with
@@ -88,9 +98,10 @@ const CommentContainer = () => {
               Comments
             </span>
             <span className="text-white pt-10" id="comments_count">
-              (7)
+              ({commentCounter})
             </span>
             <Comment
+              setReplyBox={setDummyReply}
               inputHandler={handleInputChange}
               comment={comment}
               setAddComment={setAddComment}
@@ -100,7 +111,9 @@ const CommentContainer = () => {
               setIndex={setIndex}
               inputHandler={handleReplyChange}
               setAddReply={setAddReply}
+              addReply={addReply}
               username={poster}
+              comment={comment}
               comments={comments}
               setComments={setComments}
             ></CommentField>
