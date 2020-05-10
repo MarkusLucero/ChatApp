@@ -85,7 +85,7 @@ export function startChat(values) {
 }
 export function loginSuccess(data) {
   return { type: SUCCESS, payload: data };
-
+}
 export function createThread(values){
   return {
     type: CREATE_THREAD,
