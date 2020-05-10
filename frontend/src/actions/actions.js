@@ -15,6 +15,8 @@ const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
 const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
+const LOGOUT = "LOGOUT";
+const RESET = "RESET";
 const CREATE_THREAD = "CREATE_THREAD";
 
 export function sendMessage(data) {
@@ -26,13 +28,12 @@ export function sendMessage(data) {
       user_id: data.username,
       message: data.message,
       timestamp: null,
-    }
+    },
   };
 }
 export function addFriend(data) {
-  return{   type: ADDFRIEND, payload:{ username: data.username }}
-};
-
+  return { type: ADDFRIEND, payload: { username: data.username } };
+}
 
 export function connect() {
   return { type: CONNECT, payload: null };
@@ -40,6 +41,10 @@ export function connect() {
 
 export function disconnected(data) {
   return { type: DISCONNECTED, payload: data };
+}
+
+export function logOut(data) {
+  return { type: LOGOUT };
 }
 
 export function login({ values }) {
@@ -66,18 +71,20 @@ export function register(values) {
   };
 }
 
-export function startChat(values){
+export function startChat(values) {
   console.log(values);
   return {
     type: CHAT_REQUEST,
     payload: {
       action: "chat_request",
       chat_name: values.chatName,
-      from: values.from, 
+      from: values.from,
       members: values.members,
     },
   };
 }
+export function loginSuccess(data) {
+  return { type: SUCCESS, payload: data };
 
 export function createThread(values){
   return {
@@ -95,10 +102,7 @@ export function createThread(values){
     },
   };
 }
-export function loginSuccess(data){
-  return { type: SUCCESS, payload: data}
-}
-  
+
 export function loginFailure(data) {
   return { type: FAILURE, payload: data };
 }
@@ -111,3 +115,6 @@ export function setServer(server) {
   return { type: SET, payload: server };
 }
 
+export function resetLoginState() {
+  return { type: RESET };
+}

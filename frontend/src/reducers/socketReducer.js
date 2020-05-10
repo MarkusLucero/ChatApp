@@ -6,6 +6,7 @@ const initialState = {
   wsOnline: false,
   socketServer: null,
   firstWelcome: null,
+  magicToken: null,
   username: null,
   listOfDms: null,
   listOfFriends: null,
@@ -75,7 +76,6 @@ const socketReducer = (state = initialState, action) => {
         listOfFriends: state.listOfFriends.concat(action.payload.username),
       };
     case "CHAT_REQUEST":
-      console.log(action.payload);
       state.socket.send(JSON.stringify(action.payload));
       return state;
     case "RESPONSE":
@@ -86,10 +86,11 @@ const socketReducer = (state = initialState, action) => {
         /* first response */
       } else if (action.payload.action === "login") {
         /* need to respond to socket with action = login, username, and magictoken to establish connection */
+
         state.socket.send(JSON.stringify(action.payload));
 
         /* TODO TODO
-          This if ann else cases handles the fact that we accidentely get 2 login responses from backend right now
+          This if and else cases handles the fact that we accidentely get 2 login responses from backend right now
           not to trigger useEffect in ChatContainer we have this case here.. TODO remove it after backend fixes it
         */
         if (state.firstWelcome === false) {
@@ -100,6 +101,7 @@ const socketReducer = (state = initialState, action) => {
           return {
             ...state,
             firstWelcome: false, // no longer first welcome..
+            magicToken: action.payload.magictoken.magic_token,
             /* 
             TESTING -- TODO - HARDCODED the login object that we should get in accordance with doc
             in accordance with doc it should be a response with action "init_login" but we will do 
@@ -124,6 +126,14 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "init_login":
+            return {
+              ...state,
+
+              listOfDms: parsedData.list_of_dms,
+              listOfFriends: parsedData.list_of_friends,
+              username: parsedData.user_id,
+            };
           case "send_message":
             /* add the new msg object to the right dm object */
             const index = getChatIndex(state.listOfDms, parsedData.chat_id);
@@ -195,6 +205,19 @@ const socketReducer = (state = initialState, action) => {
         };
       }
       return state;
+    case "LOGOUT":
+      /* RESET STATE */
+      return {
+        ...state,
+        socket: null,
+        wsOnline: false,
+        socketServer: null,
+        firstWelcome: null,
+        magicToken: null,
+        username: null,
+        listOfDms: null,
+        listOfFriends: null,
+      };
     default:
       return state;
   }

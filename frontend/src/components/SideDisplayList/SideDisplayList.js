@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Logout from "./Logout/Logout.js"
 import Server from "./Server";
 
 /**
@@ -21,6 +22,7 @@ const SideDisplayList = ({handleFocusedPage, server}) => {
             <Server server={server} handleFocusedPage = {handleFocusedPage} />
         </div>
       </div>
+      <Logout/>
     </div>
   );
 };

@@ -45,7 +45,6 @@ const FriendsList = () => {
   }, [addSuccessful]); 
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
-    console.log("potato");
     if (currentFriends != null) {
       setFriends(currentFriends);
     }
