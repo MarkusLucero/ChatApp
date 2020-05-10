@@ -3,6 +3,8 @@ import "../../assets/main.css";
 import SideDisplayList from "../SideDisplayList/SideDisplayList";
 import FocusedView from "../FocusedView/FocusedView";
 import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
+import { useSelector } from "react-redux";
+
 /**
  * LandingPage holds the layout design grid of the app. Also manages
  * the routing and display of everything inside SideDisplayList, InfoDisplayList and FocusedView
@@ -10,13 +12,33 @@ import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
  * @returns a div containing the SideDisplayList, InfoDisplayList and FocusedView components
  */
 const LandingPage = () => {
-
   /* state to check what chat we are currently focusing on */
   const [focusedChat, setFocusedChat] = React.useState(null);
+  
 
   /* callback function for getting the id of the direct message div that we are clicking on */
   const handleFocusedChat = (event) => {
     setFocusedChat(event.target.id);
+  };
+
+  const [server, setServer] = React.useState({});
+
+  //server object from redux
+  const serverObject = useSelector(state => state.socketState.server);
+
+  React.useEffect(() => {
+    if (serverObject !== null) {
+      setServer(serverObject);
+    }
+  }, [serverObject]);
+
+  /* state to check what page we are focusing on - some server or the home page*/
+  /* Focusing on Home always on start*/
+  const [focusedPage, setFocusedPage] = React.useState("Home");
+
+  /* callback function for getting the id of the page that we are clicking on */
+  const handleFocusedPage = (event) => {
+    setFocusedPage(event.target.id)
   };
 
   return (
@@ -25,10 +47,10 @@ const LandingPage = () => {
      *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
      */
     <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList />
-      <InfoDisplayList handleFocusedChat={handleFocusedChat} />
+      <SideDisplayList handleFocusedPage={handleFocusedPage} server={server}/>
+      <InfoDisplayList handleFocusedChat={handleFocusedChat} focusedPage={focusedPage} />
 
-      <FocusedView focusedChat={focusedChat} />
+      <FocusedView focusedChat={focusedChat} focusedPage={focusedPage} />
     </div>
   );
 };

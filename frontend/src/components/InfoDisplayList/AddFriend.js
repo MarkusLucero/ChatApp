@@ -1,39 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef} from "react";
 const axios = require("axios");
 
-function friendRequest({ setAddSuccessful, userInput, from, setErrorMsg }) {
+async function friendRequest({
+  setAddSuccessful,
+  userInput,
+  from,
+  setErrorMsg,
+}) {
   if (userInput !== "") {
-    axios
-      .post(
+    try {
+      const response = await axios.post(
         "/",
         JSON.stringify({
           action: "friend_request",
           username: userInput,
           password: from,
         })
-      )
-      .then(function (response) {
-          console.log(response);
-        switch (response.status) {
-          /* addfriend accepted, state is passed up to friendsList to determine if the username should be added or not */
-          case 200: {
-            setAddSuccessful(true);
-            setErrorMsg(false);
-            break;
-          }
-          /* addfriend denied, we simply display an error message */
-          case 404: {
-            setErrorMsg(true);
-            break;
-          }
-          default:
-            setErrorMsg(true);
-            break;
+      );
+      const data = await response;
+      switch (data.status) {
+        case 200: {
+          setAddSuccessful(true);
+          setErrorMsg(false);
+          break;
         }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+        case 404: {
+          setErrorMsg(true);
+          break;
+        }
+        default:
+          setErrorMsg(true);
+          break;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     setErrorMsg(true);
   }
@@ -50,9 +51,28 @@ const AddFriend = ({
   /* This state is local to the modal and displays error text if failed attempt */
   const [errorMsg, setErrorMsg] = useState(false);
 
-  const content = show && (
-    <div className="addFriend-custom-overlay">
-      <div className="addFriend-custom-modal">
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, []);
+
+  const monad = useRef();
+  /*Handle click outside createThread modal */
+  const handleClick = (e) => {
+    if (show == true) {
+      if (monad.current.contains(e.target)) {
+        // inside click
+        return;
+      } else {
+        setShow(false);
+      }
+    }
+  };
+  return(
+ 
+      <div className="addFriend-custom-modal" ref={monad}>
         <div className="addFriend-custom-modal-body">
           <h1>ADD FRIEND</h1>
 
@@ -92,9 +112,8 @@ const AddFriend = ({
           </button>
         </div>
       </div>
-    </div>
+
   );
 
-  return content;
 };
 export default AddFriend;

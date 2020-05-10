@@ -60,26 +60,31 @@ const FriendsList = () => {
         <img
           src={add_friend}
           alt=""
-          className= {hovered ? 'h-6 w-6 plusIcon-custom-hover' : 'h-6 w-6'}
+          className= {hovered ? 'h-6 w-6 plusIcon-custom-hover cursor-pointer' : 'h-6 w-6 cursor-pointer'}
           onClick={() => setShow(true)}
           onMouseEnter= {()=>{setHovered(!hovered)}}
           onMouseLeave = {()=>{setHovered(!hovered)}}
         />{" "}
-        {/*TODO ON CLICK, lägg till bild  */}
-        <AddFriend
-          userInput={username}
-          handleInputChange={handleInputChange}
-          setAddSuccessful={setAddSuccessful}
-          show={show}
-          setShow={setShow}
-          from={requester}
-        ></AddFriend>
+        {show ? (
+
+    <div className="addFriend-custom-overlay">
+
+          <AddFriend
+            userInput={username}
+            handleInputChange={handleInputChange}
+            setAddSuccessful={setAddSuccessful}
+            show={show}
+            setShow={setShow}
+            from={requester}
+          ></AddFriend>
+          </div>
+        ) : null 
+        }
       </div>
       <div className="flex flex-col">
         {friends.map((friend, index) => {
           return (
-            <div className="text-white text-xl hover:bg-gray-500" key={index}>
-              {" "}
+            <div className="text-white text-xl hover:bg-gray-500 cursor-pointer" key={index}>
               {friend}
             </div>
           );

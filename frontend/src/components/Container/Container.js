@@ -46,10 +46,9 @@ const Container = () => {
 
   /*  Initiates the websocket client on mount (everything in useEffect is called on mount - like created/mounted in Vue) */
   useEffect(() => {
-
     /* if current prop of ref is null and ws url is set -> initialize new websocket connection (this happens first time) */
     if (!wsRef.current && url !== null) {
-      dispatch(actions.connect()); 
+      dispatch(actions.connect());
     }
 
     /* socket is online  */
@@ -75,7 +74,7 @@ const Container = () => {
         if (wsOnline) {
           /* trigger a reconnect */
           console.log("reconnect to new ws");
-          dispatch(actions.connect()); 
+          dispatch(actions.connect());
         } else {
           /* disconnect the ws */
           console.log("ws disconnected");
@@ -86,7 +85,7 @@ const Container = () => {
   }, [
     ws,
     url,
-    firstWelcome
+    firstWelcome,
   ]); /* dependency list - when element inside is changed we refire the useEffect hook */
 
   /* a variable which checks wether we've successfully logged in or not taken from redux store */
@@ -99,7 +98,7 @@ const Container = () => {
           {loginSuccess ? <Redirect to="/start" /> : <Login />}
         </Route>
         <Route path="/start">
-          {loginSuccess ? <LandingPage /> : <Redirect to="/" />}{" "}
+          {loginSuccess ? <LandingPage /> : <Redirect to="/" />}
         </Route>
         <Route path="/register" render={(props) => <Register {...props} />} />
       </Switch>

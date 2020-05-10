@@ -10,6 +10,7 @@ const initialState = {
   username: null,
   listOfDms: null,
   listOfFriends: null,
+  server: null,
 };
 
 /**
@@ -66,6 +67,9 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: firstWelcome,
       };
+    case "CREATE_THREAD":
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "ADDFRIEND":
       return {
         ...state,
@@ -98,6 +102,23 @@ const socketReducer = (state = initialState, action) => {
             ...state,
             firstWelcome: false, // no longer first welcome..
             magicToken: action.payload.magictoken.magic_token,
+            /* 
+            TESTING -- TODO - HARDCODED the login object that we should get in accordance with doc
+            in accordance with doc it should be a response with action "init_login" but we will do 
+            it here right now
+
+            */
+            listOfDms: [],
+            listOfFriends: [],
+            username: action.payload.username,
+            /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
+            server: {
+              serverName: "GLOBAL",
+              serverInformation:
+                "This is the global server that everyone joins. Make threads, comment and be happy peeps.",
+              listOfThreads: [],
+              members: [action.payload.username],
+            },
           };
         }
       } else {

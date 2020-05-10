@@ -66,7 +66,7 @@ const MessagesList = ({ handleFocusedChat, username }) => {
           onMouseEnter= {()=> {setHovered (!hovered)}}
           onMouseLeave ={()=>{setHovered(!hovered)}}
           alt="Create a new chat!"
-          className={hovered ? 'plusIcon-custom-hover h-6 w-6' : '' + 'h-6 w-6' }
+          className={hovered ? 'plusIcon-custom-hover h-6 w-6 cursor-pointer' : 'h-6 w-6 cursor-pointer' }
         />
         </div>
 
