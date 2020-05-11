@@ -1,10 +1,10 @@
 import React  from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import InformationHeader from './InformationHeader';
-import FriendsList from './FriendsList';
-import ServerInformation from './ServerInformation';
-import ThreadList from './ThreadList';
-import MessagesList from './MessagesList';
+import InformationHeader from './InformationHeader/InformationHeader';
+import FriendsList from './FriendsList/FriendsList';
+import ServerInformation from './InformationHeader/ServerInformation';
+import ThreadList from './ThreadList/ThreadList';
+import MessagesList from './MessagesList/MessagesList';
 
 
 /**

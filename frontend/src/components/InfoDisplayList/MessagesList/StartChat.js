@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import * as actions from "../../actions/actions";
+import * as actions from "../../../actions/actions";
 import { useDispatch } from "react-redux";
 
 /**
  * StartChat is the component which is seen when pressing the '+' icon next to active chats
- * @property {array} friends, all friends of the logged in user
- * @property {string} username, the logged in user's username
- * @param {function} setShowAddChat callback is used to show/hide the StartChat modal
- * @returns A div where user can choose which friend he want's to chat with
+ * @property {array} friends list containing the friends of the suer
+ * @property {string} username the username of the user
+ * @param {function} setShowAddChat callback function is used to show/hide the StartChat modal
+ * @returns the chat modal 
  */
 const StartChat = ({ friends, username, setShowAddChat }) => {
-  /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
 
-  /*local state for which friend to start chat with     */
+  /*local state for which friend to start chat with */
   const [chosen, setChosen] = useState([username]);
   /* Used when clicking on a checkbox */
   const handleCheck = (e) => {

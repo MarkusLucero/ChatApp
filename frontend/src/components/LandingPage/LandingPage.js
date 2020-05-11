@@ -29,6 +29,8 @@ const LandingPage = () => {
     setFocusedThread(event.target.id);
   
   }
+
+  /* The global server object */
   const [server, setServer] = React.useState({});
 
   //server object from redux
@@ -50,10 +52,6 @@ const LandingPage = () => {
   };
 
   return (
-    /**
-     *  The styling is made up of Tailwind css classes
-     *  To change the width of components inside the div search for grid-cols-custom in tailwind.js and change corresponding attr.
-     */
     <div className="grid grid-cols-custom h-screen">
       <SideDisplayList handleFocusedPage={handleFocusedPage} server={server}/>
       <InfoDisplayList handleFocusedChat={handleFocusedChat} focusedPage={focusedPage} 

@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import add_friend from "../../img/add_friend.webp";
+import add_friend from "../../../img/add_friend.webp";
 import AddFriend from "./AddFriend";
-import * as actions from "../../actions/actions";
+import * as actions from "../../../actions/actions";
 
 /**
- * FriendsList holds the logged in members name and his friends
- * @property username of the logged in user
+ * FriendsList contains a list of the users friends
  * @returns a div containing all friends for the logged in user
  */
 
 const FriendsList = () => {
-  /* Get friendslist from redux store */
+
+  const dispatch = useDispatch();
+
   const currentFriends = useSelector(
     (state) => state.socketState.listOfFriends
   );
@@ -29,8 +30,11 @@ const FriendsList = () => {
   const [hovered, setHovered] = useState(false);
   /* Gets the username of the user doing the friend request */
   const requester = useSelector((state) => state.socketState.username);
-  const dispatch = useDispatch();
 
+  /**
+   * set the username of the user we want to add
+   * @param event the event of the window object
+   */
   const handleInputChange = (event) => {
     setUsername(event.target.value);
   };
@@ -43,6 +47,7 @@ const FriendsList = () => {
       setAddSuccessful(false);
     }
   }, [addSuccessful]); 
+  
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
     if (currentFriends != null) {

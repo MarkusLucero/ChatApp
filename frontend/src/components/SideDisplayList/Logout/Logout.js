@@ -4,6 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 const axios = require("axios");
 
+/**
+ * Handle the logout http response with backend
+ * @param {String} username the username of the user
+ * @param {String} magicToken the magictoken used for authentication on websocket connection
+ * @param {function} setLogoutSuccess callback function used to set state of bool upon logout
+ */
 const logoutHandler = async (username, magicToken, setLogoutSuccess) => {
   try {
     const response = await axios.post(
@@ -34,6 +40,11 @@ const logoutHandler = async (username, magicToken, setLogoutSuccess) => {
   }
 };
 
+/**
+ * Component that handles the logout functionality
+ * TODO STYLING!!
+ * @returns clickable button that will logout the user
+ */
 const Logout = () => {
   const dispatch = useDispatch();
   const magicToken = useSelector((state) => state.socketState.magicToken);

@@ -1,26 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import * as actions from "../../actions/actions";
+import * as actions from "../../../actions/actions";
 
 /**
  * CreateThread is the component which is seen when pressing '+' icon next to active threads
  * @param {bool} showCreateThread a Boolean indicating if this monad is visible or not
  * @param {function} setShowCreateThread callback is used to show/hide the createThread modal
- * @returns A div where user can create a new Thread
+ * @returns a modal on which the user can create a new thread
  */
 const CreateThread = ({ showCreateThread, setShowCreateThread }) => {
+
   /* Add event listener so we can detect clicks outside create thread modal */
   useEffect(() => {
     document.addEventListener("mousedown", handleClick);
     return () => {
       document.removeEventListener("mousedown", handleClick);
     };
-  }, []);
+  });
 
-  /*Handle click outside createThread modal */
-  const handleClick = (e) => {
-    if (showCreateThread == true) {
-      if (monad.current.contains(e.target)) {
+ /**
+ * handles a click outside of the create chat modal
+ * @param event of the window object
+ */
+  const handleClick = (event) => {
+    if (showCreateThread === true) {
+      if (monad.current.contains(event.target)) {
         // inside click
         return;
       } else {
@@ -47,7 +51,7 @@ const CreateThread = ({ showCreateThread, setShowCreateThread }) => {
   const dispatch = useDispatch();
 
   const createThread = () => {
-    if (summary != "" && details != "") {
+    if (summary !== "" && details !== "") {
       const data = {
         server: server,
         user: username,
