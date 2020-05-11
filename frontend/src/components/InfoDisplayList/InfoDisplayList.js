@@ -14,7 +14,7 @@ import MessagesList from './MessagesList';
  * @property {String} focusedPage - a string used to check what page we are focusing on
  * returns a div containing the component InformationHeader, FriendsList and MessagesList
  */
-const InfoDisplayList = ({handleFocusedChat, focusedPage}) => {
+const InfoDisplayList = ({handleFocusedChat, focusedPage, handleFocusedThread}) => {
 
     /* get the logged in  username from redux store */
     const username = useSelector((state) => state.socketState.username);
@@ -23,7 +23,7 @@ const InfoDisplayList = ({handleFocusedChat, focusedPage}) => {
         <div style={{backgroundColor: "#2C2F33"}} className="p-1">
             <InformationHeader username = {username} focusedPage={focusedPage}/>
             {focusedPage === "Home" ? <FriendsList /> : <ServerInformation focusedPage={focusedPage} />}
-            {focusedPage === "Home" ? <MessagesList  username = {username} handleFocusedChat = {handleFocusedChat} /> : <ThreadList username = {username} focusedPage={focusedPage}/> }
+            {focusedPage === "Home" ? <MessagesList  username = {username} handleFocusedChat = {handleFocusedChat} /> : <ThreadList handleFocusedThread={handleFocusedThread} username = {username} focusedPage={focusedPage}/> }
         </div>
     )
 }
