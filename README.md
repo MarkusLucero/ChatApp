@@ -20,26 +20,27 @@ till lämpliga underrubriker.
 ## Katalogstruktur
 
 **TODO:** Lägg till en kortfattad beskrivning över katalogstrukturen.
-├── backend
-│   ├── database_api
-│   │   ├── backup
-│   │   ├── ebin
-│   │   ├── postgres
-│   │   └── src
-│   └── web_api
-│       ├── config
-│       └── src
-└── frontend
-    ├── api 
-    ├── node_modules
-    ├── public
-    └── src
-        ├── actions
-        ├── assets
-        ├── components
-        ├── img
-        └── reducers
-
+<pre>
+├── backend  
+│   ├── database_api  
+│   │   ├── backup  
+│   │   ├── ebin  
+│   │   ├── postgres  
+│   │   └── src  
+│   └── web_api  
+│       ├── config  
+│       └── src  
+└── frontend  
+    ├── api   
+    ├── node_modules  
+    ├── public  
+    └── src  
+        ├── actions  
+        ├── assets  
+        ├── components  
+        ├── img  
+        └── reducers  
+</pre>
 
 ## Färdigställ 
 
