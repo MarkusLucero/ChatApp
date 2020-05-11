@@ -271,10 +271,9 @@ insert_chat_test() ->
     end.
 
 fetch_user_test() ->
-    {Username, Password, TimeStamp} = fetch_user("testuser1"),
+    {Username, Password, _} = fetch_user("testuser1"),
     "testuser1" = Username,
     "testpassword1" = Password,
-    "2020-10-19 1:0:0" = TimeStamp,
     
     {error, _} = fetch_user("Invalid username").
 
