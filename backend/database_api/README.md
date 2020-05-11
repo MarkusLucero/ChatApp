@@ -1,3 +1,7 @@
+# OBS
+Det rekommenderas att backenden körs med docker. Se `backend/README.md` för instruktioner.
+
+# Instruktioner för databaskonfiguration ifall docker ej används
 **STEG 1:**
 
 Hitta din _odbcinst.ini_ fil. Min ligger i _/usr/local/etc/odbcinst.ini_ men ni kan ha den någon annan stans.
