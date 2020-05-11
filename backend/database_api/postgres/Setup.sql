@@ -35,3 +35,33 @@ friendname VARCHAR(60) NOT NULL,
 status SMALLINT,
 CONSTRAINT friendlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id),
 CONSTRAINT friendlist_fk2 FOREIGN KEY (friend_id) REFERENCES users(user_id));
+
+CREATE TABLE servers(
+server_id BIGSERIAL PRIMARY KEY,
+servername VARCHAR(120)
+);
+
+CREATE TABLE commentlist(
+commentlist_id BIGSERIAL PRIMARY KEY,
+user_id BIGINT NOT NULL,
+parent_id BIGINT,
+text TEXT,
+CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id));
+
+CREATE TABLE thread(
+thread_id BIGSERIAL PRIMARY KEY,
+server_id BIGINT NOT NULL,
+user_id BIGINT NOT NULL,
+root_header TEXT,
+root_text TEXT,
+commentlist_id BIGINT,
+CONSTRAINT thread_fk1 FOREIGN KEY (server_id) REFERENCES servers(server_id),
+CONSTRAINT thread_fk2 FOREIGN KEY (user_id) REFERENCES users(user_id),
+CONSTRAINT thread_fk3 FOREIGN KEY (commentlist_id) REFERENCES commentlist(commentlist_id)
+);
+
+CREATE TABLE threadlist(
+server_id BIGSERIAL NOT NULL,
+thread_id BIGSERIAL NOT NULL,
+CONSTRAINT threadlist_fk1 FOREIGN KEY (thread_id) REFERENCES thread(thread_id),
+CONSTRAINT threadlist_fk2 FOREIGN KEY (server_id) REFERENCES servers(server_id));
