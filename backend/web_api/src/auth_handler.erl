@@ -95,7 +95,10 @@ init(Req0, Opts) ->
                 {struct,[{"action", "logout"},
                          {"username", Username},
                          {"magic_token", Token}]} ->
-                    chat_server:logout_user(Username, Token);
+                    chat_server:logout_user(Username, Token),
+                    Body = <<"Logout ACK">>,
+                    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
+                    {ok, Req3, Opts};
                 _ -> 
                     Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
