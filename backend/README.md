@@ -1,7 +1,12 @@
 # Instruktioner för docker
 Instruktionerna är för linux.
 
-Se till att:
+## Om placeholder-namn i kommandorna
+- `[USERNAME]` är ditt linux-användarnamn
+- `[IMAGE_NAME]` kan vara vad som helst, bara samma används i alla kommandon
+- `[CONTAINER_NAME]` kan vara vad som helst, bara samma används i alla kommandon
+
+## Se till att
 - docker är installerat
 - docker servicen är startad
     - `sudo systemctl start docker` fungerar på de flesta linux distron
