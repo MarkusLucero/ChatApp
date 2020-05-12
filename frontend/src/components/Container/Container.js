@@ -60,7 +60,7 @@ const Container = () => {
             actions.response({
               action: "login",
               username: username,
-              magictoken: loginResponse,s
+              magictoken: loginResponse,
             })
           );
         } else {
