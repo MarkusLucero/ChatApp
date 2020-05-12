@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4]).
 
 
 get_timestamp() ->
@@ -226,6 +226,34 @@ fetch_all_chats(Username) ->
     end.
 
 
+
+
+%% @doc Creates a new thread and store it in database.
+%% @param Username The username of the creator.
+%% @param Server The ID of the Server that the thread is associated with.
+%% @param Header The root header text of the thread.
+%% @param Text The root text of the thread.
+%% @returns Thread_ID if successfull, {error, Reason} if not.
+-spec create_thread(Username, Server, Header, Text) -> Thread_ID when
+      Username::list(),
+      Server::list(),
+      Header::list(),
+      Text::list(),
+      Thread_ID::term().
+
+create_thread(Username, Server, Header, Text) ->
+    database ! {create_thread, Username, Server, Header, Text, self()},
+    
+    receive
+	{error, Reason} ->
+	    {error, Reason};
+	{ok, Thread_ID} ->
+	    Thread_ID;
+	Msg ->
+	    io:format("database_api:create_thread/3 Unhandled message: ~p~n", [Msg])
+    end.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% Eunit test cases  %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -312,6 +340,11 @@ fetch_friendlist_test() ->
     [{Friend}] = fetch_friendlist("testuser1"),
     "testfriend1" = Friend,
     {error,"No user id exists for that username"} = fetch_friendlist("Invalid username").
+
+
+create_thread_test() ->
+    _ = create_thread("testuser1", "1","Test thread", "This is the root thread."),
+    {error, _} = create_thread("invalid user", "1","Test thread", "This is the root thread.").
 
 stop_test_() ->
     database ! reset_tests,
