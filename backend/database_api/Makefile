@@ -1,4 +1,4 @@
-PROJECT = database_api
+PROJECT = adrenaline_db
 PROJECT_DESCRIPTION = A database api for Chat Up!
 PROJECT_VERSION = 0.1.0
 
