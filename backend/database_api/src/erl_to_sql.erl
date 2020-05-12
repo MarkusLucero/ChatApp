@@ -47,6 +47,9 @@ loop(Ref) ->
 
 	{create_thread, Username, Server, Header, Root, From} ->
 	    create_thread(Ref, Username, Server, Header, Root, From);
+	
+	{fetch_thread, Thread_ID, From} ->
+	    fetch_thread(Ref, Thread_ID, From);
 
         stop ->
             odbc:disconnect(Ref),
@@ -219,12 +222,23 @@ create_thread(Ref, Username, Server, Header, Text, From) ->
     Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "');")),
     case Status of
      	{updated, 1} ->
-	    Thread_ID =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
+	    {selected,_,[{Thread_ID}]} =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
 	    From !  {ok, Thread_ID};
 	{error, Reason2} ->
 	    From ! {error, Reason2}
     end,
     loop(Ref).
+
+fetch_thread(Ref, Thread_ID, From) ->
+    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, commentlist_id FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
+    case Thread of 
+	[] ->
+	    From ! {error, "Thread not found in database"};
+	_ ->
+	    From ! {ok, Thread}
+    end,
+    loop(Ref).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Helper functions  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

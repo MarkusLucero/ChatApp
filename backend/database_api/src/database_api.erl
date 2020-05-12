@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1]).
 
 
 get_timestamp() ->
@@ -250,10 +250,29 @@ create_thread(Username, Server, Header, Text) ->
 	{ok, Thread_ID} ->
 	    Thread_ID;
 	Msg ->
-	    io:format("database_api:create_thread/3 Unhandled message: ~p~n", [Msg])
+	    io:format("database_api:create_thread/4 Unhandled message: ~p~n", [Msg])
     end.
 
+%% @doc fetches information about a thread from the database.
+%% @param Thread_ID The thread ID to be fetched.
+%% @returns EXAMPLE: {"1", "skooben", "Header text", "Main text"} if successfull, {error, Reason} if not.
+-spec fetch_thread(Thread_ID) -> {Server, Creator, Header, Text} when
+      Thread_ID::list(),
+      Creator::list(),
+      Server::list(),
+      Header::list(),
+      Text::list().
 
+fetch_thread(Thread_ID) ->
+    database ! {fetch_thread, Thread_ID, self()},
+    receive
+	{error, Reason} ->
+	    {error, Reason};
+	{ok, Thread} ->
+	    Thread;
+	Msg ->
+	    io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+    end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% Eunit test cases  %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -342,10 +361,27 @@ fetch_friendlist_test() ->
     {error,"No user id exists for that username"} = fetch_friendlist("Invalid username").
 
 
-create_thread_test() ->
-    _ = create_thread("testuser1", "1","Test thread", "This is the root thread."),
-    {error, _} = create_thread("invalid user", "1","Test thread", "This is the root thread.").
+create_and_fetch_thread_test() ->
+    Thread_ID = create_thread("testuser1", "1","Test thread", "This is the root thread."),
+    {error, _} = create_thread("invalid user", "1","Test thread", "This is the root thread."),
+    
+    {Server, Creator, Header, Text, Commentlist} = fetch_thread(Thread_ID),
+    Server = "1",
+    Creator = "testuser1",
+    Header = "Test thread",
+    Text = "This is the root thread.",
+    Commentlist = null,
+    {error, _} = fetch_chat("Invalid Thread_ID").
 
+%% fetch_thread_test() ->
+    
+%%     {Server, Creator, Header, Text, Commentlist} = fetch_thread("1"),
+%%     Server = "1",
+%%     Creator = "testuser1",
+%%     Header = "Test thread",
+%%     Text = "This is the root thread",
+%%     Commentlist = [],
+%%     {error, _} = fetch_chat("Invalid Thread_ID").
 stop_test_() ->
     database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
