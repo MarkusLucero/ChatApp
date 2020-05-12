@@ -1,22 +1,7 @@
-ERLC_FLAGS=
-SOURCES=$(wildcard src/*.erl)
-HEADERS=$(wildcard src/*.hrl)
-OBJECTS=$(SOURCES:src/%.erl=ebin/%.beam)
+PROJECT = adrenaline_db
+PROJECT_DESCRIPTION = A database api for Chat Up!
+PROJECT_VERSION = 0.1.0
 
-all: $(OBJECTS)
+LOCAL_DEPS = odbc eunit
 
-ebin/%.beam : src/%.erl $(HEADERS) Makefile
-	erlc $(ERLC_FLAGS) -o ebin/ $<
-clean:
-	-rm $(OBJECTS)
-test:	all
-	erl -noshell -pa ebin -eval 'eunit:test("ebin/database_api.beam",[verbose])' -s init stop	
-
-.PHONY: doc
-
-doc:
-	erl -noshell -pa ebin -eval 'edoc:files(["src/database_api.erl", "src/database_master.erl", "src/database_workers.erl"], [{dir, doc}])' -s init stop
-
-# test_workers:
-# 	erl -noshell -pa ebin -eval 'database_master:start(1000, 10)' -s init stop
-# 	make clean
+include erlang.mk
