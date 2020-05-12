@@ -1,12 +1,11 @@
 import React from "react";
-import placeholder from "../../img/placeholder.png";
+import placeholder from "../../../img/placeholder.png";
 
 /**
- * contains information about the User if on Home Page or (TODO) the specific server we are on
- *
+ * contains information about the User if on Home Page or the specific server we are on
  * @property {String} username is the username of logged in user
  * @property {String} focusedPage - a string used to check what page we are focusing on
- * returns a div containing the appropriate informaiton
+ * returns a div containing the appropriate information to be displayed
  */
 const InformationHeader = ({ username, focusedPage }) => {
   return (

@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import plus from "../../img/plus.svg";
+import plus from "../../../img/plus.svg"
 import StartChat from "./StartChat";
 import { useSelector } from "react-redux";
 
 /**
  * contains the list of available direct messages that we can chat in
- *
- * @param {function} callback function used to get the target of what we are clicking on
+ * @param {function} handleFocusedChat callback function used to get the target of what we are clicking on
  * @property {string} username  username of the logged in user
  * returns a div containing all direct messages
  */
@@ -29,9 +28,7 @@ const MessagesList = ({ handleFocusedChat, username }) => {
   const [showAddChat, setShowAddChat] = useState(false);
   /* Used to highlight the add icon when hovered */
   const [hovered, setHovered] = useState(false);
-
   /*On mount, add event listerner for click outside ref addChatModal*/
-
   useEffect(() => {
     document.addEventListener("mousedown", handleClick);
     return () => {
@@ -39,9 +36,12 @@ const MessagesList = ({ handleFocusedChat, username }) => {
     };
   }, []);
 
-  /*Handle click outside addChatModal */
-  const handleClick = (e) => {
-    if (addChatModal.current.contains(e.target)) {
+/**
+ * handles a click outside of the create chat modal
+ * @param event of the window object
+ */
+  const handleClick = (event) => {
+    if (addChatModal.current.contains(event.target)) {
       // inside click
       return;
     } else {

@@ -1,6 +1,12 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
+
+/**
+ * Get and display the correct information about the server of which we are focusing on
+ * @param {String} focusedPage a string used to check what page we are focusing on
+ * @returns a div contianing the description of the server that we are focusing on
+ */
 const ServerInformation = ({ focusedPage }) => {
 
   const serverDescription = useSelector(state => state.socketState.server.serverInformation)

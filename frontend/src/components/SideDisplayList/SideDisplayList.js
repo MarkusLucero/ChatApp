@@ -5,7 +5,8 @@ import Server from "./Server";
 /**
  * SideDisplayList holds all components in the side display - servers, add server, profile
  * @property {function} handleFocusedPage Callback function passed down from LandingPage - Used to get id of what page we click on
- * @returns A div containing the servers, add server, logout and profile buttons
+ * @property {object} server the global server object
+ * @returns A div containing the global server, Home and logout button
  */
 
 const SideDisplayList = ({handleFocusedPage, server}) => {

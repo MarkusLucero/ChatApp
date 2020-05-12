@@ -3,12 +3,13 @@ import "../../assets/main.css";
 import Message from "./Message";
 /**
  * Chat holds the layout of all messages and the input/sent
- * @property messages the state containing list of chat messages
+ * @property messages the state containing list of message objects
  * @returns a div containing all messages
  */
 const Chat = ({ messages }) => {
+  
   /* 
-    Using ref to makes sure that we scroll to end of chat area if it overflows 
+    Using ref and useEffect to makes sure that we scroll to end of chat area if it overflows 
   */
   const messagesEndRef = React.useRef(null);
   const scrollToBottom = () => {

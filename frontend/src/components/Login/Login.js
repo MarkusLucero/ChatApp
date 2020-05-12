@@ -22,10 +22,9 @@ const validate = (values) => {
 /**
  * Login provides the layout and login of a user
  * A successfully validated form will redirect to LandingPage with pathname = "/start"
- * @property history is passed on due to Login being an immediate child of a Route component in Container component
  * @returns a div containing the form to fill out and its validation
  */
-const Login = ({ history }) => {
+const Login = () => {
   /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
 
