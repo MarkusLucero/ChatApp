@@ -1,4 +1,13 @@
 # Instruktioner för docker
+Instruktionerna är för linux.
+
+Se till att:
+- docker är installerat
+- docker servicen är startad
+    - `sudo systemctl start docker` fungerar på de flesta linux distron
+- du är i `docker` gruppen
+    - `sudo gpasswd -a [USERNAME] docker` fungerar på de flesta linux distron
+        - logga ut och in igen efter kommandot på raden ovan
 
 ## För att starta backend första gången
 1. `docker build . -t [IMAGE_NAME]`
