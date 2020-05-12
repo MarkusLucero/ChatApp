@@ -2,11 +2,11 @@
 
 ## För att starta backend första gången
 1. `docker build . -t [IMAGE_NAME]`
-2. `docker run --name=[CONTAINER_NAME] -it [IMAGE_NAME]`
+2. `docker run -p8080:8080 --name=[CONTAINER_NAME] -it [IMAGE_NAME]`
 3. `docker exec -it [CONTAINER_NAME] start_app` (i annan terminal)
 
 ## För att backenden efter första gången
-1. `docker start [CONTAINER_NAME]`
+1. `docker start -i [CONTAINER_NAME]`
 2. `docker exec -it [CONTAINER_NAME] start_app` (i annan terminal)
 
 ## För att ta bort containern
