@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import "../../assets/main.css";
 import Comment from "../Comment/Comment";
@@ -46,10 +46,11 @@ const CommentContainer = () => {
 
   /* This state is used as a dummy, we must always pass a dummy function to comment to allow it to use setReplyBox */
   const [dummyReply, setDummyReply] = useState([]);
+  const dispatch = useDispatch();
 
   const [commentCounter, setCommentCounter] = useState(0);
 
-  /* When we successfully change the value of comment, i.e someone comment button is pressed, we update the Array holding all comments */
+  /* When we successfully change the value of comment, i.e someone comment button is pressed, we should dispatch an action*/
   React.useEffect(() => {
     if (addComment === true) {
       setComments((comments) =>

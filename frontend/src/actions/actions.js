@@ -15,6 +15,7 @@ const FAILURE = "FAILURE";
 const SENDMESSAGE = "SENDMESSAGE";
 const ADDFRIEND = "ADDFRIEND";
 const CHAT_REQUEST = "CHAT_REQUEST";
+const ADDCOMMENT ="ADDCOMMENT"
 
 export function sendMessage(data) {
   return {
@@ -31,6 +32,11 @@ export function sendMessage(data) {
 export function addFriend(data) {
   return{   type: ADDFRIEND, payload:{ username: data.username }}
 };
+
+export function addComment(data){
+
+  return{ TYPE: ADDCOMMENT, payload:{data}}
+}
 
 
 export function connect() {
