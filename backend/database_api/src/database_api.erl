@@ -7,6 +7,10 @@
 -export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1]).
 
 
+get_timestamp() ->
+    {{Year, Month, Day}, {Hour, Minute, Second}} = calendar:universal_time(),
+    lists:flatten(io_lib:format("~p-~p-~p ~p:~p:~p", [Year, Month, Day, Hour, Minute, Second])).
+
 %% @doc Initilize odbc connection and logs in to database.
 -spec start() -> ok.
 
@@ -33,18 +37,18 @@ stop() ->
       Password::list(),
       TimeStamp::list().
 
-insert_user(Username, Password, TimeStamp) ->
-    database ! {insert_user,Username, Password, TimeStamp, self()},
+insert_user(Username, Password, _TimeStamp) ->
+    database ! {insert_user,Username, Password, get_timestamp(), self()},
 
     receive
-	ok ->
-	    ok;
-	{error, user_exist} ->
-	    {error, "Username already exist in database"};
-	Msg ->
-	    {error, Msg}
+        ok ->
+            ok;
+        {error, user_exist} ->
+            {error, "Username already exist in database"};
+        Msg ->
+            {error, Msg}
     end.
-		
+                
 
 %% @doc Insert a friend to a users friendlist.
 %% @param Username The users ID.
@@ -59,7 +63,7 @@ insert_friend(Username, Friend) ->
     receive
         ok ->
             ok;
-	{error, Reason} ->
+        {error, Reason} ->
              {error, Reason};
         Msg ->
             io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
@@ -104,13 +108,13 @@ create_chat(Chat_Name, Creator, Members) ->
       TimeStamp::list(),
       Status::term().
 
-insert_chat(From_Username, Chat_ID, {TimeStamp, Msg}, Status) ->
-    database ! {insert_chat, From_Username, Chat_ID, {TimeStamp, Msg}, Status, self()},
+insert_chat(From_Username, Chat_ID, {_TimeStamp, Msg}, Status) ->
+    database ! {insert_chat, From_Username, Chat_ID, {get_timestamp(), Msg}, Status, self()},
     receive
-	ok ->
-	    ok;
-	{error, Reason} ->
-	    {error, Reason}
+        ok ->
+            ok;
+        {error, Reason} ->
+            {error, Reason}
     end.
 
 
@@ -267,10 +271,9 @@ insert_chat_test() ->
     end.
 
 fetch_user_test() ->
-    {Username, Password, TimeStamp} = fetch_user("testuser1"),
+    {Username, Password, _} = fetch_user("testuser1"),
     "testuser1" = Username,
     "testpassword1" = Password,
-    "2020-10-19 1:0:0" = TimeStamp,
     
     {error, _} = fetch_user("Invalid username").
 
@@ -300,7 +303,7 @@ fetch_chat_test() ->
     database ! {get_group_id,"festchatten", self()},
     receive
         Group_ID ->
-	    [{"testuser1"}, {"testfriend1"}] = fetch_chat_members(Group_ID)
+            [{"testuser1"}, {"testfriend1"}] = fetch_chat_members(Group_ID)
     end,
 
     {error, "Chat_ID not found in database."} = fetch_chat_members("Invalid chat_ID").
