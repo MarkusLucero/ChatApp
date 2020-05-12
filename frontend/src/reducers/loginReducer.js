@@ -19,6 +19,9 @@ const loginReducer = (state = loginState, action) => {
     case "SUCCESS": {
       return {...state, loginSuccess: true, username : action.payload.username, loginResponse: action.payload.response};
     }
+    case "RESET": {
+      return {...state, loginSuccess: false, username: null, loginResponse : null }
+    }
     case "FAILURE": {
         /* Failure simply returns loginState as false */
       return state;

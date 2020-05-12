@@ -27,8 +27,7 @@ const ChatContainer = ({ focusedChat }) => {
   };
 
   /**
-   * Trigger the search of the searchTerm in the actuall focused chat
-   * event parameter is displayed only to prevent he windows default action when pressing a submit button
+   * TODO Trigger the search of the searchTerm in the actuall focused chat
    * @param event the event object of the window
    */
   const handleSearchSubmit = (event) => {
@@ -36,17 +35,36 @@ const ChatContainer = ({ focusedChat }) => {
        to be displayed in the chat
     */
     console.log(searchTerm);
+
+    /* OBS OBS !! IF YOU WANT TO TRY OUT THE PYTHON SEARCH API UNCOMMENT THE FETCH STATEMENT BELOW */
+    // Send the same request
+    /*     fetch("http://localhost:5000/search", {
+      // Specify the method
+      method: "POST",
+      // A JSON payload
+      body: JSON.stringify({
+        "search_term": searchTerm,
+      }),
+    })
+      .then(function (response) {
+        return response.json(); //parse result as JSON
+      })
+      .then(function (json) {
+        console.log("Search results: ");
+        console.log(json); // Here’s our JSON object
+      }); */
     setSearchTerm("");
     event.preventDefault();
   };
 
-  /* get my username from redux store */
   const myUsername = useSelector((state) => state.socketState.username);
-
-  /* State and callback functions for Chat and ChatInput */
-
   const listOfDms = useSelector((state) => state.socketState.listOfDms);
 
+  /**
+   * Check for the right DM object chatID wich matches the focusedChat prop
+   * @param {array} list the list containing Dm objects
+   * @return {array} array containing the list of message objects from the corresponding DM object
+   */
   const rightChat = (list) => {
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
@@ -58,11 +76,10 @@ const ChatContainer = ({ focusedChat }) => {
 
   const [messages, setMessages] = React.useState([]);
 
-  /*This is the state used when typing a new message*/
   const [newMessage, setNewMessage] = React.useState("");
 
   /**
-   * Set the messages state by updating it with the "newMessage" message
+   * Set the messages state setting it to include the "newMessage" message
    * @param event the event object of the window
    */
   const sendMessage = (event) => {
@@ -87,18 +104,8 @@ const ChatContainer = ({ focusedChat }) => {
   };
 
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
-
-  /* 
-    will render on mount - dependency list holds focusedChat so whenever that changes we will fire everything inside useEffect
-    when focusedChat changes we change the messages that are displayed. 
-    
-    If state of listOfDms changes we will refire this aswell displaying the new chat messages 
-    ( this hapens when we get a response from someone or when we send a message and update listOfDms)
-    */
+  
   React.useEffect(() => {
-    console.log(listOfDms);
-    console.log("fookus my man fookus");
-
     if (listOfDms != null) {
       setMessages(rightChat(listOfDms));
     }

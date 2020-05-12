@@ -17,14 +17,41 @@ projekt.
 (kompileras eller liknande), testas (automatiska tester) och startas. Lägg gärna
 till lämpliga underrubriker.
 
+## Frontend
+
+Testats på Mozilla Firefox och Google Chrome.  
+
+Följande steg sker i /frontend mappen.
+- Om det är första gången du startar upp servern, kör "npm install" för att automatiskt installera alla dependencies.
+- För att sätta igång webb servern så kör du "npm start" 
+- För att generera dokument och öppna den i webläsaren kör du "npm run doc"
+- För att köra enhetstester kör du "npm test" och följer kommandon som visas upp i terminalen.
+
 ## Katalogstruktur
 
 **TODO:** Lägg till en kortfattad beskrivning över katalogstrukturen.
+<pre>
+├── backend  
+│   ├── database_api  
+│   │   ├── backup  
+│   │   ├── ebin  
+│   │   ├── postgres  
+│   │   └── src  
+│   └── web_api  
+│       ├── config  
+│       └── src  
+└── frontend  
+    ├── api   
+    ├── node_modules  
+    ├── public  
+    └── src  
+        ├── actions  
+        ├── assets  
+        ├── components  
+        ├── img  
+        └── reducers  
+</pre>
 
-## Färdigställ 
-
-- Beta av alla **TODO**s ni kan redan nu.
+## Färdigställ
 - Allt eftersom projektet fortskrider kan ni lägga till fler rubriker i detta
   dokument med kompletterande information.
-- Tag bort alla stycken markerade med **TODO** och **INFO**.
-- Tag bort hela detta avsnitt, dvs tag bort avsnittet **Färdigställ**.

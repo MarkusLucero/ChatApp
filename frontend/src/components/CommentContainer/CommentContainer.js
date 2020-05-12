@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
+import * as actions from "../../actions/actions";
 import "../../assets/main.css";
 import Comment from "../Comment/Comment";
 import CommentField from "../CommentField/CommentField.js";
@@ -13,23 +13,25 @@ import CommentField from "../CommentField/CommentField.js";
  the poster of the message and an array of comment objects that symbolize replies. */
 
 /* This function returns a comment object.  */
-function assembleComment(poster, comment) {
+function assembleComment(poster, postedComment) {
   return {
     username: poster,
-    text: comment,
+    comment: postedComment,
     reply: [],
   };
 }
-function assembleReply(poster, comment, reply) {
+function assembleReply(poster, postedComment, reply) {
   return {
     username: poster,
-    text: comment,
+    comment: postedComment,
     reply: reply,
   };
 }
 
-const CommentContainer = () => {
+const CommentContainer = ({ thread }) => {
+  /* Thread is passed in as a paprameter. Use its comments array as start array*/
   /* This state handles the comment input */
+  console.log(thread.comments);
   const [comment, setComment] = useState("");
   /* This state handles if comment was posted or not */
   const [addComment, setAddComment] = useState(false);
@@ -40,7 +42,7 @@ const CommentContainer = () => {
   /* Gets the username of the person posting the comment*/
   const poster = useSelector((state) => state.socketState.username);
   /* The recursive comment obj array */
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState(thread.comments);
   /* Index to the comment we reply to */
   const [index, setIndex] = useState(0);
 
@@ -50,12 +52,21 @@ const CommentContainer = () => {
 
   const [commentCounter, setCommentCounter] = useState(0);
 
-  /* When we successfully change the value of comment, i.e someone comment button is pressed, we should dispatch an action*/
+  /* When we successfully change the value of comment, i.e someone comment button is pressed, we 
+  dispatch an addComment action.  */
   React.useEffect(() => {
     if (addComment === true) {
-      setComments((comments) =>
-        comments.concat(assembleComment(poster, comment))
+      dispatch(
+        actions.addComment({
+          thread_id: thread.id,
+          username: poster,
+          comment: comment,
+          reply: {},
+        })
       );
+      /*  setComments((comments) =>
+        comments.concat(assembleComment(poster, comment))
+      ); */
       setAddComment(false);
       setCommentCounter(commentCounter + 1);
       setComment("");
@@ -64,13 +75,24 @@ const CommentContainer = () => {
 
   React.useEffect(() => {
     if (addReply === true) {
-      setComments((comments) =>
+      /*  setComments((comments) =>
         comments.concat(
           assembleReply(poster, reply, {
             username: comments[index].username,
-            text: comments[index].text,
+            comment: comments[index].comment,
           })
         )
+      ); */
+      dispatch(
+        actions.addComment({
+          thread_id: thread.id,
+          username: poster,
+          comment: reply,
+          reply: {
+            user_id: comments[index].user_id,
+            comment: comments[index].comment,
+          },
+        })
       );
       setCommentCounter(commentCounter + 1);
     }
