@@ -44,6 +44,7 @@ servername VARCHAR(120)
 CREATE TABLE commentlist(
 commentlist_id BIGSERIAL PRIMARY KEY,
 user_id BIGINT NOT NULL,
+username VARCHAR(60) NOT NULL,
 parent_id BIGINT,
 text TEXT,
 CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id));
@@ -52,6 +53,7 @@ CREATE TABLE thread(
 thread_id BIGSERIAL PRIMARY KEY,
 server_id BIGINT NOT NULL,
 user_id BIGINT NOT NULL,
+username VARCHAR(60) NOT NULL,
 root_header TEXT,
 root_text TEXT,
 commentlist_id BIGINT,

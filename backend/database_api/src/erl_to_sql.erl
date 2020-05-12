@@ -24,13 +24,11 @@ loop(Ref) ->
         {insert_friend, Username, Friend, From} ->
 	    insert_friend(Ref, Username, Friend, From);
 
-
         {create_chat, Chat_Name, _, Members, From} ->
 	    create_chat(Ref, Chat_Name, unused, Members, From);
         
         {insert_chat, From_Username, Chat_ID, Message, Status, From} ->
             insert_chat(Ref, From_Username, Chat_ID, Message, Status, From);
-          
 
         {fetch_user, Username, From} ->
 	    fetch_user(Ref, Username, From);
@@ -47,6 +45,9 @@ loop(Ref) ->
         {fetch_all_chats, Username, From} ->
 	    fetch_all_chats(Ref, Username, From);
 
+	{create_thread, Username, Server, Header, Root, From} ->
+	    create_thread(Ref, Username, Server, Header, Root, From);
+
         stop ->
             odbc:disconnect(Ref),
             odbc:stop(),
@@ -61,6 +62,7 @@ loop(Ref) ->
             odbc:sql_query(Ref, "DELETE FROM groups * WHERE groupname = 'skolchatten';"),
             odbc:sql_query(Ref, "DELETE FROM friendlist * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM friendlist * WHERE username = 'testfriend1';"),
+	    odbc:sql_query(Ref, "DELETE FROM thread * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testfriend1';");
 
@@ -205,7 +207,24 @@ fetch_all_chats(Ref, Username, From) ->
     end,
     loop(Ref).
 
-
+create_thread(Ref, Username, Server, Header, Text, From) ->
+    User_ID = fetch_user_id(Ref, Username),
+    case User_ID of
+	{error, Reason1} ->
+	    From ! {error, Reason1},
+	    loop(Ref);
+	_ ->
+	    ok
+    end,
+    Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "');")),
+    case Status of
+     	{updated, 1} ->
+	    Thread_ID =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
+	    From !  {ok, Thread_ID};
+	{error, Reason2} ->
+	    From ! {error, Reason2}
+    end,
+    loop(Ref).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Helper functions  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
