@@ -47,6 +47,7 @@ user_id BIGINT NOT NULL,
 username VARCHAR(60) NOT NULL,
 parent_id BIGINT,
 text TEXT,
+timestamp TIMESTAMP,
 CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id));
 
 CREATE TABLE thread(

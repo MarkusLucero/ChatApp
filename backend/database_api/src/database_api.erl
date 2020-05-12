@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1, insert_comment/4]).
 
 
 get_timestamp() ->
@@ -242,7 +242,7 @@ fetch_all_chats(Username) ->
       Thread_ID::term().
 
 create_thread(Username, Server, Header, Text) ->
-    database ! {create_thread, Username, Server, Header, Text, self()},
+    database ! {create_thread, Username, Server, Header, Text, get_timestamp(), self()},
     
     receive
 	{error, Reason} ->
@@ -272,6 +272,17 @@ fetch_thread(Thread_ID) ->
 	    Thread;
 	Msg ->
 	    io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+    end.
+
+insert_comment(Thread_ID, Parent_ID, Username, Text) ->
+    database ! {insert_comment, Thread_ID, Parent_ID, Username, Text, get_timestamp(), self()},
+    receive
+	{error, Reason} ->
+	    {error, Reason};
+	{ok, Thread_ID} ->
+	    Thread_ID;
+	Msg ->
+	    io:format("database_api:insert_comment/4 Unhandled message: ~p~n", [Msg])
     end.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%% Eunit test cases  %%%%%%%%%%%%%%%%%%%%
@@ -365,7 +376,7 @@ create_and_fetch_thread_test() ->
     Thread_ID = create_thread("testuser1", "1","Test thread", "This is the root thread."),
     {error, _} = create_thread("invalid user", "1","Test thread", "This is the root thread."),
     
-    {Server, Creator, Header, Text, Commentlist} = fetch_thread(Thread_ID),
+    {Server, Creator, Header, Text, _, Commentlist} = fetch_thread(Thread_ID),
     Server = "1",
     Creator = "testuser1",
     Header = "Test thread",
@@ -373,17 +384,12 @@ create_and_fetch_thread_test() ->
     Commentlist = null,
     {error, _} = fetch_chat("Invalid Thread_ID").
 
-%% fetch_thread_test() ->
-    
-%%     {Server, Creator, Header, Text, Commentlist} = fetch_thread("1"),
-%%     Server = "1",
-%%     Creator = "testuser1",
-%%     Header = "Test thread",
-%%     Text = "This is the root thread",
-%%     Commentlist = [],
-%%     {error, _} = fetch_chat("Invalid Thread_ID").
+insert_comment_test() ->
+ %%   ok = insert_comment("1", "0", "tetuser1", "text test", get_timestamp()).
+%%    ok = insert_comment(Thread_ID, Parent_ID, Username, Text, Timestamp).
+    tbi.
 stop_test_() ->
-    database ! reset_tests,
+    %% database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
     %% database ! {remove_user, "testfriend1"},
     %% database ! {remove_table, "chat_id_1"},

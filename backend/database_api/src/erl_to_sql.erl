@@ -45,8 +45,8 @@ loop(Ref) ->
         {fetch_all_chats, Username, From} ->
 	    fetch_all_chats(Ref, Username, From);
 
-	{create_thread, Username, Server, Header, Root, From} ->
-	    create_thread(Ref, Username, Server, Header, Root, From);
+	{create_thread, Username, Server, Header, Text, Timestamp, From} ->
+	    create_thread(Ref, Username, Server, Header, Text, Timestamp, From);
 	
 	{fetch_thread, Thread_ID, From} ->
 	    fetch_thread(Ref, Thread_ID, From);
@@ -210,7 +210,7 @@ fetch_all_chats(Ref, Username, From) ->
     end,
     loop(Ref).
 
-create_thread(Ref, Username, Server, Header, Text, From) ->
+create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
     User_ID = fetch_user_id(Ref, Username),
     case User_ID of
 	{error, Reason1} ->
@@ -219,7 +219,7 @@ create_thread(Ref, Username, Server, Header, Text, From) ->
 	_ ->
 	    ok
     end,
-    Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "');")),
+    Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text, timestamp) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
     case Status of
      	{updated, 1} ->
 	    {selected,_,[{Thread_ID}]} =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
@@ -230,7 +230,7 @@ create_thread(Ref, Username, Server, Header, Text, From) ->
     loop(Ref).
 
 fetch_thread(Ref, Thread_ID, From) ->
-    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, commentlist_id FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
+    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, timestamp, commentlist_id FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
     case Thread of 
 	[] ->
 	    From ! {error, "Thread not found in database"};
