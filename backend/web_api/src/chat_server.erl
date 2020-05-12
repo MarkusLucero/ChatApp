@@ -164,7 +164,25 @@ send_chat(Chat_Name, Creator, Members) ->
             chat_server ! {chat_request, Chat_Name, Chat_ID, Creator, Members},
             ok
     end.
+
+chat_server:create_thread(Server_Name, Username, Root_Header, Root_Comment, Timestamp) -> ok when
+      Server_Name :: list(Integer),
+      Username :: list(Integer),
+      Root_Header :: list(Integer),
+      Root_Comment :: list(Integer),
+      Timestamp :: list(Integer)
+%% @doc Creates a new thread
+%% @param Server_Name the name of the server in which the thread will be placed
+%% @param Username the name of the creator of the thread
+%% @param Root_Header the header text of the thread
+%% @param Room_Comment the body text of the thread
+%% @param Timestamp the time the thread was created
+%% @returns ok
+chat_server:create_thread(Server_Name, Username, Root_Header, Root_Comment, Timestamp) ->
     
+    Thread_ID = database_api:create_thread(Username, Server_Name, Root_Header, Root_Comment),
+    chat_server ! {create_thread, Thread_ID, Username, Root_Header, Root_Comment, Timestamp},
+    ok
 
 -spec start() -> ok.
 %% @doc Starts a Web API node and registers the central process to the name chat_server
@@ -273,8 +291,22 @@ loop(Connection_map) ->
                                       {"chat_id", Chat_ID},
                                       {"members", {array, Members}},
                                       {"creator", Creator}]}),
+	    
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
             [PID ! {text, JSON_Message} || {ok, {PID, _}} <- Member_PIDs],
+            loop(Connection_map);
+	{create_thread, Thread_ID, Username, Root_Header, Root_Comment, Timestamp} ->
+            JSON_Message = mochijson:encode(
+                             {struct,[{"action", "create_thread"},
+                                      {"thread_id", Thread_ID},
+				      {"username", Username},
+                                      {"root_post", {struct, [{"root_header", Root_Header},
+							      {"root_comment", Root_Comment}]}},
+				      {"timestamp", Timestamp}]}),
+	    Fun = fun(_Username, {PID, Magic_Token}) ->
+			  PID ! {text, JSON_Message}
+		  end,
+	    maps:map(Fun, Connection_map),
             loop(Connection_map);
         {logout_user, Username, Token} ->
             case maps:get(Username, Connection_map) of
