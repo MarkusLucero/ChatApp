@@ -218,9 +218,9 @@ const socketReducer = (state = initialState, action) => {
             return{
               ...state,
               server: {
-                ... server, 
+                ... state.server, 
                 listOfThreads: [
-                  ...server.listOfThreads, 
+                  ...state.server.listOfThreads, 
                   {
                   rootPost: {
                     rootHeader: parsedData.rootHeader, 
