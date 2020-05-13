@@ -312,12 +312,13 @@ loop(Connection_map) ->
 	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
-				      {"server_name", Server_Name},
+				      {"serverName", Server_Name},
                                       {"thread_id", Thread_ID},
 				      {"username", Username},
                                       {"root_post", {struct, [{"root_header", Root_Header},
 							      {"root_comment", Root_Comment}]}},
-				      {"timestamp", Timestamp}]}),
+				      {"timestamp", Timestamp}
+				      {"commentList", {array, []}}]}),
 	    Fun = fun(_Username, {PID, _Magic_Token}) ->
 			  PID ! {text, JSON_Message}
 		  end,
