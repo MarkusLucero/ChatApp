@@ -1,3 +1,6 @@
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
 Create TABLE users(
 user_id BIGSERIAL NOT NULL PRIMARY KEY,
 username VARCHAR(60) NOT NULL UNIQUE,
@@ -38,17 +41,11 @@ CONSTRAINT friendlist_fk2 FOREIGN KEY (friend_id) REFERENCES users(user_id));
 
 CREATE TABLE servers(
 server_id BIGSERIAL PRIMARY KEY,
-servername VARCHAR(120)
+servername VARCHAR(120),
+threadlist BIGINT,
+timestamp TIMESTAMP
+/*CONSTRAINT servers_fk1 FOREIGN KEY (threadlist_id) REFERENCES threadlist(thread_id)*/
 );
-
-CREATE TABLE commentlist(
-commentlist_id BIGSERIAL PRIMARY KEY,
-user_id BIGINT NOT NULL,
-username VARCHAR(60) NOT NULL,
-parent_id BIGINT,
-text TEXT,
-timestamp TIMESTAMP,
-CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id));
 
 CREATE TABLE thread(
 thread_id BIGSERIAL PRIMARY KEY,
@@ -57,14 +54,29 @@ user_id BIGINT NOT NULL,
 username VARCHAR(60) NOT NULL,
 root_header TEXT,
 root_text TEXT,
+timestamp TIMESTAMP,
 commentlist_id BIGINT,
 CONSTRAINT thread_fk1 FOREIGN KEY (server_id) REFERENCES servers(server_id),
-CONSTRAINT thread_fk2 FOREIGN KEY (user_id) REFERENCES users(user_id),
-CONSTRAINT thread_fk3 FOREIGN KEY (commentlist_id) REFERENCES commentlist(commentlist_id)
+CONSTRAINT thread_fk2 FOREIGN KEY (user_id) REFERENCES users(user_id)
+/*CONSTRAINT thread_fk3 FOREIGN KEY (commentlist_id) REFERENCES commentlist(commentlist_id)*/
 );
+
+CREATE TABLE commentlist(
+commentlist_id BIGSERIAL PRIMARY KEY,
+user_id BIGINT NOT NULL,
+thread_id BIGINT NOT NULL,
+username VARCHAR(60) NOT NULL,
+parent_id BIGINT,
+reply_id BIGINT,
+text TEXT,
+timestamp TIMESTAMP,
+CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id),
+CONSTRAINT commentlist_fk2 FOREIGN KEY (thread_id) REFERENCES thread(thread_id));
 
 CREATE TABLE threadlist(
 server_id BIGSERIAL NOT NULL,
 thread_id BIGSERIAL NOT NULL,
 CONSTRAINT threadlist_fk1 FOREIGN KEY (thread_id) REFERENCES thread(thread_id),
 CONSTRAINT threadlist_fk2 FOREIGN KEY (server_id) REFERENCES servers(server_id));
+
+INSERT INTO servers (server_id, servername) VALUES (0, 'test server');
