@@ -119,7 +119,7 @@ export function createThread(values) {
   return {
     type: CREATE_THREAD,
     payload: {
-      serverName: values.server,
+      serverName: values.server.serverName,
       thread_id: null, //TODO: ? kanske todo, kanske rätt
       username: values.user,
       root_post: { root_header: values.summary, root_cooment: values.details },
