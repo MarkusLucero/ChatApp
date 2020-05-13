@@ -214,6 +214,26 @@ const socketReducer = (state = initialState, action) => {
               };
             }
             return state;
+          case "create_thread": 
+            return{
+              ...state,
+              server: {
+                ... server, 
+                listOfThreads: [
+                  ...server.listOfThreads, 
+                  {
+                  rootPost: {
+                    rootHeader: parsedData.rootHeader, 
+                    rootComment: parsedData.rootComment, 
+                  },
+                  username: parsedData.username, 
+                  timestamp: parsedData.timestamp, 
+                  comments: parsedData.comments, 
+                  id: parsedData.id, 
+                  }
+                ]
+                }
+            }
           default:
             return state;
         }
