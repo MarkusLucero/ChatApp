@@ -177,7 +177,6 @@ send_chat(Chat_Name, Creator, Members) ->
 %% @param Room_Comment the body text of the thread
 %% @returns ok
 create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
-    Timestamp = database_api:get_timestamp(),
     case database_api:create_thread(Username, Server_Name, Root_Header, Root_Comment) of
 	{error, _Reason} ->
 	    erlang:error('Error creating thread');
@@ -309,7 +308,8 @@ loop(Connection_map) ->
                     loop(maps:remove(Username, Connection_map));
                 _ -> loop(Connection_map)
             end;
-	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, _Commentlist} ->
+	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist} ->
+	    io:format("MADE IT PAST LIST OF DMs: ~p ~p ~p ~p ~p ~p ~p~n", [Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist]),
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
 				      {"server_name", Server_Name},
@@ -318,7 +318,9 @@ loop(Connection_map) ->
                                       {"root_post", {struct, [{"root_header", Root_Header},
 							      {"root_comment", Root_Comment}]}},
 				      {"timestamp", Timestamp},
-				      {"commentList", {array, []}}]}),
+				      {"commentList", {array, Commentlist}}
+				     ]}),
+	    io:format("Parsed JSON message create thread~n"),
 	    Fun = fun(_Username, {PID, _Magic_Token}) ->
 			  PID ! {text, JSON_Message}
 		  end,

@@ -239,8 +239,8 @@ fetch_thread(Ref, Thread_ID, From) ->
     case Thread of 
 	[] ->
 	    From ! {error, "Thread not found in database"};
-	_ ->
-	    From ! {ok, Thread}
+	{Server, Creator, Header, Text, Timestamp, Commentlist} ->
+	    From ! {ok, {Server, Creator, Header, Text, stringify_timestamp(Timestamp), Commentlist}}
     end,
     loop(Ref).
 
