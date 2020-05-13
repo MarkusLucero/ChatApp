@@ -178,6 +178,7 @@ send_chat(Chat_Name, Creator, Members) ->
 %% @returns ok
 create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
     case database_api:create_thread(Username, Server_Name, Root_Header, Root_Comment) of
+
 	{error, _Reason} ->
 	    erlang:error('Error creating thread');
 	Thread_ID ->
@@ -188,6 +189,7 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 		    chat_server ! {create_thread, Thread_ID, Server, Creator, Header, Text, Timestamp, Commentlist},
 		    ok
 	    end
+
     end.
 
 -spec start() -> ok.
@@ -297,7 +299,7 @@ loop(Connection_map) ->
                                       {"chat_id", Chat_ID},
                                       {"members", {array, Members}},
                                       {"creator", Creator}]}),
-	    
+            
             Member_PIDs = [maps:find(Username, Connection_map) || Username <- Members],
             [PID ! {text, JSON_Message} || {ok, {PID, _}} <- Member_PIDs],
             loop(Connection_map);
@@ -308,14 +310,17 @@ loop(Connection_map) ->
                     loop(maps:remove(Username, Connection_map));
                 _ -> loop(Connection_map)
             end;
+
 	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist} ->
 	    io:format("MADE IT PAST LIST OF DMs: ~p ~p ~p ~p ~p ~p ~p~n", [Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist]),
+
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
-				      {"server_name", Server_Name},
+                                      {"server_name", Server_Name},
                                       {"thread_id", Thread_ID},
-				      {"username", Username},
+                                      {"username", Username},
                                       {"root_post", {struct, [{"root_header", Root_Header},
+
 							      {"root_comment", Root_Comment}]}},
 				      {"timestamp", Timestamp},
 				      {"commentList", {array, Commentlist}}
@@ -325,5 +330,15 @@ loop(Connection_map) ->
 			  PID ! {text, JSON_Message}
 		  end,
 	    maps:map(Fun, Connection_map),
-            loop(Connection_map)
+            loop(Connection_map);
+
+        {dead_connection, From} ->
+            maps:map(fun(Username, {PID, Token}) -> 
+                             case PID of
+                                 From -> token_server ! {remove_token, Token, Username};
+                                 _ -> ok
+                             end
+                     end, Connection_map),
+
+            loop(maps:filter(fun(_Username, {PID, _Token}) -> PID =/= From end, Connection_map))
     end.
