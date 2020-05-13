@@ -1,7 +1,8 @@
 import React from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import OriginalPost from "./OriginalPost";
-
+import {useSelector} from "react-redux"
+import CommentContainer from "../CommentContainer/CommentContainer"
 /**
  * ThreadContainer holds all information about a thread; rootpost, comments etc
  * @property {string} focusedThread the threadId of the thread we're currently focusing on 
@@ -34,6 +35,35 @@ const ThreadContainer = ({focusedThread }) => {
     event.preventDefault();
   };
   
+    // list of all threads in server object from redux store
+    const listOfThreads = useSelector(
+      (state) => state.socketState.server.listOfThreads
+    );
+  
+    //helper function for retrieving the right thread from state
+    const rightThread = (list) => {
+      for (const thread of list) {
+        if (thread.id === focusedThread) {
+          console.log(thread);
+          return thread;
+        }
+      }
+      return null;
+    };
+  
+    /*local state for actual thread object*/
+    const [thread, setThread] = React.useState(rightThread(listOfThreads));
+    /* state for thread comments */
+  
+    /*update the focused thread when clicked, refire when focusedThread or state's thread is updated */
+    React.useEffect(() => {
+      console.log(thread);
+      if (listOfThreads != null) {
+        const actual = rightThread(listOfThreads);
+        setThread(actual);
+      }
+    }, [focusedThread, listOfThreads]);
+  
   return (
     <div className="focused-view-custom-bg text-white flex flex-col content-center ">
       <SearchBar
@@ -42,9 +72,10 @@ const ThreadContainer = ({focusedThread }) => {
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
       />
-      <div className="h-screen75  overflow-y-scroll">
+      <div className="h-screen75">
 
-      {focusedThread ? <OriginalPost focusedThread={focusedThread} /> : null}
+      {focusedThread && thread ? <OriginalPost thread={thread} focusedThread={focusedThread} /> : null}
+      {focusedThread && thread ? <CommentContainer thread={thread} focusedThread={focusedThread} /> : null}
       </div>
     </div>
   );
