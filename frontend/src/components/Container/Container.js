@@ -81,11 +81,7 @@ const Container = () => {
         }
       };
     }
-  }, [
-    ws,
-    url,
-    firstWelcome,
-  ]);
+  }, [ws, url, firstWelcome]);
 
   /* a variable which checks wether we've successfully logged in or not taken from redux store */
   const loginSuccess = useSelector((state) => state.loginState.loginSuccess);
