@@ -185,8 +185,8 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 	    case database_api:fetch_thread(Thread_ID) of
 		{error, _Reason} ->
 		    erlang:error('Error fetching thread');
-		{Server, Creator, Header, Text, Timestamp} ->
-		    chat_server ! {create_thread, Thread_ID, Server, Creator, Header, Text, Timestamp},
+		{Server, Creator, Header, Text, Timestamp, Commentlist} ->
+		    chat_server ! {create_thread, Thread_ID, Server, Creator, Header, Text, Timestamp, Commentlist},
 		    ok
 	    end
     end.
@@ -309,7 +309,7 @@ loop(Connection_map) ->
                     loop(maps:remove(Username, Connection_map));
                 _ -> loop(Connection_map)
             end;
-	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp} ->
+	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, _Commentlist} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
 				      {"server_name", Server_Name},
@@ -317,7 +317,7 @@ loop(Connection_map) ->
 				      {"username", Username},
                                       {"root_post", {struct, [{"root_header", Root_Header},
 							      {"root_comment", Root_Comment}]}},
-				      {"timestamp", Timestamp}
+				      {"timestamp", Timestamp},
 				      {"commentList", {array, []}}]}),
 	    Fun = fun(_Username, {PID, _Magic_Token}) ->
 			  PID ! {text, JSON_Message}
