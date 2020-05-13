@@ -223,13 +223,13 @@ const socketReducer = (state = initialState, action) => {
                   ...state.server.listOfThreads, 
                   {
                   rootPost: {
-                    rootHeader: parsedData.rootHeader, 
-                    rootComment: parsedData.rootComment, 
+                    rootHeader: parsedData.root_post.root_header, 
+                    rootComment: parsedData.root_post.root_comment, 
                   },
                   username: parsedData.username, 
                   timestamp: parsedData.timestamp, 
-                  comments: parsedData.comments, 
-                  id: parsedData.id, 
+                  comments: parsedData.commentList, 
+                  id: parsedData.thread_id, 
                   }
                 ]
                 }
