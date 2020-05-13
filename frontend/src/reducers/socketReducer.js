@@ -67,6 +67,32 @@ const socketReducer = (state = initialState, action) => {
         wsOnline: true,
         firstWelcome: firstWelcome,
       };
+    case "ADD_COMMENT":
+      /* This will fetch us the correct thread */
+      for (const thread of state.server.listOfThreads) {
+        if (thread.id === action.payload.thread_id) {
+          thread.comments.push({
+            user_id: action.payload.user_id,
+            comment: action.payload.comment,
+            reply: action.payload.reply,
+          });
+        }
+      }
+      /*       state.socket.send(JSON.stringify(action.payload));
+       */
+      return state;
+    case "ADD_REPLY":
+      for (const thread of state.server.listOfThreads) {
+        if (thread.id === action.payload.thread_id) {
+          thread.comments.push({
+            user_id: action.payload.user_id,
+            comment: action.payload.comment,
+            reply: action.payload.reply,
+          });
+        }
+      }
+      /*       state.socket.send(JSON.stringify(action.payload));
+       */ return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
@@ -120,21 +146,24 @@ const socketReducer = (state = initialState, action) => {
                 {
                   rootPost: {
                     rootHeader: "Hjälp med linux!",
-                    rootComment: "Hej, har nån bra koll på mint??"
+                    rootComment: "Hej, har nån bra koll på mint??",
                   },
                   username: "Skooben",
                   timestamp: "2020-01-10",
-                  id: "1"
+                  comments: [],
+                  id: "1",
                 },
                 {
                   rootPost: {
                     rootHeader: "Knarka i helgen?",
-                    rootComment: "Tjena, skulle vilja knarka med någon i helgen. Sugen?"
+                    rootComment:
+                      "Tjena, skulle vilja knarka med någon i helgen. Sugen?",
                   },
                   username: "Rövpannan",
                   timestamp: "2019-12-24",
-                  id: "2"
-                }
+                  comments: [],
+                  id: "2",
+                },
               ],
               members: [action.payload.username],
             },

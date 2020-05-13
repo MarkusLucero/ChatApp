@@ -14,27 +14,26 @@ import { useSelector } from "react-redux";
 const LandingPage = () => {
   /* state to check what chat we are currently focusing on */
   const [focusedChat, setFocusedChat] = React.useState(null);
-  
+
   /*state to check what thread we are focuing on */
   const [focusedThread, setFocusedThread] = React.useState(null);
-  
 
   /* callback function for getting the id of the direct message div that we are clicking on */
   const handleFocusedChat = (event) => {
     setFocusedChat(event.target.id);
   };
 
-  /*callback for focusing a thread */ 
+  /*callback for focusing a thread */
+
   const handleFocusedThread = (event) => {
     setFocusedThread(event.target.id);
-  
-  }
+  };
 
   /* The global server object */
   const [server, setServer] = React.useState({});
 
   //server object from redux
-  const serverObject = useSelector(state => state.socketState.server);
+  const serverObject = useSelector((state) => state.socketState.server);
 
   React.useEffect(() => {
     if (serverObject !== null) {
@@ -48,16 +47,23 @@ const LandingPage = () => {
 
   /* callback function for getting the id of the page that we are clicking on */
   const handleFocusedPage = (event) => {
-    setFocusedPage(event.target.id)
+    setFocusedPage(event.target.id);
   };
 
   return (
     <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList handleFocusedPage={handleFocusedPage} server={server}/>
-      <InfoDisplayList handleFocusedChat={handleFocusedChat} focusedPage={focusedPage} 
-      handleFocusedThread = {handleFocusedThread}  />
+      <SideDisplayList handleFocusedPage={handleFocusedPage} server={server} />
+      <InfoDisplayList
+        handleFocusedChat={handleFocusedChat}
+        focusedPage={focusedPage}
+        handleFocusedThread={handleFocusedThread}
+      />
 
-      <FocusedView focusedChat={focusedChat} focusedPage={focusedPage} focusedThread ={focusedThread} />
+      <FocusedView
+        focusedChat={focusedChat}
+        focusedPage={focusedPage}
+        focusedThread={focusedThread}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ const ThreadContainer = ({focusedThread }) => {
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
 
+
   /**
    * Set the state of searchTerm to the value of the input field when that changes
    * @param event the event object of the window
@@ -41,7 +42,7 @@ const ThreadContainer = ({focusedThread }) => {
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
       />
-      <div className="h-screen75">
+      <div className="h-screen75  overflow-y-scroll">
 
       {focusedThread ? <OriginalPost focusedThread={focusedThread} /> : null}
       </div>

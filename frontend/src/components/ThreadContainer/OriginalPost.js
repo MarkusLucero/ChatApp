@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import CommentContainer from "../CommentContainer/CommentContainer";
 
 /**
  * OriginalPost is the first post of a Thread
@@ -25,6 +26,7 @@ const OriginalPost = ({ focusedThread }) => {
 
   /*local state for actual thread object*/
   const [thread, setThread] = useState(rightThread(listOfThreads));
+  /* state for thread comments */
 
   /*update the focused thread when clicked, refire when focusedThread or state's thread is updated */
   useEffect(() => {
@@ -36,18 +38,21 @@ const OriginalPost = ({ focusedThread }) => {
   }, [focusedThread, listOfThreads]);
 
   return (
-    <div className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-700">
-      <div className="flex flex-row justify-between">
-        <div className=" text-3xl text-white pl-2 w-auto">
-          {thread.rootPost.rootHeader}
+    <div>
+      <div className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-700">
+        <div className="flex flex-row justify-between">
+          <div className=" text-3xl text-white pl-2 w-auto">
+            {thread.rootPost.rootHeader}
+          </div>
+          <div className="text-xs text-white">
+            Posted by: {thread.username} on {thread.timestamp}
+          </div>
         </div>
-        <div className="text-xs text-white">
-          Posted by: {thread.username} on {thread.timestamp}
+        <div className="text-xl text-white ml-5 ">
+          {thread.rootPost.rootComment}
         </div>
       </div>
-      <div className="text-xl text-white ml-5 ">
-        {thread.rootPost.rootComment}
-      </div>
+      <CommentContainer thread={thread} focusedThread={focusedThread}></CommentContainer>
     </div>
   );
 };
