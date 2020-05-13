@@ -31,7 +31,6 @@ function assembleReply(poster, postedComment, reply) {
 const CommentContainer = ({ thread }) => {
   /* Thread is passed in as a paprameter. Use its comments array as start array*/
   /* This state handles the comment input */
-  console.log(thread.comments);
   const [comment, setComment] = useState("");
   /* This state handles if comment was posted or not */
   const [addComment, setAddComment] = useState(false);
@@ -100,6 +99,15 @@ const CommentContainer = ({ thread }) => {
     setReply("");
   }, [addReply]);
 
+  React.useEffect(() => {
+    if(thread){
+      setComments(thread.comments)
+      setCommentCounter(thread.comments.length)
+    }
+
+  }, [thread]);
+
+
   const handleInputChange = (event) => {
     setComment(event.target.value);
   };
@@ -107,13 +115,12 @@ const CommentContainer = ({ thread }) => {
   const handleReplyChange = (event) => {
     setReply(event.target.value);
   };
-  console.log(comments);
 
   /* When submitting a reply we must create a new Posted Comment field and concatinate this new pushed comment field with
   the parrent reply [] array. */
 
   return (
-    <div className="flex flex-col content-center focused-view-custom-bg">
+    <div className="flex flex-col content-center focused-view-custom-bg h-screen75 overflow-y-scroll">
       <div className="p-40">
         <div className="p-10 ">
           <div className="commentContainerBg">
