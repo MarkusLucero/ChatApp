@@ -96,3 +96,10 @@ Kör kommandot
 make test
 ```
 i database_api folder och be till gudarna att allt fungerar.
+
+** Enbart uppdatera tabellerna i databasen?
+
+kör kommado
+```
+make rebuild_database
+```

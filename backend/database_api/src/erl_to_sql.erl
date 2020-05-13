@@ -50,6 +50,9 @@ loop(Ref) ->
 	
 	{fetch_thread, Thread_ID, From} ->
 	    fetch_thread(Ref, Thread_ID, From);
+	
+	{insert_comment, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From} ->
+	    insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From);
 
         stop ->
             odbc:disconnect(Ref),
@@ -65,6 +68,8 @@ loop(Ref) ->
             odbc:sql_query(Ref, "DELETE FROM groups * WHERE groupname = 'skolchatten';"),
             odbc:sql_query(Ref, "DELETE FROM friendlist * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM friendlist * WHERE username = 'testfriend1';"),
+	    odbc:sql_query(Ref, "DELETE FROM commentlist * WHERE username = 'testuser1';"),
+	    odbc:sql_query(Ref, "DELETE FROM commentlist * WHERE username = 'testfriend1';"),
 	    odbc:sql_query(Ref, "DELETE FROM thread * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testfriend1';");
@@ -239,6 +244,35 @@ fetch_thread(Ref, Thread_ID, From) ->
     end,
     loop(Ref).
 
+insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From) ->
+    User_ID = fetch_user_id(Ref, Username),
+    case User_ID of
+	{error, Reason1} ->
+	    From ! {error, Reason1},
+	    loop(Ref);
+	_ ->
+	    ok
+    end,
+    Status = (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, parent_id, reply_id, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Parent_ID ++ ", " ++ Reply_ID ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
+    case Status of
+     	{updated, 1} ->
+	    {selected,_,[{Comment_ID}]} =  odbc:sql_query(Ref, "SELECT commentlist_id FROM commentlist WHERE (username = '" ++ Username ++ "' AND parent_id = " ++ Parent_ID ++ ");"),
+	    case Parent_ID of
+		"0" ->
+		    odbc:sql_query(Ref, "UPDATE thread SET commentlist_id = " ++ Comment_ID ++ " WHERE thread_id = " ++ Thread_ID),
+		    From !  {ok, Comment_ID};
+		_ ->
+		    ok
+	    end;
+	{error, Reason2} ->
+	    From ! {error, Reason2}
+    end,
+    loop(Ref).
+
+
+
+
+ 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Helper functions  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
