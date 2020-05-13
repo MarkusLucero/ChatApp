@@ -42,6 +42,7 @@ init(Req0, State) ->
 %% @param State The state of the handler.
 %% @returns ok For all terminations.
 terminate(_Reason, _Req, _State) ->
+    chat_server ! {dead_connection, self()},
     ok.
 
 
