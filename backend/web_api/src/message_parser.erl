@@ -40,6 +40,14 @@ handle_message(Msg, PID) ->
                  {"from", Username},
 		 {"members", {array,Members}}]} ->
             chat_server:send_chat(Chat_Name, Username, Members);
+	{struct,[{"server_name", Server_Name},
+                 {"thread_id", _Thread_ID},
+                 {"username", Username},
+		 {"root_post", {struct, [{"root_header", Root_Header},
+					{"root_comment", Root_Comment}]}},
+		 {"timestamp", _Timestamp},
+                 {"commentList", {array, _CommentList}}]} ->
+            chat_server:create_thread(Server_Name, Username, Root_Header, Root_Comment);
         _ -> erlang:error('unknown message')
     end,
     ok.
