@@ -312,7 +312,7 @@ loop(Connection_map) ->
 	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
-				      {"serverName", Server_Name},
+				      {"server_name", Server_Name},
                                       {"thread_id", Thread_ID},
 				      {"username", Username},
                                       {"root_post", {struct, [{"root_header", Root_Header},

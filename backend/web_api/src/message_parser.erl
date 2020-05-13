@@ -42,7 +42,7 @@ handle_message(Msg, PID) ->
             chat_server:send_chat(Chat_Name, Username, Members);
 	{struct,[{"server_name", Server_Name},
                  {"thread_id", _Thread_ID},
-                 {"user_id", Username},
+                 {"username", Username},
 		 {"root_post", {struct, [{"root_header", Root_Header},
 					{"root_comment", Root_Comment}]}},
 		 {"timestamp", _Timestamp},
