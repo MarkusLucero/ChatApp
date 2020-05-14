@@ -64,6 +64,22 @@ friend_request(Username, Friendname, Req0, Opts) ->
    end.    
 
 
+
+request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
+    token_server ! {check_token, Magic_Token, Username, self()},
+    receive
+        {ok, Magic_Token} -> 
+            Body = <<"<h1>Strange request!</h1>">>,
+            Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
+            {ok, Req3, Opts};
+        _ -> 
+            Body = <<"Bad Auth">>,
+            Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+            {ok, Req3, Opts};
+    end,
+    ok.
+
+
 -spec init(Req, State) -> {ok, Req, Opts} when
       Req :: cowboy_req:req(),
       State :: any(),
@@ -99,8 +115,13 @@ init(Req0, Opts) ->
                     Body = <<"Logout ACK">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
                     {ok, Req3, Opts};
+                {struct, [{"action", "fetch_thread"},
+                          {"thread_id", Thread_ID},
+                          {"magic_token", Magic_Token},
+                          {"username", Username}]} ->
+                    request_thread(Thread_ID, Magic_Token, Username, Req0, Opts);
                 _ -> 
-                    Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
+                    Body = <<"<h1>Strange request!</h1>">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
                     {ok, Req3, Opts}
             end;
