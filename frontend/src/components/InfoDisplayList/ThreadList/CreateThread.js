@@ -59,6 +59,7 @@ const CreateThread = ({ showCreateThread, setShowCreateThread }) => {
         details: details,
       };
       dispatch(actions.createThread(data));
+      setShowCreateThread(false);
     } else {
       setShowCreateThread(false);
     }

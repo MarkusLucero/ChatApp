@@ -26,8 +26,14 @@ const LandingPage = () => {
   /*callback for focusing a thread */
 
   const handleFocusedThread = (event) => {
+    console.log(event.target);
     setFocusedThread(event.target.id);
   };
+
+  /* callback for resetting the focused thread */
+  const resetFocusedThread = ()=> { 
+    setFocusedThread(null);
+  }
 
   /* The global server object */
   const [server, setServer] = React.useState({});
@@ -52,7 +58,10 @@ const LandingPage = () => {
 
   return (
     <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList handleFocusedPage={handleFocusedPage} server={server} />
+      <SideDisplayList
+        resetFocusedThread={resetFocusedThread}
+        handleFocusedPage={handleFocusedPage}
+        server={server} />
       <InfoDisplayList
         handleFocusedChat={handleFocusedChat}
         focusedPage={focusedPage}
@@ -62,7 +71,9 @@ const LandingPage = () => {
       <FocusedView
         focusedChat={focusedChat}
         focusedPage={focusedPage}
+        handleFocusedThread={handleFocusedThread}
         focusedThread={focusedThread}
+        resetFocusedThread={resetFocusedThread}
       />
     </div>
   );
