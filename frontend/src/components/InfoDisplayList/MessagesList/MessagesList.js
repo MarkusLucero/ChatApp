@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import plus from "../../../img/plus.svg"
+import plus from "../../../img/plus.svg";
 import StartChat from "./StartChat";
 import { useSelector } from "react-redux";
 
@@ -7,9 +7,10 @@ import { useSelector } from "react-redux";
  * contains the list of available direct messages that we can chat in
  * @param {function} handleFocusedChat callback function used to get the target of what we are clicking on
  * @property {string} username  username of the logged in user
+ * @property {String} focusedChat - a string used to check what chat we are focusing on
  * returns a div containing all direct messages
  */
-const MessagesList = ({ handleFocusedChat, username }) => {
+const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
   /* Get friendslist from redux store */
   const friends = useSelector((state) => state.socketState.listOfFriends);
 
@@ -36,10 +37,10 @@ const MessagesList = ({ handleFocusedChat, username }) => {
     };
   }, []);
 
-/**
- * handles a click outside of the create chat modal
- * @param event of the window object
- */
+  /**
+   * handles a click outside of the create chat modal
+   * @param event of the window object
+   */
   const handleClick = (event) => {
     if (addChatModal.current.contains(event.target)) {
       // inside click
@@ -63,12 +64,20 @@ const MessagesList = ({ handleFocusedChat, username }) => {
             setShowAddChat(true);
           }}
           src={plus}
-          onMouseEnter= {()=> {setHovered (!hovered)}}
-          onMouseLeave ={()=>{setHovered(!hovered)}}
+          onMouseEnter={() => {
+            setHovered(!hovered);
+          }}
+          onMouseLeave={() => {
+            setHovered(!hovered);
+          }}
           alt="Create a new chat!"
-          className={hovered ? 'plusIcon-custom-hover h-6 w-6 cursor-pointer' : 'h-6 w-6 cursor-pointer' }
+          className={
+            hovered
+              ? "plusIcon-custom-hover h-6 w-6 cursor-pointer"
+              : "h-6 w-6 cursor-pointer"
+          }
         />
-        </div>
+      </div>
 
       <div ref={addChatModal}>
         {showAddChat ? (
@@ -81,14 +90,23 @@ const MessagesList = ({ handleFocusedChat, username }) => {
       </div>
       <div className="flex flex-col">
         {chats.map((chat, index) => {
+          console.log(chat);
           return (
             <div
-              className="text-white text-xl hover:bg-gray-500 cursor-pointer"
               onClick={handleFocusedChat}
               key={index}
               id={chat.chatID}
+              className="text-white text-xl hover:bg-gray-500 cursor-pointer flex flex-row justify-between"
             >
-              {chat.chatName}
+            {/* TODO FIX SAME ID BAD PRAXIS */}
+              <div id={chat.chatID} >{chat.chatName}</div>
+              <div className="text-red-700">
+                {focusedChat === chat.chatID
+                  ? ""
+                  : !chat.sinceLastSeen
+                  ? ""
+                  : "+" + chat.sinceLastSeen}
+              </div>
             </div>
           );
         })}
