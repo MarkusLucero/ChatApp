@@ -68,16 +68,29 @@ friend_request(Username, Friendname, Req0, Opts) ->
 request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
     token_server ! {check_token, Magic_Token, Username, self()},
     receive
-        {ok, Magic_Token} -> 
-            Body = <<"<h1>Strange request!</h1>">>,
-            Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
-            {ok, Req3, Opts};
+        {ok, Magic_Token} ->
+            case database_api:fetch_thread(Thread_ID) of
+                {error, _Reason} ->
+                    Body = <<"Bad Auth">>,
+                    Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts};
+                {Server, Creator, Header, Text, Timestamp, Comments} ->
+                    JSON_Response = {struct,[{"action", "fetch_thread"},
+                                             {"server_name", Server},
+                                            {"creator", Creator},
+                                             {"header", Header},
+                                             {"text", Text},
+                                             {"timestamp", Timestamp},
+                                             {"comment_list", {array, Comments}}]},
+                    Body = mochijson:encode(JSON_Response),
+                    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts}
+            end;
         _ -> 
             Body = <<"Bad Auth">>,
             Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-            {ok, Req3, Opts};
-    end,
-    ok.
+            {ok, Req3, Opts}
+    end.
 
 
 -spec init(Req, State) -> {ok, Req, Opts} when
