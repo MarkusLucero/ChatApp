@@ -64,6 +64,74 @@ friend_request(Username, Friendname, Req0, Opts) ->
    end.    
 
 
+
+request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
+    token_server ! {check_token, Magic_Token, Username, self()},
+    receive
+        {ok, Magic_Token} ->
+            case database_api:fetch_thread(Thread_ID) of
+                {error, _Reason} ->
+                    Body = <<"Bad request">>,
+                    Req3 = cowboy_req:reply(400, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts};
+                {Server, Creator, Header, Text, Timestamp, Comments} ->
+                    JSON_Response = {struct,[{"action", "fetch_thread"},
+                                             {"server_name", Server},
+                                            {"creator", Creator},
+                                             {"header", Header},
+                                             {"text", Text},
+                                             {"timestamp", Timestamp},
+                                             {"comment_list", {array, Comments}}]},
+                    Body = mochijson:encode(JSON_Response),
+                    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts}
+            end;
+        _ -> 
+            Body = <<"Bad Auth">>,
+            Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+            {ok, Req3, Opts}
+    end.
+
+fetch_thread_JSON(Thread_ID) ->
+            case database_api:fetch_thread(Thread_ID) of
+                {error, _Reason} ->
+                    erlang:error(badarg);
+                {Server, Creator, Header, Text, Timestamp, Comments} ->
+                    JSON_Response = {struct,[{"action", "fetch_thread"},
+                                             {"thread_id", Thread_ID},
+                                             {"server_name", Server},
+                                             {"creator", Creator},
+                                             {"header", Header},
+                                             {"text", Text},
+                                             {"timestamp", Timestamp},
+                                             {"comment_list", {array, Comments}}]},
+                    mochijson:encode(JSON_Response)
+            end.
+
+request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->
+    token_server ! {check_token, Magic_Token, Username, self()},
+    receive
+        {ok, Magic_Token} ->
+            case database_api:fetch_thread_IDs() of
+                {error, _Reason} ->
+                    Body = <<"Bad request">>,
+                    Req3 = cowboy_req:reply(400, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts};
+                ThreadList ->
+                    Threads_JSON = lists:map(fun(ID) -> fetch_thread_JSON(ID) end, ThreadList),
+                    Body = mochijson:encode({struct,[{"action", "fetch_server_contents"},
+                                                     {"server_name", Server_Name},
+                                                     {"threads", {array, Threads_JSON}}
+                                                     ]}),
+                    Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+                    {ok, Req3, Opts}
+            end;
+        _ -> 
+            Body = <<"Bad Auth">>,
+            Req3 = cowboy_req:reply(403, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
+            {ok, Req3, Opts}
+    end.
+
 -spec init(Req, State) -> {ok, Req, Opts} when
       Req :: cowboy_req:req(),
       State :: any(),
@@ -99,8 +167,18 @@ init(Req0, Opts) ->
                     Body = <<"Logout ACK">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
                     {ok, Req3, Opts};
+                {struct, [{"action", "fetch_thread"},
+                          {"thread_id", Thread_ID},
+                          {"magic_token", Magic_Token},
+                          {"username", Username}]} ->
+                    request_thread(Thread_ID, Magic_Token, Username, Req0, Opts);
+                {struct, [{"action", "fetch_server_contents"},
+                          {"server_name", Server_Name},
+                          {"magic_token", Magic_Token},
+                          {"username", Username}]} ->
+                    request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts);
                 _ -> 
-                    Body = <<"<h1>DO NOT SEND A GET TO THIS SERVER</h1>">>,
+                    Body = <<"<h1>Strange request!</h1>">>,
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/html">> }, Body, Req0),
                     {ok, Req3, Opts}
             end;
