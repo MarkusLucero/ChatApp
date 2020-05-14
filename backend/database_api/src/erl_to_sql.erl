@@ -224,6 +224,17 @@ create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
 	_ ->
 	    ok
     end,
+
+    Check_Duplicate = odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND server_id = " ++ Server ++ " AND root_header = '" ++ Header ++ "');"),
+    
+    case Check_Duplicate of
+	{selected, _, []} ->
+	    ok;
+	_Already_Exists ->
+	  From ! {error, "This user has already created a thread with this root_header. Please choose a different header."},
+	    loop(Ref)
+    end,
+
     Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text, timestamp) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
     case Status of
      	{updated, 1} ->
