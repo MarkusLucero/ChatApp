@@ -249,12 +249,12 @@ create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
     loop(Ref).
 
 fetch_thread(Ref, Thread_ID, From) ->
-    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, timestamp, commentlist_id FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
+    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, timestamp FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
     case Thread of 
-        [] ->
-            From ! {error, "Thread not found in database"};
-        {Server, Creator, Header, Text, Timestamp, Commentlist} ->
-            From ! {ok, {Server, Creator, Header, Text, stringify_timestamp(Timestamp), Commentlist}}
+	[] ->
+	    From ! {error, "Thread not found in database"};
+	{Server, Creator, Header, Text, Timestamp} ->
+	    From ! {ok, {Server, Creator, Header, Text, stringify_timestamp(Timestamp), fetch_all_comments(Ref, Thread_ID)}}
     end,
     loop(Ref).
 
@@ -274,17 +274,18 @@ insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, F
     end,
     Status = (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, parent_id, reply_id, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Parent_ID ++ ", " ++ Reply_ID ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
     case Status of
-        {updated, 1} ->
-            {selected,_,[{Comment_ID}]} =  odbc:sql_query(Ref, "SELECT commentlist_id FROM commentlist WHERE (username = '" ++ Username ++ "' AND parent_id = " ++ Parent_ID ++ ");"),
-            case Parent_ID of
-                "0" ->
-                    odbc:sql_query(Ref, "UPDATE thread SET commentlist_id = " ++ Comment_ID ++ " WHERE thread_id = " ++ Thread_ID),
-                    From !  {ok, Comment_ID};
-                _ ->
-                    ok
-            end;
-        {error, Reason2} ->
-            From ! {error, Reason2}
+     	{updated, 1} ->
+%%	    fetch_all_comments(Ref, Thread_ID),
+	    {selected,_,[{Comment_ID}]} =  odbc:sql_query(Ref, "SELECT commentlist_id FROM commentlist WHERE (username = '" ++ Username ++ "' AND parent_id = " ++ Parent_ID ++ ");"),
+	    case Parent_ID of
+		"0" ->
+		    odbc:sql_query(Ref, "UPDATE thread SET commentlist_id = " ++ Comment_ID ++ " WHERE thread_id = " ++ Thread_ID),
+		    From !  {ok, Comment_ID};
+		_ ->
+		    tbi
+	    end;
+	{error, Reason2} ->
+	    From ! {error, Reason2}
     end,
     loop(Ref).
 
@@ -335,8 +336,32 @@ fetch_all_chats_helper([{Chat_ID}|Tail], All_Chats, Ref) ->
     New_Chat_List = All_Chats ++ [{Chat_ID, Chat_Name, Messages}],
     fetch_all_chats_helper(Tail, New_Chat_List, Ref).
 
+
+fetch_all_comments(Ref, Thread_ID) ->
+    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, parent_id, reply_id, username, text, timestamp FROM commentlist WHERE thread_id = '" ++ Thread_ID ++ "';")),
+    
+    case Status of
+	{selected, _, []} ->
+%%	    io:format("fetch_all_comments/2: CommentList = []~n");
+	    [];
+	{selected, _, Commentlist} ->
+%%	    io:format("fetch_all_comments/2: CommentList = ~p~n", [Commentlist]),
+	    X =  [stringify_comment(E) || E <- Commentlist],
+
+	    X;
+	Error ->
+	    io:format("fetch_all_comments/2: CommentList = ~p~n", [Error]),
+	    Error
+    end.
+
+
 %% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
 stringify_timestamp({Date,Time}) ->
     {Year,Month,Day} = Date,
     {Hour,Minute,Second} = Time,
     integer_to_list(Year) ++ "-" ++ integer_to_list(Month) ++ "-" ++ integer_to_list(Day) ++ " " ++ integer_to_list(Hour) ++ ":" ++ integer_to_list(Minute) ++ ":" ++ integer_to_list(Second).
+
+
+stringify_comment({Comment_ID, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp}) ->
+    {Comment_ID, Thread_ID, Parent_ID, Reply_ID, Username, Text, stringify_timestamp(Timestamp)}.
+   

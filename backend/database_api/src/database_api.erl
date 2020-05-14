@@ -424,9 +424,20 @@ create_and_fetch_thread_test() ->
 
 insert_comment_test() ->
     Thread_ID = create_thread("testuser1", "0","Test thread 2", "This is the second root thread."),
-    _ = insert_comment(Thread_ID, "0", "0", "testuser1", "text test"),
-    _ = insert_comment(Thread_ID, "0", "2", "testfriend1", "reply text test"),
-    {error, _} = insert_comment("-1", "0", "2", "invalid", "reply text test").
+    Comment_ID1 = insert_comment(Thread_ID, "0", "0", "testuser1", "text test"),
+    Comment_ID2 = insert_comment(Thread_ID, "0", "2", "testfriend1", "reply text test"),
+    {error, _} = insert_comment("-1", "0", "2", "invalid", "reply text test"),
+    
+    {Server, Creator, Header, Text, _Timestamp, [Comment1, Comment2]} = fetch_thread(Thread_ID),
+    Server = "0",
+    Creator = "testuser1",
+    Header = "Test thread 2",
+    Text = "This is the second root thread.",
+    {Comment_ID1, Thread_ID, "0", "0", "testuser1", "text test", _} = Comment1,
+    {Comment_ID2, Thread_ID, "0", "2", "testfriend1", "reply text test", _} = Comment2.
+    
+    
+
 
 stop_test_() ->
     %% database ! reset_tests,
