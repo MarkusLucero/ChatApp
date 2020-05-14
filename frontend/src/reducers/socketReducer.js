@@ -68,31 +68,9 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: firstWelcome,
       };
     case "ADD_COMMENT":
-      /* This will fetch us the correct thread */
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */
+      state.socket.send(JSON.stringify(action.payload));
+
       return state;
-    case "ADD_REPLY":
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */ return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
@@ -174,6 +152,17 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "insert_comment":
+            for (const thread of state.server.listOfThreads) {
+              if (thread.id === parsedData.action.payload.thread_id) {
+                thread.comments.push({
+                  user_id: parsedData.action.payload.user_id,
+                  comment: parsedData.action.payload.comment,
+                  reply: parsedData.action.payload.reply,
+                });
+              }
+            }
+            break;
           case "init_login":
             return {
               ...state,
@@ -214,26 +203,26 @@ const socketReducer = (state = initialState, action) => {
               };
             }
             return state;
-        case "create_thread": 
-            return{
+          case "create_thread":
+            return {
               ...state,
               server: {
-                ... state.server, 
+                ...state.server,
                 listOfThreads: [
-                  ...state.server.listOfThreads, 
+                  ...state.server.listOfThreads,
                   {
-                  rootPost: {
-                    rootHeader: parsedData.root_post.root_header, 
-                    rootComment: parsedData.root_post.root_comment, 
+                    rootPost: {
+                      rootHeader: parsedData.root_post.root_header,
+                      rootComment: parsedData.root_post.root_comment,
+                    },
+                    username: parsedData.username,
+                    timestamp: parsedData.timestamp,
+                    comments: parsedData.commentList,
+                    id: parsedData.thread_id,
                   },
-                  username: parsedData.username, 
-                  timestamp: parsedData.timestamp, 
-                  comments: parsedData.commentList, 
-                  id: parsedData.thread_id, 
-                  }
-                ]
-                }
-            }
+                ],
+              },
+            };
           default:
             return state;
         }
