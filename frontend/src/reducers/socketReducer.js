@@ -96,6 +96,15 @@ const socketReducer = (state = initialState, action) => {
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
+    
+    case "ADD_THREADS": 
+    return{
+      ...state,
+      server: {
+        ... state.server, 
+        listOfThreads: action.payload.threads     
+        }
+      };
     case "ADDFRIEND":
       return {
         ...state,

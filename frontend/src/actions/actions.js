@@ -18,8 +18,10 @@ const CHAT_REQUEST = "CHAT_REQUEST";
 const LOGOUT = "LOGOUT";
 const RESET = "RESET";
 const CREATE_THREAD = "CREATE_THREAD";
+const ADD_THREADS = "ADD_THREADS";
 const ADD_COMMENT = "ADD_COMMENT";
 const ADD_REPLY = "ADD_REPLY";
+
 
 export function sendMessage(data) {
   return {
@@ -120,13 +122,20 @@ export function createThread(values) {
     type: CREATE_THREAD,
     payload: {
       serverName: values.server.serverName,
-      thread_id: null, //TODO: ? kanske todo, kanske rätt
+      thread_id: null,
       username: values.user,
       root_post: { root_header: values.summary, root_cooment: values.details },
-      //TODO: Vet inte om detta är ok eller ej, tänkte initialt att det kanske är lättare att sätta timestamp i backend
       timestamp: null,
       comments: [],
     },
+  };
+}
+export function addThreads(data) {
+  return { 
+    type: ADD_THREADS,
+    payload: {
+      threads: data.threads, 
+    }
   };
 }
 
