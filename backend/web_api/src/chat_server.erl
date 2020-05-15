@@ -209,7 +209,7 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
     case database_api:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) of
 	{error, _Reason} ->
 	    erlang:error('Error inserting comment');
-	{_Comment_ID, {Reply_User, Reply_Comment}} ->
+	{Thread_ID, Username, Comment, {Reply_User, Reply_Comment}} ->
 	    chat_server ! {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment},
 	    ok
     end.
