@@ -259,7 +259,7 @@ fetch_thread_IDs(Ref, From) ->
     loop(Ref).
 
 insert_comment(Ref, Thread_ID, Index, Reply_Index, Username, Text, Timestamp, From) ->
-      User_ID = fetch_user_id(Ref, Username),
+    User_ID = fetch_user_id(Ref, Username),
     case User_ID of
 	{error, Reason1} ->
 	    From ! {error, Reason1},
