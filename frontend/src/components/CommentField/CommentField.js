@@ -14,7 +14,7 @@ const CommentField = ({
   setComments,
 }) => {
   return (
-    <div className=" pl-20 pr-20 pb-20  pt-10">
+    <div className=" pl-4 pr-4 pb-10  pt-10">
       <div className="commentField">
         <PostedComment
          className="text-black"

@@ -102,10 +102,10 @@ function getParentId(){
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg h-screen75 overflow-y-scroll">
-      <div className="p-40">
-        <div className="p-10 ">
+      <div className=" w-full">
+        <div className="">
           <div className="commentContainerBg">
-            <span className="text-white pt-10 pl-20 " id="comments">
+            <span className="text-white pt-10 pl-4 " id="comments">
               Comments
             </span>
             <span className="text-white pt-10" id="comments_count">
@@ -118,7 +118,8 @@ function getParentId(){
               setAddComment={setAddComment}
               username={poster}
             ></Comment>
-            <CommentField
+            {/* only render this part if there's comments */}
+            {comments.length >  0 && <CommentField
               setIndex={setIndex}
               inputHandler={handleReplyChange}
               setAddReply={setAddReply}
@@ -127,7 +128,7 @@ function getParentId(){
               comment={comment}
               comments={comments}
               setComments={setComments}
-            ></CommentField>
+            ></CommentField> }
           </div>
         </div>
       </div>

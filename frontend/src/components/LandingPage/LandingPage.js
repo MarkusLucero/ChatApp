@@ -3,7 +3,8 @@ import "../../assets/main.css";
 import SideDisplayList from "../SideDisplayList/SideDisplayList";
 import FocusedView from "../FocusedView/FocusedView";
 import InfoDisplayList from "../InfoDisplayList/InfoDisplayList";
-import { useSelector } from "react-redux";
+import * as actions from "../../actions/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 /**
  * LandingPage holds the layout design grid of the app. Also manages
@@ -12,6 +13,8 @@ import { useSelector } from "react-redux";
  * @returns a div containing the SideDisplayList, InfoDisplayList and FocusedView components
  */
 const LandingPage = () => {
+  const dispatch = useDispatch();
+
   /* state to check what chat we are currently focusing on */
   const [focusedChat, setFocusedChat] = React.useState(null);
 
@@ -26,8 +29,14 @@ const LandingPage = () => {
   /*callback for focusing a thread */
 
   const handleFocusedThread = (event) => {
+    console.log(event.target);
     setFocusedThread(event.target.id);
   };
+
+  /* callback for resetting the focused thread */
+  const resetFocusedThread = ()=> { 
+    setFocusedThread(null);
+  }
 
   /* The global server object */
   const [server, setServer] = React.useState({});
@@ -41,6 +50,11 @@ const LandingPage = () => {
     }
   }, [serverObject]);
 
+  React.useEffect(() => {
+    if(focusedChat){
+      dispatch(actions.resetLastSeen({chatID:focusedChat}));
+    }
+  },[focusedChat])
   /* state to check what page we are focusing on - some server or the home page*/
   /* Focusing on Home always on start*/
   const [focusedPage, setFocusedPage] = React.useState("Home");
@@ -52,17 +66,23 @@ const LandingPage = () => {
 
   return (
     <div className="grid grid-cols-custom h-screen">
-      <SideDisplayList handleFocusedPage={handleFocusedPage} server={server} />
+      <SideDisplayList
+        resetFocusedThread={resetFocusedThread}
+        handleFocusedPage={handleFocusedPage}
+        server={server} />
       <InfoDisplayList
         handleFocusedChat={handleFocusedChat}
         focusedPage={focusedPage}
+        focusedChat={focusedChat}
         handleFocusedThread={handleFocusedThread}
       />
 
       <FocusedView
         focusedChat={focusedChat}
         focusedPage={focusedPage}
+        handleFocusedThread={handleFocusedThread}
         focusedThread={focusedThread}
+        resetFocusedThread={resetFocusedThread}
       />
     </div>
   );

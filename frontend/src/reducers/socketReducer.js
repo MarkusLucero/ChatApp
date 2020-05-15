@@ -164,10 +164,12 @@ const socketReducer = (state = initialState, action) => {
             }
             break;
           case "init_login":
+            const listOfDms = parsedData.list_of_dms.map((obj) => {
+              return { ...obj, sinceLastSeen: 0 }; /* used for notifications */
+            });
             return {
               ...state,
-
-              listOfDms: parsedData.list_of_dms,
+              listOfDms: listOfDms,
               listOfFriends: parsedData.list_of_friends,
               username: parsedData.user_id,
             };
@@ -178,6 +180,7 @@ const socketReducer = (state = initialState, action) => {
               ...state,
               listOfDms: [
                 ...state.listOfDms,
+                state.listOfDms[index].sinceLastSeen++,
                 state.listOfDms[index].messages.push({
                   message: parsedData.message,
                   username: parsedData.user_id,
@@ -198,6 +201,7 @@ const socketReducer = (state = initialState, action) => {
                     messages: [],
                     members: parsedData.members,
                     creator: parsedData.creator,
+                    sinceLastSeen: 0 /* used for notifications */,
                   },
                 ],
               };
@@ -275,6 +279,18 @@ const socketReducer = (state = initialState, action) => {
         listOfDms: null,
         listOfFriends: null,
       };
+    case "RESET_LAST_SEEN":
+      /* Reset the since last seen counter to 0 */
+      console.log(action.payload)
+      const i = getChatIndex(state.listOfDms, action.payload.chatID);
+      return {
+        ...state,
+        listOfDms: [
+          ...state.listOfDms,
+          state.listOfDms[i].sinceLastSeen = 0,
+        ],
+      };
+
     default:
       return state;
   }

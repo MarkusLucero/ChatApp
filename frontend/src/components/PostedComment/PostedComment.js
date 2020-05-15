@@ -37,7 +37,7 @@ const PostedComment = ({
                     </span>
                   </div>
                   <div className="break"></div>
-                  <div className="ml-4 ">{comment.reply.reply_user}</div>
+                  <div className="ml-4 ">{comment.reply.reply_comment}</div>
                 </div>
               ) : null}
               <div className=" ml-4 ">
