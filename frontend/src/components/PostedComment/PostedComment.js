@@ -14,7 +14,7 @@ const PostedComment = ({
 }) => {
   return (
     <div className="w-full">
-      <div>{comments.username}</div>
+      <div>{comments.user_id}</div>
       <div className="text-white w-full">
         {comments.map((comment, index) => (
           <div className=" w-full " key={index}>
@@ -27,7 +27,8 @@ const PostedComment = ({
             </span>
             <div className="break-words ml-12">
               <div className="  mt-4 ml-4 text-blue-700">{comment.user_id}</div>
-              {Object.keys(comment.reply).length !== 0 ? (
+              {console.log(comment)}
+              {Object.keys(comment.reply.reply_comment).length !== 0 ? (
                 <div className="quote">
                   <div className=" font-bold ml-4">
                     Originally posted by {""}

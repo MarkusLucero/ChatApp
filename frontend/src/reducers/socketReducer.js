@@ -163,7 +163,7 @@ const socketReducer = (state = initialState, action) => {
                 listOfThreads: [
                   ...state.server.listOfThreads,
                   state.server.listOfThreads[iT].comments.push({
-                    user_id: parsedData.user_id,
+                    user_id: parsedData.username,
                     comment: parsedData.comment,
                     reply: parsedData.reply,
                   }),
