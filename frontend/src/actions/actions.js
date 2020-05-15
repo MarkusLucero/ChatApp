@@ -20,6 +20,7 @@ const RESET = "RESET";
 const CREATE_THREAD = "CREATE_THREAD";
 const ADD_COMMENT = "ADD_COMMENT";
 const ADD_REPLY = "ADD_REPLY";
+const RESET_LAST_SEEN = "RESET_LAST_SEEN";
 
 export function sendMessage(data) {
   return {
@@ -38,24 +39,11 @@ export function addComment(data) {
   return {
     type: ADD_COMMENT,
     payload: {
-      thread_id: data.thread_id,
-      user_id: data.username,
+      thread_id: data.thread.id,
+      index: data.index,
+      reply_index: data.reply_index,
+      username: data.username,
       comment: data.comment,
-      reply: data.reply,
-    },
-  };
-}
-export function addReply(data) {
-  return {
-    type: ADD_REPLY,
-    payload: {
-      thread_id: data.thread_id,
-      user_id: data.username,
-      comment: data.comment,
-      reply: {
-        user_id: data.reply.user_id,
-        comment: data.reply.comment,
-      },
     },
   };
 }
@@ -144,4 +132,8 @@ export function setServer(server) {
 
 export function resetLoginState() {
   return { type: RESET };
+}
+
+export function resetLastSeen(data) {
+  return { type: RESET_LAST_SEEN, payload:data };
 }

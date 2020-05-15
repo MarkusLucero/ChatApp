@@ -68,31 +68,9 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: firstWelcome,
       };
     case "ADD_COMMENT":
-      /* This will fetch us the correct thread */
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */
+      state.socket.send(JSON.stringify(action.payload));
+
       return state;
-    case "ADD_REPLY":
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */ return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
@@ -174,11 +152,24 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "insert_comment":
+            for (const thread of state.server.listOfThreads) {
+              if (thread.id === parsedData.thread_id) {
+                thread.comments.push({
+                  user_id: parsedData.user_id,
+                  comment: parsedData.comment,
+                  reply: parsedData.reply,
+                });
+              }
+            }
+            break;
           case "init_login":
+            const listOfDms = parsedData.list_of_dms.map((obj) => {
+              return { ...obj, sinceLastSeen: 0 }; /* used for notifications */
+            });
             return {
               ...state,
-
-              listOfDms: parsedData.list_of_dms,
+              listOfDms: listOfDms,
               listOfFriends: parsedData.list_of_friends,
               username: parsedData.user_id,
             };
@@ -189,6 +180,7 @@ const socketReducer = (state = initialState, action) => {
               ...state,
               listOfDms: [
                 ...state.listOfDms,
+                state.listOfDms[index].sinceLastSeen++,
                 state.listOfDms[index].messages.push({
                   message: parsedData.message,
                   username: parsedData.user_id,
@@ -209,31 +201,32 @@ const socketReducer = (state = initialState, action) => {
                     messages: [],
                     members: parsedData.members,
                     creator: parsedData.creator,
+                    sinceLastSeen: 0 /* used for notifications */,
                   },
                 ],
               };
             }
             return state;
-        case "create_thread": 
-            return{
+          case "create_thread":
+            return {
               ...state,
               server: {
-                ... state.server, 
+                ...state.server,
                 listOfThreads: [
-                  ...state.server.listOfThreads, 
+                  ...state.server.listOfThreads,
                   {
-                  rootPost: {
-                    rootHeader: parsedData.root_post.root_header, 
-                    rootComment: parsedData.root_post.root_comment, 
+                    rootPost: {
+                      rootHeader: parsedData.root_post.root_header,
+                      rootComment: parsedData.root_post.root_comment,
+                    },
+                    username: parsedData.username,
+                    timestamp: parsedData.timestamp,
+                    comments: parsedData.commentList,
+                    id: parsedData.thread_id,
                   },
-                  username: parsedData.username, 
-                  timestamp: parsedData.timestamp, 
-                  comments: parsedData.commentList, 
-                  id: parsedData.thread_id, 
-                  }
-                ]
-                }
-            }
+                ],
+              },
+            };
           default:
             return state;
         }
@@ -286,6 +279,18 @@ const socketReducer = (state = initialState, action) => {
         listOfDms: null,
         listOfFriends: null,
       };
+    case "RESET_LAST_SEEN":
+      /* Reset the since last seen counter to 0 */
+      console.log(action.payload)
+      const i = getChatIndex(state.listOfDms, action.payload.chatID);
+      return {
+        ...state,
+        listOfDms: [
+          ...state.listOfDms,
+          state.listOfDms[i].sinceLastSeen = 0,
+        ],
+      };
+
     default:
       return state;
   }

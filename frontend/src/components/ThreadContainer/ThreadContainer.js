@@ -3,12 +3,15 @@ import SearchBar from "../SearchBar/SearchBar";
 import OriginalPost from "./OriginalPost";
 import {useSelector} from "react-redux"
 import CommentContainer from "../CommentContainer/CommentContainer"
+import ThreadInfo from "./ThreadInfo";
 /**
  * ThreadContainer holds all information about a thread; rootpost, comments etc
  * @property {string} focusedThread the threadId of the thread we're currently focusing on 
+ * @property {Function} handleFocusedThread - callback funktion for setting the focused thread
+ * @property {function} resetFocusedThread callback for resetting the focused thread
  * @returns a div with the Originalpost and comments
  */
-const ThreadContainer = ({focusedThread }) => {
+const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread }) => {
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -44,7 +47,6 @@ const ThreadContainer = ({focusedThread }) => {
     const rightThread = (list) => {
       for (const thread of list) {
         if (thread.id === focusedThread) {
-          console.log(thread);
           return thread;
         }
       }
@@ -57,24 +59,26 @@ const ThreadContainer = ({focusedThread }) => {
   
     /*update the focused thread when clicked, refire when focusedThread or state's thread is updated */
     React.useEffect(() => {
-      console.log(thread);
       if (listOfThreads != null) {
         const actual = rightThread(listOfThreads);
         setThread(actual);
       }
     }, [focusedThread, listOfThreads]);
-  
   return (
     <div className="focused-view-custom-bg text-white flex flex-col content-center ">
-      <SearchBar
+     {/*<SearchBar
         id="search-chat"
         value={searchTerm}
         onButtonClick={handleSearchSubmit}
         onInputChange={handleSearchInput}
-      />
+      /> */}
+      
       <div className="h-screen75">
-
-      {focusedThread && thread ? <OriginalPost thread={thread} focusedThread={focusedThread} /> : null}
+      { !focusedThread ? 
+        listOfThreads.map((thread, index) => {
+          return <ThreadInfo handleFocusedThread={handleFocusedThread}thread={thread} key={index}/>
+      }):null }
+      {focusedThread && thread ? <OriginalPost handleFocusedThread={handleFocusedThread} thread={thread} focusedThread={focusedThread} resetFocusedThread={resetFocusedThread} /> : null}
       {focusedThread && thread ? <CommentContainer thread={thread} focusedThread={focusedThread} /> : null}
       </div>
     </div>
