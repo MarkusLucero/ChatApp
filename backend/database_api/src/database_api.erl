@@ -16,7 +16,7 @@ get_timestamp() ->
 
 start() ->
     DB = erl_to_sql:init("PostgreSQL test", "adrenaline", "1234"),
-%%  io:format("database:start() -> DB = ~p~n", [DB]),
+    %%  io:format("database:start() -> DB = ~p~n", [DB]),
     register(database, DB),
     ok.
 
@@ -48,7 +48,7 @@ insert_user(Username, Password, _TimeStamp) ->
         Msg ->
             {error, Msg}
     end.
-                
+
 
 %% @doc Insert a friend to a users friendlist.
 %% @param Username The users ID.
@@ -64,10 +64,10 @@ insert_friend(Username, Friend) ->
         ok ->
             ok;
         {error, Reason} ->
-             {error, Reason};
+	    {error, Reason};
         Msg ->
             io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
-     end.
+    end.
 
 
 %% @doc Creates a new chat table in the database.
@@ -146,7 +146,7 @@ fetch_user(Username) ->
 
 fetch_friendlist(Username) ->
     database ! {fetch_friendlist, Username, self()},
-    
+
     receive
         {error, no_user} ->
             {error, "No user id exists for that username"};
@@ -167,11 +167,11 @@ fetch_friendlist(Username) ->
 
 fetch_chat(Chat_ID) ->
     database ! {fetch_chat, Chat_ID, self()},
-    
+
     receive
         {error, _} ->
             {error, "Chat_ID not found in database."};
-        
+
         {Chat_ID, Chat_Name, Content} ->
             {Chat_ID, Chat_Name, Content};
 
@@ -184,7 +184,7 @@ fetch_chat(Chat_ID) ->
 %% @returns [{"member1", "member2",..}] if fetch from database was successfull, {error, Reason} if not.
 fetch_chat_members(Chat_ID) ->
     database ! {fetch_chat_members, Chat_ID, self()},
-    
+
     receive
         {_,_, Members} ->
             Members;
@@ -201,7 +201,7 @@ fetch_chat_undelivered(Chat_ID) ->
     database ! {fetch_chat_undelivered, Chat_ID, self()},
     receive
         {_,_,Content} ->
-             Content;
+	    Content;
         {error, no_chat} ->
             {error, "Chat_ID not found in database."};
         Msg ->
@@ -213,11 +213,11 @@ fetch_chat_undelivered(Chat_ID) ->
 %% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Status}]}] if fetch from database was successfull, [] (empty list) if not.
 fetch_all_chats(Username) ->
     database ! {fetch_all_chats, Username, self()},
-    
+
     receive
         {error, _} ->
             [];
-        
+
         {ok, Chats} ->
             Chats;
 
@@ -243,7 +243,7 @@ fetch_all_chats(Username) ->
 
 create_thread(Username, Server, Header, Text) ->
     database ! {create_thread, Username, Server, Header, Text, get_timestamp(), self()},
-    
+
     receive
 	{error, Reason} ->
 	    {error, Reason};
@@ -255,7 +255,7 @@ create_thread(Username, Server, Header, Text) ->
 
 %% @doc fetches information about a thread from the database. This also include all the comments made on that thread.
 %% @param Thread_ID The thread ID to be fetched.
-%% @returns EXAMPLE: {"1", "skooben", "Header text", "Main text", "2020-1-1 00:00:00", [{Commendata}]} if successfull, {error, Reason} if not.
+%% @returns EXAMPLE: {"1", "skooben", "Header text", "Main text", "2020-1-1 00:00:00", [Comments]} if successfull, {error, Reason} if not.
 -spec fetch_thread(Thread_ID) -> {Server, Creator, Header, Text, Timestamp, Commentlist} when
       Thread_ID::list(),
       Creator::list(),
@@ -271,7 +271,7 @@ fetch_thread(Thread_ID) ->
 	{error, Reason} ->
 	    {error, Reason};
 	{ok, {Server, Creator, Header, Text, Timestamp, null}} ->
-	   {Server, Creator, Header, Text, Timestamp, []};
+	    {Server, Creator, Header, Text, Timestamp, []};
 	{ok, {Server, Creator, Header, Text, Timestamp, Commentlist}} ->
 	    {Server, Creator, Header, Text, Timestamp, Commentlist};
 	Msg ->
@@ -280,21 +280,21 @@ fetch_thread(Thread_ID) ->
 
 %% @doc Inserts a comment on a thread.
 %% @param Thread_ID The thread ID to be commented.
-%% @param Parent_ID The id of the previouse comment made on the thread. Set this to "0" if this is the first comment.
-%% @param Reply_ID ID of the comment this comment is replying. Set this to "0" if no reply should be included.
+%% @param Index The index of the comment made on the thread. Set this to "0" if this is the first comment.
+%% @param Reply_Index The index of the comment this comment is replying. Set this to "" if no reply should be included.
 %% @param Username The username that wrote this comment.
 %% @param Text The actual comment/text that was written.
-%% @returns Comment_ID if successfull (Ex "147"). {error, Reason} if not.
--spec insert_comment(Thread_ID, Parent_ID, Reply_ID, Username, Text) -> Comment_ID when
+%% @returns Comment if successfull (Ex {"Thread_ID", "Username", "Text", {"Reply_Username", "Reply_Text"}}). {error, Reason} if not.
+-spec insert_comment(Thread_ID, Index, Reply_Index, Username, Text) -> Comment when
       Thread_ID::list(),
       Username::list(),
-      Parent_ID::list(),
-      Reply_ID::list(),
+      Index::list(),
+      Reply_Index::list(),
       Text::list(),
-      Comment_ID::list().
+      Comment::term().
 
-insert_comment(Thread_ID, Parent_ID, Reply_ID, Username, Text) ->
-    database ! {insert_comment, Thread_ID, Parent_ID, Reply_ID, Username, Text, get_timestamp(), self()},
+insert_comment(Thread_ID, Index, Reply_Index, Username, Text) ->
+    database ! {insert_comment, Thread_ID, Index, Reply_Index, Username, Text, get_timestamp(), self()},
     receive
 	{error, Reason} ->
 	    {error, Reason};
@@ -335,7 +335,7 @@ insert_friend_test() ->
     {error, _} = insert_friend("invalid username", "invalid friend").
 
 create_chat_test() ->
-  
+
     _ = create_chat("festchatten","testuser1", ["testuser1", "testfriend1"]),
     _ = create_chat("skolchatten","testuser1", ["testuser1"]).
 
@@ -355,7 +355,7 @@ fetch_user_test() ->
     {Username, Password, _} = fetch_user("testuser1"),
     "testuser1" = Username,
     "testpassword1" = Password,
-    
+
     {error, _} = fetch_user("Invalid username").
 
 fetch_chat_test() ->
@@ -367,20 +367,20 @@ fetch_chat_test() ->
             "test message1!!!" = Msg1,
             1 = Status1
     end,
-     database ! {get_group_id, "skolchatten", self()},
+    database ! {get_group_id, "skolchatten", self()},
     receive
         Group_ID2 ->
-           {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
+	    {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
             "testfriend1" = Sender2,
             "test message2!!!" = Msg2,
             0 = Status2
     end,
-   
+
     {error, "Chat_ID not found in database."} = fetch_chat("Invalid Chat_ID").
 
 
 
- fetch_chat_members_test() ->
+fetch_chat_members_test() ->
     database ! {get_group_id,"festchatten", self()},
     receive
         Group_ID ->
@@ -398,7 +398,7 @@ fetch_friendlist_test() ->
 create_and_fetch_thread_test() ->
     Thread_ID = create_thread("testuser1", "0","Test thread", "This is the root thread."),
     {error, _} = create_thread("invalid user", "0","Test thread", "This is the root thread."),
-    
+
     {Server, Creator, Header, Text, _Timestamp, Commentlist} = fetch_thread(Thread_ID),
     Server = "0",
     Creator = "testuser1",
@@ -409,19 +409,19 @@ create_and_fetch_thread_test() ->
 
 insert_comment_test() ->
     Thread_ID = create_thread("testuser1", "0","Test thread 2", "This is the second root thread."),
-    Comment_ID1 = insert_comment(Thread_ID, "0", "0", "testuser1", "text test"),
-    Comment_ID2 = insert_comment(Thread_ID, "0", "2", "testfriend1", "reply text test"),
+    Comment1 = insert_comment(Thread_ID, "0", "", "testuser1", "text test"),
+    Comment2 = insert_comment(Thread_ID, "1", "0", "testfriend1", "reply text test"),
     {error, _} = insert_comment("-1", "0", "2", "invalid", "reply text test"),
-    
+
     {Server, Creator, Header, Text, _Timestamp, [Comment1, Comment2]} = fetch_thread(Thread_ID),
     Server = "0",
     Creator = "testuser1",
     Header = "Test thread 2",
     Text = "This is the second root thread.",
-    {Comment_ID1, Thread_ID, "0", "0", "testuser1", "text test", _} = Comment1,
-    {Comment_ID2, Thread_ID, "0", "2", "testfriend1", "reply text test", _} = Comment2.
-    
-    
+    {Thread_ID, "testuser1", "text test", {"",""}} = Comment1,
+    {Thread_ID, "testfriend1", "reply text test", {"testuser1", "text test"}} = Comment2.
+
+
 
 
 stop_test_() ->
