@@ -19,7 +19,7 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
     /*Get the username, magictoken and list of threads from store */
     const username = useSelector((state) => state.socketState.username);
     const magic_token = useSelector((state) => state.socketState.magicToken);
-  
+
     /*Reset the focused thread, so we show all threads in focusedview */
     const handle = (e)=>{
         fetchThreads();
@@ -41,14 +41,12 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
             const data = await response;
             switch (data.status) {
               case 200: {
-                console.log(data.data);
-
                 /*The threads in the list of threads recieced looks different, need to create new thredobjects from that information */
                 let threads = [];
                 for (const thread of data.data.threads){
                     threads.push({rootPost: {rootHeader: thread.header, rootComment: thread.text}, username: thread.creator, timestamp: thread.timestamp, comments: thread.comment_list, id: thread.thread_id });
                 };
-                dispatch(actions.addThreads(threads));
+                dispatch(actions.addThreads({threads: threads}));
                 }   
                 break;
               case 404: {

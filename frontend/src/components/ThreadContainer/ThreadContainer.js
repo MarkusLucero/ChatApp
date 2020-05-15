@@ -24,20 +24,7 @@ const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread
     setSearchTerm(event.target.value);
   };
 
-  /**
-   * Trigger the search of the searchTerm in the actuall focused chat
-   * event parameter is displayed only to prevent he windows default action when pressing a submit button
-   * @param event the event object of the window
-   */
-  const handleSearchSubmit = (event) => {
-    /* TODO Actually search for threads containing the text in searchTerm and only allow that
-     to be displayed in the threadContainer
-  */
-    console.log(searchTerm);
-    setSearchTerm("");
-    event.preventDefault();
-  };
-  
+    
     // list of all threads in server object from redux store
     const listOfThreads = useSelector(
       (state) => state.socketState.server.listOfThreads
@@ -45,11 +32,11 @@ const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread
   
     //helper function for retrieving the right thread from state
     const rightThread = (list) => {
-      for (const thread of list) {
-        if (thread.id === focusedThread) {
-          return thread;
+        for (const thread of list) {
+          if (thread.id === focusedThread) {
+            return thread;
+          }
         }
-      }
       return null;
     };
   
