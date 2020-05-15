@@ -21,6 +21,7 @@ const CREATE_THREAD = "CREATE_THREAD";
 const ADD_THREADS = "ADD_THREADS";
 const ADD_COMMENT = "ADD_COMMENT";
 const ADD_REPLY = "ADD_REPLY";
+const RESET_LAST_SEEN = "RESET_LAST_SEEN";
 
 
 export function sendMessage(data) {
@@ -153,4 +154,8 @@ export function setServer(server) {
 
 export function resetLoginState() {
   return { type: RESET };
+}
+
+export function resetLastSeen(data) {
+  return { type: RESET_LAST_SEEN, payload:data };
 }

@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1, insert_comment/5]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1, insert_comment/5, fetch_thread_IDs/0]).
 
 
 get_timestamp() ->
@@ -245,12 +245,12 @@ create_thread(Username, Server, Header, Text) ->
     database ! {create_thread, Username, Server, Header, Text, get_timestamp(), self()},
     
     receive
-	{error, Reason} ->
-	    {error, Reason};
-	{ok, Thread_ID} ->
-	    Thread_ID;
-	Msg ->
-	    io:format("database_api:create_thread/4 Unhandled message: ~p~n", [Msg])
+        {error, Reason} ->
+            {error, Reason};
+        {ok, Thread_ID} ->
+            Thread_ID;
+        Msg ->
+            io:format("database_api:create_thread/4 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc fetches information about a thread from the database. This also include all the comments made on that thread.
@@ -268,14 +268,29 @@ create_thread(Username, Server, Header, Text) ->
 fetch_thread(Thread_ID) ->
     database ! {fetch_thread, Thread_ID, self()},
     receive
-	{error, Reason} ->
-	    {error, Reason};
-	{ok, {Server, Creator, Header, Text, Timestamp, null}} ->
-	   {Server, Creator, Header, Text, Timestamp, []};
-	{ok, {Server, Creator, Header, Text, Timestamp, _Commentlist}} ->
-	    {Server, Creator, Header, Text, Timestamp, []};
-	Msg ->
-	    io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+        {error, Reason} ->
+            {error, Reason};
+        {ok, {Server, Creator, Header, Text, Timestamp, null}} ->
+           {Server, Creator, Header, Text, Timestamp, []};
+        {ok, {Server, Creator, Header, Text, Timestamp, _Commentlist}} ->
+            {Server, Creator, Header, Text, Timestamp, []};
+        Msg ->
+            io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+    end.
+
+%% @doc fetches all thread IDs on the database
+%% @returns EXAMPLE: {"1", "skooben", "Header text", "Main text", "2020-1-1 00:00:00", [{Commendata}]} if successfull, {error, Reason} if not.
+-spec fetch_thread_IDs() -> list(list()).
+
+fetch_thread_IDs() ->
+    database ! {fetch_thread_IDs, self()},
+    receive
+        {error, Reason} ->
+            {error, Reason};
+        {ok, ThreadList} ->
+           ThreadList;
+        Msg ->
+            io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
     end.
 
 %% @doc Inserts a comment on a thread.
@@ -296,12 +311,12 @@ fetch_thread(Thread_ID) ->
 insert_comment(Thread_ID, Parent_ID, Reply_ID, Username, Text) ->
     database ! {insert_comment, Thread_ID, Parent_ID, Reply_ID, Username, Text, get_timestamp(), self()},
     receive
-	{error, Reason} ->
-	    {error, Reason};
-	{ok, Comment_ID} ->
-	    Comment_ID;
-	Msg ->
-	    io:format("database_api:insert_comment/5 Unhandled message: ~p~n", [Msg])
+        {error, Reason} ->
+            {error, Reason};
+        {ok, Comment_ID} ->
+            Comment_ID;
+        Msg ->
+            io:format("database_api:insert_comment/5 Unhandled message: ~p~n", [Msg])
     end.
 
 

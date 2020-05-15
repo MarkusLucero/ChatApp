@@ -179,16 +179,16 @@ send_chat(Chat_Name, Creator, Members) ->
 create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
     case database_api:create_thread(Username, Server_Name, Root_Header, Root_Comment) of
 
-	{error, _Reason} ->
-	    erlang:error('Error creating thread');
-	Thread_ID ->
-	    case database_api:fetch_thread(Thread_ID) of
-		{error, _Reason} ->
-		    erlang:error('Error fetching thread');
-		{Server, Creator, Header, Text, Timestamp, Commentlist} ->
-		    chat_server ! {create_thread, Thread_ID, Server, Creator, Header, Text, Timestamp, Commentlist},
-		    ok
-	    end
+        {error, _Reason} ->
+            erlang:error('Error creating thread');
+        Thread_ID ->
+            case database_api:fetch_thread(Thread_ID) of
+                {error, _Reason} ->
+                    erlang:error('Error fetching thread');
+                {Server, Creator, Header, Text, Timestamp, Commentlist} ->
+                    chat_server ! {create_thread, Thread_ID, Server, Creator, Header, Text, Timestamp, Commentlist},
+                    ok
+            end
 
     end.
 
@@ -238,7 +238,8 @@ loop(Connection_map) ->
                                      {struct,[{"action", "init_login"},
                                               {"user_id", Username},
                                               {"list_of_dms", {array, List_of_DMs}},
-                                              {"list_of_friends", {array, FriendList}}]}),
+                                              {"list_of_friends", {array, FriendList}},
+                                              {"list_of_servers", {array, ["0"]}}]}),
                     io:format("ABOUT TO SEND INIT_LOGIN~n"),
                     PID ! {text, JSON_Message},
                     io:format("SENT INIT_LOGIN~n"),
@@ -311,8 +312,8 @@ loop(Connection_map) ->
                 _ -> loop(Connection_map)
             end;
 
-	{create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist} ->
-	    io:format("MADE IT PAST LIST OF DMs: ~p ~p ~p ~p ~p ~p ~p~n", [Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist]),
+        {create_thread, Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist} ->
+            io:format("MADE IT PAST LIST OF DMs: ~p ~p ~p ~p ~p ~p ~p~n", [Thread_ID, Server_Name, Username, Root_Header, Root_Comment, Timestamp, Commentlist]),
 
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "create_thread"},
@@ -321,15 +322,15 @@ loop(Connection_map) ->
                                       {"username", Username},
                                       {"root_post", {struct, [{"root_header", Root_Header},
 
-							      {"root_comment", Root_Comment}]}},
-				      {"timestamp", Timestamp},
-				      {"commentList", {array, Commentlist}}
-				     ]}),
-	    io:format("Parsed JSON message create thread~n"),
-	    Fun = fun(_Username, {PID, _Magic_Token}) ->
-			  PID ! {text, JSON_Message}
-		  end,
-	    maps:map(Fun, Connection_map),
+                                                              {"root_comment", Root_Comment}]}},
+                                      {"timestamp", Timestamp},
+                                      {"commentList", {array, Commentlist}}
+                                     ]}),
+            io:format("Parsed JSON message create thread~n"),
+            Fun = fun(_Username, {PID, _Magic_Token}) ->
+                          PID ! {text, JSON_Message}
+                  end,
+            maps:map(Fun, Connection_map),
             loop(Connection_map);
 
         {dead_connection, From} ->
