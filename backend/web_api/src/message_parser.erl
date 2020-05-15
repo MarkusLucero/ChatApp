@@ -48,6 +48,12 @@ handle_message(Msg, PID) ->
 		 {"timestamp", _Timestamp},
                  {"comments", {array, _CommentList}}]} ->
             chat_server:create_thread(Server_Name, Username, Root_Header, Root_Comment);
+	{struct,[{"thread_id", Thread_ID},
+		 {"index", Index},
+		 {"reply_index", Reply_Index},
+                 {"username", Username},
+		 {"comment", Comment}]} ->
+            chat_server:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment);
         _ -> erlang:error('unknown message')
     end,
     ok.
