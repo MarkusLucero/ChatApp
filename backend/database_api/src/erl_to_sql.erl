@@ -232,10 +232,12 @@ create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
         {updated, 1} ->
 	    NewStatus = odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND timestamp = '" ++ Timestamp ++ "');"),
 	    case NewStatus of
-		{selected,_,[{Thread_ID}]}->  
+		{selected,_,[{Thread_ID}]}->
+        odbc:sql_query(Ref, "INSERT INTO threadlist (server_id, thread_id) VALUES ('" ++ Server ++ "', '" ++ Thread_ID ++ "');"),
 		    From ! {ok, Thread_ID};
 		{selected,_,Thread_IDS}->
 		    [{ID} | _Tail] = lists:reverse(Thread_IDS),
+        odbc:sql_query(Ref, "INSERT INTO threadlist (server_id, thread_id) VALUES ('" ++ Server ++ "', '" ++ ID ++ "');"),
 		    From ! {ok, ID}
 	    end;
 {error, Reason2} ->
