@@ -272,8 +272,8 @@ fetch_thread(Thread_ID) ->
             {error, Reason};
         {ok, {Server, Creator, Header, Text, Timestamp, null}} ->
            {Server, Creator, Header, Text, Timestamp, []};
-        {ok, {Server, Creator, Header, Text, Timestamp, _Commentlist}} ->
-            {Server, Creator, Header, Text, Timestamp, []};
+        {ok, {Server, Creator, Header, Text, Timestamp, Commentlist}} ->
+            {Server, Creator, Header, Text, Timestamp, Commentlist};
         Msg ->
             io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
     end.

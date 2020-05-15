@@ -258,14 +258,14 @@ fetch_thread_IDs(Ref, From) ->
     From ! {ok, Threadlist},
     loop(Ref).
 
-insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From) ->
-    User_ID = fetch_user_id(Ref, Username),
+insert_comment(Ref, Thread_ID, Index, Reply_Index, Username, Text, Timestamp, From) ->
+      User_ID = fetch_user_id(Ref, Username),
     case User_ID of
-        {error, Reason1} ->
-            From ! {error, Reason1},
-            loop(Ref);
-        _ ->
-            ok
+	{error, Reason1} ->
+	    From ! {error, Reason1},
+	    loop(Ref);
+	_ ->
+	    ok
     end,
 
     Status = case Reply_Index of
