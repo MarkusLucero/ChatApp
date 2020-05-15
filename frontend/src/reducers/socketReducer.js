@@ -154,11 +154,11 @@ const socketReducer = (state = initialState, action) => {
         switch (parsedData.action) {
           case "insert_comment":
             for (const thread of state.server.listOfThreads) {
-              if (thread.id === parsedData.action.payload.thread_id) {
+              if (thread.id === parsedData.thread_id) {
                 thread.comments.push({
-                  user_id: parsedData.action.payload.user_id,
-                  comment: parsedData.action.payload.comment,
-                  reply: parsedData.action.payload.reply,
+                  user_id: parsedData.user_id,
+                  comment: parsedData.comment,
+                  reply: parsedData.reply,
                 });
               }
             }
