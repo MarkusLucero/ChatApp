@@ -129,7 +129,7 @@ const socketReducer = (state = initialState, action) => {
                   username: "Skooben",
                   timestamp: "2020-01-10",
                   comments: [],
-                  id: "1",
+                  id: "-1",
                 },
                 {
                   rootPost: {
@@ -140,7 +140,7 @@ const socketReducer = (state = initialState, action) => {
                   username: "Rövpannan",
                   timestamp: "2019-12-24",
                   comments: [],
-                  id: "2",
+                  id: "-2",
                 },
               ],
               members: [action.payload.username],

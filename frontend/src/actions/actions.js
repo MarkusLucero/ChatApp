@@ -36,10 +36,11 @@ export function sendMessage(data) {
 }
 
 export function addComment(data) {
+  console.log(data);
   return {
     type: ADD_COMMENT,
     payload: {
-      thread_id: data.thread.id,
+      thread_id: data.thread_id,
       index: data.index,
       reply_index: data.reply_index,
       username: data.username,
