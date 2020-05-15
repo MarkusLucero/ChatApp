@@ -12,21 +12,7 @@ import CommentField from "../CommentField/CommentField.js";
  The comment object must in turn be an object that holds the actual message, 
  the poster of the message and an array of comment objects that symbolize replies. */
 
-/* This function returns a comment object.  */
-function assembleComment(poster, postedComment) {
-  return {
-    username: poster,
-    comment: postedComment,
-    reply: [],
-  };
-}
-function assembleReply(poster, postedComment, reply) {
-  return {
-    username: poster,
-    comment: postedComment,
-    reply: reply,
-  };
-}
+
 
 const CommentContainer = ({ thread }) => {
   /* Thread is passed in as a paprameter. Use its comments array as start array*/
@@ -50,7 +36,14 @@ const CommentContainer = ({ thread }) => {
   const dispatch = useDispatch();
 
   const [commentCounter, setCommentCounter] = useState(0);
+/* This function returns a comment object.  */
+function getParentId(){
+    if (commentCounter === 0){
+        return 0;
+    }
+    return commentCounter - 1;
 
+}
   /* When we successfully change the value of comment, i.e someone comment button is pressed, we 
   dispatch an addComment action.  */
   React.useEffect(() => {
@@ -58,14 +51,12 @@ const CommentContainer = ({ thread }) => {
       dispatch(
         actions.addComment({
           thread_id: thread.id,
+          index: commentCounter.toString(),
+          reply_index: "",
           username: poster,
           comment: comment,
-          reply: {},
         })
       );
-      /*  setComments((comments) =>
-        comments.concat(assembleComment(poster, comment))
-      ); */
       setAddComment(false);
       setCommentCounter(commentCounter + 1);
       setComment("");
@@ -74,23 +65,13 @@ const CommentContainer = ({ thread }) => {
 
   React.useEffect(() => {
     if (addReply === true) {
-      /*  setComments((comments) =>
-        comments.concat(
-          assembleReply(poster, reply, {
-            username: comments[index].username,
-            comment: comments[index].comment,
-          })
-        )
-      ); */
       dispatch(
         actions.addComment({
           thread_id: thread.id,
+          index: commentCounter.toString(),
+          reply_index: index.toString(),
           username: poster,
           comment: reply,
-          reply: {
-            user_id: comments[index].user_id,
-            comment: comments[index].comment,
-          },
         })
       );
       setCommentCounter(commentCounter + 1);

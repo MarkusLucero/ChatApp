@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2, create_thread/4]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2, create_thread/4, insert_comment/5]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -192,6 +192,28 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 
     end.
 
+-spec insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) -> ok when
+      Thread_ID :: list(Integer),
+      Index :: list(Integer),
+      Reply_Index :: list(Integer),
+      Username :: list(Integer),
+      Comment :: list(Integer).
+%% @doc Inserts a new comment into a thread
+%% @param Thread_ID the ID of the thread
+%% @param Index the index of the previous comment
+%% @param Reply_Index the index of the comment being replied to
+%% @param Username the username of the commenter
+%% @param Text the content of the comment
+%% @returns ok
+insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
+    case database_api:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) of
+	{error, _Reason} ->
+	    erlang:error('Error inserting comment');
+	{Thread_ID, Username, Comment, {Reply_User, Reply_Comment}} ->
+	    chat_server ! {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment},
+	    ok
+    end.
+
 -spec start() -> ok.
 %% @doc Starts a Web API node and registers the central process to the name chat_server
 %% @returns ok For every start.
@@ -341,5 +363,19 @@ loop(Connection_map) ->
                              end
                      end, Connection_map),
 
-            loop(maps:filter(fun(_Username, {PID, _Token}) -> PID =/= From end, Connection_map))
+            loop(maps:filter(fun(_Username, {PID, _Token}) -> PID =/= From end, Connection_map));
+	{insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment} ->
+	    JSON_Message = mochijson:encode(
+                             {struct,[{"action", "insert_comment"},
+                                      {"thread_id", Thread_ID},
+                                      {"username", Username},
+                                      {"comment", Comment},
+				      {"reply", {struct, [{"reply_user", Reply_User},
+							  {"reply_comment", Reply_Comment}]}}
+				     ]}),
+	    Fun = fun(_Username, {PID, _Magic_Token}) ->
+			  PID ! {text, JSON_Message}
+		  end,
+	    maps:map(Fun, Connection_map),
+            loop(Connection_map)
     end.
