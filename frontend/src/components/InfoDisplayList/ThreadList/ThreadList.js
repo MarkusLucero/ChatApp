@@ -30,6 +30,9 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
       setThreads(listOfThreads);
     }
   }, [listOfThreads]);
+  /*filter all threads matching the currently logged in username*/
+  const yourThreads = threads.filter(thread => thread.username === username);
+  
 
   return (
     <div className="flex flex-col ml-2">
@@ -37,7 +40,7 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
         id="threadListHeader"
         className="text-white text-xl h-auto border-solid border-b-2 border-gray-700  mt-4 flex flex-row justify-between"
       >
-        Threads
+        Threads created by you: 
         <img
           src={plus}
           onMouseEnter={() => {
@@ -73,7 +76,7 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
         id="threadList"
         className="text-white pt-1 h-screen25 overflow-y-scroll"
       >
-        {threads.map((thread, index) => {
+        {yourThreads.map((thread, index) => {
           return (
             <div
               className="text-white text-xl hover:bg-gray-500 cursor-pointer"
