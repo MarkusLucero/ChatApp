@@ -66,6 +66,7 @@ friend_request(Username, Friendname, Req0, Opts) ->
 
 
 request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
+    io:format("REQUESTING THREAD: ~p~n", [Thread_ID]),
     token_server ! {check_token, Magic_Token, Username, self()},
     receive
         {ok, Magic_Token} ->
@@ -93,20 +94,20 @@ request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
     end.
 
 fetch_thread_JSON(Thread_ID) ->
-            case database_api:fetch_thread(Thread_ID) of
-                {error, _Reason} ->
-                    erlang:error(badarg);
-                {Server, Creator, Header, Text, Timestamp, Comments} ->
-                    JSON_Response = {struct,[{"action", "fetch_thread"},
-                                             {"thread_id", Thread_ID},
-                                             {"server_name", Server},
-                                             {"creator", Creator},
-                                             {"header", Header},
-                                             {"text", Text},
-                                             {"timestamp", Timestamp},
-                                             {"comment_list", {array, Comments}}]},
-                    mochijson:encode(JSON_Response)
-            end.
+    io:format("REQUESTING THREAD JSON: ~p~n", [Thread_ID]),
+    case database_api:fetch_thread(Thread_ID) of
+        {error, _Reason} ->
+            erlang:error(badarg);
+        {Server, Creator, Header, Text, Timestamp, Comments} ->
+            {struct,[{"action", "fetch_thread"},
+                     {"thread_id", Thread_ID},
+                     {"server_name", Server},
+                     {"creator", Creator},
+                     {"header", Header},
+                     {"text", Text},
+                     {"timestamp", Timestamp},
+                     {"comment_list", {array, Comments}}]}
+    end.
 
 request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->
     token_server ! {check_token, Magic_Token, Username, self()},

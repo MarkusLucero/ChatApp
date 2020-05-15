@@ -231,6 +231,7 @@ create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
     case Status of
         {updated, 1} ->
             {selected,_,[{Thread_ID}]} =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
+            odbc:sql_query(Ref, "INSERT INTO threadlist (server_id, thread_id) VALUES ('" ++ Server ++ "', '" ++ Thread_ID ++ "');"),
             From !  {ok, Thread_ID};
         {error, Reason2} ->
             From ! {error, Reason2}
