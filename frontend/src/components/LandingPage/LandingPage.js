@@ -29,7 +29,6 @@ const LandingPage = () => {
   /*callback for focusing a thread */
 
   const handleFocusedThread = (event) => {
-    console.log(event.target);
     setFocusedThread(event.target.id);
   };
 

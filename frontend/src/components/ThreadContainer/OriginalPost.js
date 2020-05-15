@@ -8,6 +8,7 @@ import React from "react";
  */
 const OriginalPost = ({ thread, resetFocusedThread }) => {
 
+  console.log(thread);
   return (
       <div onClick={resetFocusedThread} className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-700">
         <div className="flex flex-row justify-between">

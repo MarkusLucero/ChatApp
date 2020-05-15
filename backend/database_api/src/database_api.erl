@@ -288,7 +288,7 @@ fetch_thread_IDs() ->
         {error, Reason} ->
             {error, Reason};
         {ok, ThreadList} ->
-           ThreadList;
+           [ID || {ID} <- ThreadList];
         Msg ->
             io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
     end.
