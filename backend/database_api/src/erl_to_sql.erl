@@ -19,25 +19,25 @@ loop(DSN, UID, PWD) ->
 loop(Ref) ->
     receive
         {insert_user, Username, Password, Timestamp, From} ->
-            insert_user(Ref, Username, Password, Timestamp, From);
-        
+	    insert_user(Ref, Username, Password, Timestamp, From);
+
         {insert_friend, Username, Friend, From} ->
             insert_friend(Ref, Username, Friend, From);
 
         {create_chat, Chat_Name, _, Members, From} ->
-            create_chat(Ref, Chat_Name, unused, Members, From);
-        
+	    create_chat(Ref, Chat_Name, unused, Members, From);
+
         {insert_chat, From_Username, Chat_ID, Message, Status, From} ->
             insert_chat(Ref, From_Username, Chat_ID, Message, Status, From);
 
         {fetch_user, Username, From} ->
             fetch_user(Ref, Username, From);
 
-        {fetch_friendlist, Username, From} ->
-           fetch_friendlist(Ref, Username, From);
+	{fetch_friendlist, Username, From} ->
+	    fetch_friendlist(Ref, Username, From);
 
         {fetch_chat, Chat_ID, From} ->
-           fetch_chat(Ref, Chat_ID, From);
+	    fetch_chat(Ref, Chat_ID, From);
 
         {fetch_chat_members, Chat_ID, From} -> 
             fetch_chat_members(Ref, Chat_ID, From);
@@ -61,7 +61,7 @@ loop(Ref) ->
             odbc:disconnect(Ref),
             odbc:stop(),
             exit(succeful_exit);
-        
+
         reset_tests ->
             odbc:sql_query(Ref, "DELETE FROM messages * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM messages * WHERE username = 'testfriend1';"),
@@ -85,10 +85,10 @@ loop(Ref) ->
 
         {remove_friendlist, Username} ->
             odbc:sql_query(Ref, "DELETE FROM friend_list WHERE username = '" ++ Username ++ "';");
-        
+
         {get_group_id, Username, From} ->
             From ! fetch_group_id(Ref, Username);
-        
+
         Msg ->
             io:format("database_api:loop/1 Unhandled message: ~p~n", [Msg])
     end,
@@ -149,7 +149,7 @@ create_chat(Ref, Chat_Name, _, Members, From) ->
             From ! {ok, Chat_ID}
     end,
     loop(Ref).
-  
+
 insert_chat(Ref, From_Username, Chat_ID, {Timestamp, Msg}, Status, From) ->
     User_ID = fetch_user_id(Ref, From_Username),
     Success = (catch odbc:sql_query(Ref, "INSERT INTO messages (username, user_id, group_id, message, status, timestamp) VALUES ('"++ From_Username ++"', '"++ User_ID ++ "', '" ++ Chat_ID ++ "', '" ++ Msg ++ "', '" ++ integer_to_list(Status) ++ "', '" ++ Timestamp ++ "');")),
@@ -230,20 +230,26 @@ create_thread(Ref, Username, Server, Header, Text, Timestamp, From) ->
     Status = (catch odbc:sql_query(Ref, "INSERT INTO thread (username, user_id, server_id, root_header, root_text, timestamp) VALUES ('" ++ Username ++ "', '" ++ User_ID ++ "', " ++ Server ++ ", '" ++ Header ++ "', '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
     case Status of
         {updated, 1} ->
-            {selected,_,[{Thread_ID}]} =  odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND root_header = '" ++ Header ++ "');"),
-            From !  {ok, Thread_ID};
-        {error, Reason2} ->
-            From ! {error, Reason2}
+	    NewStatus = odbc:sql_query(Ref, "SELECT thread_id FROM thread WHERE (username = '" ++ Username ++ "' AND timestamp = '" ++ Timestamp ++ "');"),
+	    case NewStatus of
+		{selected,_,[{Thread_ID}]}->  
+		    From ! {ok, Thread_ID};
+		{selected,_,Thread_IDS}->
+		    [{ID} | _Tail] = lists:reverse(Thread_IDS),
+		    From ! {ok, ID}
+	    end;
+{error, Reason2} ->
+    From ! {error, Reason2}
     end,
     loop(Ref).
 
 fetch_thread(Ref, Thread_ID, From) ->
-    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, timestamp, commentlist_id FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
+    {selected, _, [Thread]} = (catch odbc:sql_query(Ref, "SELECT server_id, username, root_header, root_text, timestamp FROM thread WHERE thread_id = " ++ Thread_ID ++ ";")),
     case Thread of 
-        [] ->
-            From ! {error, "Thread not found in database"};
-        {Server, Creator, Header, Text, Timestamp, Commentlist} ->
-            From ! {ok, {Server, Creator, Header, Text, stringify_timestamp(Timestamp), Commentlist}}
+	[] ->
+	    From ! {error, "Thread not found in database"};
+	{Server, Creator, Header, Text, Timestamp} ->
+	    From ! {ok, {Server, Creator, Header, Text, stringify_timestamp(Timestamp), fetch_all_comments(Ref, Thread_ID)}}
     end,
     loop(Ref).
 
@@ -252,35 +258,37 @@ fetch_thread_IDs(Ref, From) ->
     From ! {ok, Threadlist},
     loop(Ref).
 
-insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From) ->
+insert_comment(Ref, Thread_ID, Index, Reply_Index, Username, Text, Timestamp, From) ->
     User_ID = fetch_user_id(Ref, Username),
     case User_ID of
-        {error, Reason1} ->
-            From ! {error, Reason1},
-            loop(Ref);
-        _ ->
-            ok
+	{error, Reason1} ->
+	    From ! {error, Reason1},
+	    loop(Ref);
+	_ ->
+	    ok
     end,
-    Status = (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, parent_id, reply_id, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Parent_ID ++ ", " ++ Reply_ID ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');")),
+
+    Status = case Reply_Index of
+		 "" ->
+		     (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');"));
+		 _ ->
+		     (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, reply_index, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", " ++ Reply_Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');"))
+	     end,
+
     case Status of
-        {updated, 1} ->
-            {selected,_,[{Comment_ID}]} =  odbc:sql_query(Ref, "SELECT commentlist_id FROM commentlist WHERE (username = '" ++ Username ++ "' AND parent_id = " ++ Parent_ID ++ ");"),
-            case Parent_ID of
-                "0" ->
-                    odbc:sql_query(Ref, "UPDATE thread SET commentlist_id = " ++ Comment_ID ++ " WHERE thread_id = " ++ Thread_ID),
-                    From !  {ok, Comment_ID};
-                _ ->
-                    ok
-            end;
-        {error, Reason2} ->
-            From ! {error, Reason2}
+     	{updated, 1} ->
+	    {selected,_,[{Comment_ID}]} =  odbc:sql_query(Ref, "SELECT commentlist_id FROM commentlist WHERE (thread_id = " ++ Thread_ID ++ " AND index = " ++ Index ++ ");"),
+	    Comment = fetch_comment(Ref, Comment_ID),
+	    From ! {ok, Comment};
+	{error, Reason2} ->
+	    From ! {error, Reason2}
     end,
     loop(Ref).
 
 
 
 
- 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%% Helper functions  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,7 +303,7 @@ fetch_user_id(Ref, Username) ->
     end.
 fetch_group_id(Ref, Groupname) ->
     ID = odbc:sql_query(Ref, "SELECT group_id FROM groups WHERE groupname = '" ++ Groupname ++ "';"),
-    
+
     case ID of
         {selected, _, [{Group_ID}]} ->
             Group_ID;
@@ -324,8 +332,49 @@ fetch_all_chats_helper([{Chat_ID}|Tail], All_Chats, Ref) ->
     New_Chat_List = All_Chats ++ [{Chat_ID, Chat_Name, Messages}],
     fetch_all_chats_helper(Tail, New_Chat_List, Ref).
 
+
+fetch_comment(Ref, Comment_ID) ->
+    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp FROM commentlist WHERE commentlist_id = " ++ Comment_ID ++ ";")),
+
+    case Status of
+	{selected, _, []} ->
+	    erlang:error("fetch_comment/2: No Comment with that ID.");
+	{selected, _, [Comment]} ->
+	    refactor_comment(Ref,Comment);
+	Error ->
+	    io:format("~p~n",[Error]),
+	    erlang:error("fetch_comment/: Postgres failed for unkown reason.")
+    end.
+
+fetch_all_comments(Ref, Thread_ID) ->
+    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp FROM commentlist WHERE thread_id = '" ++ Thread_ID ++ "';")),
+
+    case Status of
+	{selected, _, []} ->
+	    [];
+	{selected, _, Commentlist} ->
+	    Refactored_Comments = [refactor_comment(Ref,E) || E <- Commentlist],
+	    Refactored_Comments;
+	Error ->
+	    io:format("fetch_all_comments/2: CommentList = ~p~n", [Error]),
+	    Error
+    end.
+
+
 %% PostgreSQL return TIMESTAMP as a multi-tuple e.g {{2020,03,19}, {13,7,0}} where the date and time are integers. This function converts that tuple to a string on format "2020-03-10 13:7:0". Maybe it would be easier to compare different timestamps if we keep them as integers???
 stringify_timestamp({Date,Time}) ->
     {Year,Month,Day} = Date,
     {Hour,Minute,Second} = Time,
     integer_to_list(Year) ++ "-" ++ integer_to_list(Month) ++ "-" ++ integer_to_list(Day) ++ " " ++ integer_to_list(Hour) ++ ":" ++ integer_to_list(Minute) ++ ":" ++ integer_to_list(Second).
+
+
+refactor_comment(Ref, {_Comment_ID, Thread_ID, _Index, Reply_Index, Username, Text, _Timestamp}) ->    
+    case Reply_Index of
+	null ->
+	    {Thread_ID, Username, Text, {"", ""}};
+	_ ->
+	    {selected, _, [{Reply_User, Reply_Text}]} = (catch odbc:sql_query(Ref, "SELECT username, text FROM commentlist WHERE (thread_id = " ++ Thread_ID ++ " AND index =  " ++ Reply_Index ++ ");")),
+	    {Thread_ID, Username, Text, {Reply_User, Reply_Text}}
+    end.
+
+
