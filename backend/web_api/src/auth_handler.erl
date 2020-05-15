@@ -111,7 +111,7 @@ fetch_thread_JSON(Thread_ID) ->
 request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->
     token_server ! {check_token, Magic_Token, Username, self()},
     receive
-        {ok, Magic_Token} ->
+        token_ok ->
             case database_api:fetch_thread_IDs() of
                 {error, _Reason} ->
                     Body = <<"Bad request">>,

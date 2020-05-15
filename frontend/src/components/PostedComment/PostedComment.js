@@ -33,11 +33,11 @@ const PostedComment = ({
                     Originally posted by {""}
                     {console.log(comment.reply)}
                     <span className="font-bold text-blue-700">
-                      {comment.reply.user_id}
+                      {comment.reply.reply_user}
                     </span>
                   </div>
                   <div className="break"></div>
-                  <div className="ml-4 ">{comment.reply.comment}</div>
+                  <div className="ml-4 ">{comment.reply.reply_comment}</div>
                 </div>
               ) : null}
               <div className=" ml-4 ">
