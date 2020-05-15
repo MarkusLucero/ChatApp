@@ -68,31 +68,9 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: firstWelcome,
       };
     case "ADD_COMMENT":
-      /* This will fetch us the correct thread */
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */
+      state.socket.send(JSON.stringify(action.payload));
+
       return state;
-    case "ADD_REPLY":
-      for (const thread of state.server.listOfThreads) {
-        if (thread.id === action.payload.thread_id) {
-          thread.comments.push({
-            user_id: action.payload.user_id,
-            comment: action.payload.comment,
-            reply: action.payload.reply,
-          });
-        }
-      }
-      /*       state.socket.send(JSON.stringify(action.payload));
-       */ return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
@@ -174,6 +152,17 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "insert_comment":
+            for (const thread of state.server.listOfThreads) {
+              if (thread.id === parsedData.thread_id) {
+                thread.comments.push({
+                  user_id: parsedData.user_id,
+                  comment: parsedData.comment,
+                  reply: parsedData.reply,
+                });
+              }
+            }
+            break;
           case "init_login":
             const listOfDms = parsedData.list_of_dms.map((obj) => {
               return { ...obj, sinceLastSeen: 0 }; /* used for notifications */
