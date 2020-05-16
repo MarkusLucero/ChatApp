@@ -99,9 +99,6 @@ const ChatContainer = ({ focusedChat }) => {
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
 
   React.useEffect(() => {
-    if(focusedChat === null){
-      setSearching(false)
-    }
     if (listOfDms !== null && searching === false) {
       setMessages(rightChat(listOfDms));
     }
