@@ -40,8 +40,7 @@ Följande steg sker i /frontend mappen.
 │   └── web_api  
 │       ├── config  
 │       └── src  
-└── frontend  
-    ├── api   
+└── frontend    
     ├── node_modules  
     ├── public  
     └── src  
