@@ -20,7 +20,7 @@ const Chat = ({ messages }) => {
   return (
     <div
       id="chat-area"
-      className=" h-screen75 w-full pl-2 pr-2 mt-10 overflow-y-scroll"
+      className=" h-screen75 w-full pl-2 pr-2 mt-4 overflow-y-scroll"
     >
       {messages === "" ? "" : messages.map((message, index) => (
         <Message key={index} message={message} />
