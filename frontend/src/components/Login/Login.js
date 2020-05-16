@@ -1,23 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useFormik } from "formik";
+import { useFormik, setNestedObjectValues } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
 
 const axios = require("axios");
 
 //axios.get("http://localhost:8080/", { crossdomain: true })
-const validate = (values) => {
-  const errors = {};
-  if (!values.Username) {
-    errors.Username = "Required";
-  }
-
-  if (!values.Password) {
-    errors.Password = "Required";
-    return errors;
-  }
-};
 
 /**
  * Login provides the layout and login of a user
@@ -27,6 +16,20 @@ const validate = (values) => {
 const Login = () => {
   /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
+  const [errorMsg, setErrorMsg] = useState(false);
+  const validate = (values) => {
+    const errors = {};
+    if (!values.Username) {
+      setErrorMsg(false);
+      errors.Username = "Required";
+    }
+
+    if (!values.Password) {
+      setErrorMsg(false);
+      errors.Password = "Required";
+      return errors;
+    }
+  };
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
@@ -43,17 +46,20 @@ const Login = () => {
         )
         .then(function (response) {
           console.log(response);
-          
+
           /* The response contains: status and a payload data: server/token */
           switch (response.status) {
             /* Login accepted */
 
             case 200: {
-              const data = {response : response.data, username : values.Username};
+              const data = {
+                response: response.data,
+                username: values.Username,
+              };
 
               /* Data should contain token & server */
-              dispatch(actions.setServer( "ws://localhost:8080/websocket"));
-              dispatch(actions.loginSuccess( data ));
+              dispatch(actions.setServer("ws://localhost:8080/websocket"));
+              dispatch(actions.loginSuccess(data));
               break;
             }
             case 404: {
@@ -67,12 +73,16 @@ const Login = () => {
           }
         })
         .catch(function (error) {
-          console.log(error);
+          setErrorMsg(true);
         });
       /* Use the store reducer to dispatch login actions */
       dispatch(actions.login({ values }));
     },
   });
+  function a() {
+    setErrorMsg(false);
+    return null;
+  }
   return (
     <div
       style={{
@@ -106,6 +116,13 @@ const Login = () => {
           <div>
             {formik.touched.Username && formik.errors.Username ? (
               <div className="text-red-600">{formik.errors.Username}</div>
+            ) : null}
+          </div>
+          <div>
+            {errorMsg ? (
+              <label className="text-red-600">
+                Login failed! Try something else.
+              </label>
             ) : null}
           </div>
           <label

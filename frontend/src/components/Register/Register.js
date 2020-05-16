@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Notifications from "../Notifications/Notifications";
 
@@ -6,17 +6,6 @@ import * as Notifications from "../Notifications/Notifications";
  */
 const axios = require("axios");
 
-const validate = (values) => {
-  const errors = {};
-  if (!values.Username) {
-    errors.Username = "Required";
-  }
-
-  if (!values.Password) {
-    errors.Password = "Required";
-    return errors;
-  }
-};
 /**
  * Register provides the layout and the registration for an user account
  * A successfully validated form will redirect to login page pathname = "/"
@@ -24,6 +13,21 @@ const validate = (values) => {
  * @returns a div containing the form to fill out and its validation
  */
 const Register = ({ history }) => {
+  const [errorMsg, setErrorMsg] = useState(false);
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.Username) {
+      setErrorMsg(false);
+      errors.Username = "Required";
+    }
+
+    if (!values.Password) {
+      setErrorMsg(false);
+      errors.Password = "Required";
+      return errors;
+    }
+  };
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
     validate,
@@ -62,7 +66,7 @@ const Register = ({ history }) => {
           }
         })
         .catch(function (error) {
-          console.log(error);
+          setErrorMsg(true);
         });
     },
   });
@@ -91,6 +95,13 @@ const Register = ({ history }) => {
           <div>
             {formik.touched.Password && formik.errors.Password ? (
               <div className="text-red-600">{formik.errors.Username}</div>
+            ) : null}
+          </div>
+          <div>
+            {errorMsg ? (
+              <label className="text-red-600">
+                Register failed! Try something else.
+              </label>
             ) : null}
           </div>
           <label
