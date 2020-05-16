@@ -30,7 +30,6 @@ const FriendsList = () => {
   const [hovered, setHovered] = useState(false);
   /* Gets the username of the user doing the friend request */
   const requester = useSelector((state) => state.socketState.username);
-
   /**
    * set the username of the user we want to add
    * @param event the event of the window object
@@ -73,11 +72,12 @@ const FriendsList = () => {
         {show ? (
 
     <div className="addFriend-custom-overlay">
-
           <AddFriend
             userInput={username}
+            requester={requester}
             handleInputChange={handleInputChange}
             setAddSuccessful={setAddSuccessful}
+            currentFriends={currentFriends}
             show={show}
             setShow={setShow}
             from={requester}
