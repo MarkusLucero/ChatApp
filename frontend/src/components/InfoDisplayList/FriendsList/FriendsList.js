@@ -77,6 +77,7 @@ const FriendsList = () => {
             requester={requester}
             handleInputChange={handleInputChange}
             setAddSuccessful={setAddSuccessful}
+            currentFriends={currentFriends}
             show={show}
             setShow={setShow}
             from={requester}

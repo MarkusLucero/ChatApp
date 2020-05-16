@@ -4,12 +4,13 @@ const axios = require("axios");
 async function friendRequest({
   setAddSuccessful,
   userInput,
+  currentFriends,
   requester,
   from,
   setErrorMsg,
 }) {
 
-  if (userInput !== "" && userInput !== requester) {
+  if (userInput !== "" && userInput !== requester && !currentFriends.includes(userInput)) {
     try {
       const response = await axios.post(
         "/",
@@ -48,6 +49,7 @@ const AddFriend = ({
   handleInputChange,
   setAddSuccessful,
   requester,
+  currentFriends,
   show,
   setShow,
   from,
@@ -105,6 +107,7 @@ const AddFriend = ({
             friendRequest({
               setAddSuccessful,
               userInput,
+              currentFriends,
               requester,
               from,
               setErrorMsg,
