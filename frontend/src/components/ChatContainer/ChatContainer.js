@@ -23,36 +23,28 @@ const ChatContainer = ({ focusedChat }) => {
    * @param event the event object of the window
    */
   const handleSearchInput = (event) => {
+    setSearching(false);
     setSearchTerm(event.target.value);
   };
 
+  /* used as a check if we are currenyly displaying searched messages */
+  const [searching, setSearching] = React.useState(false);
   /**
    * TODO Trigger the search of the searchTerm in the actuall focused chat
    * @param event the event object of the window
    */
   const handleSearchSubmit = (event) => {
-    /* TODO Actually search for chat messages containing the text in searchTerm and only allow that
-       to be displayed in the chat
-    */
     console.log(searchTerm);
 
-    /* OBS OBS !! IF YOU WANT TO TRY OUT THE PYTHON SEARCH API UNCOMMENT THE FETCH STATEMENT BELOW */
-    // Send the same request
-    /*     fetch("http://localhost:5000/search", {
-      // Specify the method
-      method: "POST",
-      // A JSON payload
-      body: JSON.stringify({
-        "search_term": searchTerm,
-      }),
-    })
-      .then(function (response) {
-        return response.json(); //parse result as JSON
-      })
-      .then(function (json) {
-        console.log("Search results: ");
-        console.log(json); // Here’s our JSON object
-      }); */
+    setSearching(true);
+    var filteredChat = [];
+    messages.map((chat) => {
+      if (chat.message.includes(searchTerm)) {
+        filteredChat.push(chat);
+      }
+    });
+
+    setMessages(filteredChat);
     setSearchTerm("");
     event.preventDefault();
   };
@@ -66,6 +58,7 @@ const ChatContainer = ({ focusedChat }) => {
    * @return {array} array containing the list of message objects from the corresponding DM object
    */
   const rightChat = (list) => {
+    console.log(list);
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
         return chat.messages;
@@ -104,22 +97,34 @@ const ChatContainer = ({ focusedChat }) => {
   };
 
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
-  
+
   React.useEffect(() => {
-    if (listOfDms != null) {
+    if (listOfDms !== null && searching === false) {
       setMessages(rightChat(listOfDms));
     }
-  }, [focusedChat, listOfDms]);
+  }, [focusedChat, listOfDms, searching]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
-      <SearchBar
-        id="search-chat"
-        value={searchTerm}
-        onButtonClick={handleSearchSubmit}
-        onInputChange={handleSearchInput}
-      />
-
+      {focusedChat ? (
+        <SearchBar
+          id="search-chat"
+          placeHolder="Search in this chat..."
+          value={searchTerm}
+          onButtonClick={handleSearchSubmit}
+          onInputChange={handleSearchInput}
+        />
+      ) : null}
+      {searching ? (
+        <div
+          className="text-white p-2 input-box-custom-bg self-center cursor-pointer mt-4"
+          onClick={(e) => {
+            setSearching(false);
+          }}
+        >
+          Cancel Search
+        </div>
+      ) : null}
       <Chat messages={messages} />
       {focusedChat ? (
         <ChatInput
