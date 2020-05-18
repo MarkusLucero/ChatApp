@@ -9,9 +9,10 @@ const axios = require("axios");
  * @property {function} handleFocusedPage Callback function passed down from LandingPage - Used to get id of what page we click on
  * @property {object} server the global server object
  * @property {Function} resetFocusedThread - callback for resetting the currently focused thread
+ * @property {function} setThreadMutex used for locking the rendering of threads 
  * @returns the button of the global server
  */
-const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
+const Server = ({ server, handleFocusedPage, resetFocusedThread, setThreadMutex }) => {
 
     /* useDispatch from dispatch function from store */
     const dispatch = useDispatch();
@@ -22,12 +23,13 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
 
     /*Reset the focused thread, so we show all threads in focusedview */
     const handle = (e)=>{
-        fetchThreads();
+        //fetchThreads();
         resetFocusedThread();
         handleFocusedPage(e);
     }
 
     async function fetchThreads() {
+      setThreadMutex(false);
         try {
             const response = await axios.post(
               "/",
@@ -47,13 +49,16 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
                     threads.push({rootPost: {rootHeader: thread.header, rootComment: thread.text}, username: thread.creator, timestamp: thread.timestamp, comments: thread.comment_list, id: thread.thread_id });
                 };
                 dispatch(actions.addThreads({threads: threads}));
-                }   
+                }
+                setThreadMutex(true);
                 break;
               case 404: {
                 console.log(data);
+                setThreadMutex(true);
                 break;
               }
               default:
+                setThreadMutex(true);
                 alert("cannot fetch threads from server");
                 break;
             }
@@ -63,7 +68,7 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
     };
 
     return (
-        <div id={server.serverName} onClick={handle} className="rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg hover:bg-gray-500 flex items-center justify-center"> 
+        <div id={server.serverName} onClick={handle} className="text-white rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg cursor-pointer hover:bg-gray-500 flex items-center justify-center"> 
             {server.serverName}
         </div>
     )

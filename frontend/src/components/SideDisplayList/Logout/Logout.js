@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import * as actions from "../../../actions/actions";
 import { useDispatch, useSelector } from "react-redux";
+import logout from "../../../img/logout.svg";
 
 const axios = require("axios");
 
@@ -54,17 +55,34 @@ const Logout = () => {
   React.useEffect(() => {
     if (logoutSuccess === true) {
       dispatch(actions.logOut()); /* Reset socketState */
-      dispatch(actions.resetLoginState()) /* Reset loginState  -- this will trigger redirect to login page! */
-      console.log("Successfuly logged out!")
+      dispatch(
+        actions.resetLoginState()
+      ); /* Reset loginState  -- this will trigger redirect to login page! */
+      console.log("Successfuly logged out!");
     }
   }, [logoutSuccess, dispatch]);
 
+  const [hovered, setHovered] = useState(false);
   return (
     <div
-      className="text-white cursor-pointer"
+      className="text-white cursor-pointer flex flex-row justify-center  mb-2"
       onClick={() => logoutHandler(username, magicToken, setLogoutSuccess)}
     >
-      LOGOUT
+      <img
+        src={logout}
+        onMouseEnter={() => {
+          setHovered(!hovered);
+        }}
+        onMouseLeave={() => {
+          setHovered(!hovered);
+        }}
+        className={
+          hovered
+            ? "plusIcon-custom-hover h-10 w-10 cursor-pointer"
+            : "h-10 w-10 cursor-pointer"
+        }
+        onClick={() => logoutHandler(username, magicToken, setLogoutSuccess)}
+      />
     </div>
   );
 };
