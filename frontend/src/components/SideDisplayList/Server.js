@@ -23,7 +23,7 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread, setThreadMutex 
 
     /*Reset the focused thread, so we show all threads in focusedview */
     const handle = (e)=>{
-        //fetchThreads();
+        fetchThreads();
         resetFocusedThread();
         handleFocusedPage(e);
     }
