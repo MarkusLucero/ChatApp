@@ -12,7 +12,6 @@
 %% @parak Args IGNORED
 %% @returns ok
 start(_Type, _Args) ->
-    chat_server:start(),
     Dispatch = cowboy_router:compile([
                                       {'_', [
                                              {"/", auth_handler, []},

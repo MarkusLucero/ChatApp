@@ -18,10 +18,16 @@ shell_test_start() ->
 %% @doc Starts the supervisor for the Web API node
 init(_Args) ->
     SupFlags = #{strategy => one_for_one, intensity => 1, period => 5},
-    ChildSpecs = [#{id => token,
+    ChildSpecs = [#{id => token_server,
                     start => {token_server, start_link, []},
                     restart => permanent,
-                    shutdown => 10,
+                    shutdown => 500,
                     type => worker,
-                    modules => [token_server]}],
+                    modules => [token_server]},
+                  #{id => chat_server,
+                    start => {chat_server, start_link, []},
+                    restart => permanent,
+                    shutdown => 500,
+                    type => worker,
+                    modules => [chat_server]}],
     {ok, {SupFlags, ChildSpecs}}.
