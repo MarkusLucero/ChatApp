@@ -29,7 +29,10 @@ handle_call({check_token, Token, User}, _From, Table) ->
             {reply, token_ok, Table};
         _ ->
             {reply, token_not_ok, Table}
-    end.
+    end;
+
+handle_call(_Request, _From, State) ->
+    {reply, ok, State}.
 
 handle_cast({add_token, Token, User}, Table) ->
     ets:insert(Table, {Token, User}),
@@ -37,4 +40,7 @@ handle_cast({add_token, Token, User}, Table) ->
 
 handle_cast({remove_token, Token, User}, Table) ->
     ets:match_delete(Table, {Token, User}),
-    {noreply, Table}.
+    {noreply, Table};
+
+handle_cast(_Request, State) ->
+    {noreply, State}.
