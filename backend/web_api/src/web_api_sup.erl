@@ -3,6 +3,7 @@
 
 -export([start_link/0]).
 -export([init/1]).
+-export([shell_test_start/0]).
 
 -spec start_link() -> {ok, pid() | ignore | {error, any()}}.
 %% @doc Starts the supervisor for the Web API node
@@ -10,10 +11,17 @@
 start_link() ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
--spec init([]) -> {ok, {{one_for_one, integer(), integer()}, list()}}.
+shell_test_start() ->
+    {ok, Pid} = supervisor:start_link(?MODULE, []),
+    unlink(Pid).
+
 %% @doc Starts the supervisor for the Web API node
-%% @param List MUST BE EMPTY LIST
-%% @returns ok
-init([]) ->
-    Procs = [],
-    {ok, {{one_for_one, 1, 5}, Procs}}.
+init(_Args) ->
+    SupFlags = #{strategy => one_for_one, intensity => 1, period => 5},
+    ChildSpecs = [#{id => token,
+                    start => {token_server, start_link, []},
+                    restart => permanent,
+                    shutdown => 10,
+                    type => worker,
+                    modules => [token_server]}],
+    {ok, {SupFlags, ChildSpecs}}.

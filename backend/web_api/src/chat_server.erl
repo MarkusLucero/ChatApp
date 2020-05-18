@@ -225,12 +225,10 @@ start() ->
             unregister(chat_server)
     end,
     register(chat_server, spawn(fun() -> loop(maps:new()) end)),
-    auth_handler:start_token_server(),
     ok.
 
 check_token(User, Token) ->
-    token_server ! {check_token, Token, User, self()},
-    receive
+    case token_server:check_token(Token, User) of
         token_ok ->
             true;
         _ ->

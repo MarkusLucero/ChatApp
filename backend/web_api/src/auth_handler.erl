@@ -3,7 +3,6 @@
 
 -export([init/2]).
 -export([terminate/3, register_user/4]).
--export([start_token_server/0]).
 
 
 login(Username, Password, Req0, Opts) ->
@@ -24,7 +23,7 @@ login(Username, Password, Req0, Opts) ->
                              {struct,[{"action", "login"},
                                       {"magic_token", Magic_Token}]}),
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
-                    token_server ! {add_token, Magic_Token, Username},
+                    token_server:add_token(Magic_Token, Username),
                     {ok, Req3, Opts}
             end;
         {error, Reason} ->
@@ -74,8 +73,7 @@ commentList2JSON({Thread_ID, Username, Comment, {Reply_User, Reply_Comment}}) ->
 
 request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
     io:format("REQUESTING THREAD: ~p~n", [Thread_ID]),
-    token_server ! {check_token, Magic_Token, Username, self()},
-    receive
+    case token_server:check_token(Magic_Token, Username) of
         {ok, Magic_Token} ->
             case database_api:fetch_thread(Thread_ID) of
                 {error, _Reason} ->
@@ -119,8 +117,7 @@ fetch_thread_JSON(Thread_ID) ->
     end.
 
 request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->
-    token_server ! {check_token, Magic_Token, Username, self()},
-    receive
+    case token_server:check_token(Magic_Token, Username) of
         token_ok ->
             case database_api:fetch_thread_IDs() of
                 {error, _Reason} ->
@@ -132,7 +129,7 @@ request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->
                     Body = mochijson:encode({struct,[{"action", "fetch_server_contents"},
                                                      {"server_name", Server_Name},
                                                      {"threads", {array, Threads_JSON}}
-                                                     ]}),
+                                                    ]}),
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
                     {ok, Req3, Opts}
             end;
@@ -204,9 +201,9 @@ init(Req0, Opts) ->
 
 -spec terminate(Reason, Req, State) -> ok when
       Reason     :: normal | stop | timeout
-                  | remote | {remote, cow_ws:close_code(), binary()}
-                  | {error, badencoding | badframe | closed | atom()}
-                  | {crash, error | exit | throw, any()},
+      | remote | {remote, cow_ws:close_code(), binary()}
+      | {error, badencoding | badframe | closed | atom()}
+      | {crash, error | exit | throw, any()},
       Req :: cowboy_req:req(),
       State :: any().
 %% @doc Terminates http connection
@@ -215,46 +212,4 @@ init(Req0, Opts) ->
 %% @param State The state of the handler.
 %% @returns ok For all terminations.
 terminate(_Reason, _Req, _State) ->
-        ok.
-
--spec start_token_server() -> ok.
-%% @doc Starts the token server
-%% @returns ok.
-start_token_server() ->
-    case whereis(token_server) of
-        undefined -> 
-            ok;
-        _PID -> 
-            unregister(token_server)
-    end,
-    register(token_server, spawn(fun() -> token_server_loop(maps:new()) end)),
     ok.
-
-
-token_server_loop(Token_map) ->
-    receive
-        {remove_token, Token, Username} ->
-            case maps:get(Username, Token_map) of
-                Token -> 
-                    token_server_loop(maps:remove(Username, Token_map));
-                _ -> 
-                    token_server_loop(Token_map)
-            end;
-        {add_token, Token, User} ->
-            io:format("Adding token: ~p~n", [Token]),
-            New_map = maps:put(User, Token, Token_map),
-            token_server_loop(New_map);
-        {check_token, Token, User, From} ->
-            io:format("Checking token: ~p~n", [Token]),
-            case maps:find(User, Token_map) of
-                {ok, Token} ->
-                    From ! token_ok;
-                error ->
-                    From ! token_not_ok;
-                _ ->
-                    From ! token_not_ok
-            end,
-            token_server_loop(Token_map);
-        _ ->
-            token_server_loop(Token_map)
-    end.
