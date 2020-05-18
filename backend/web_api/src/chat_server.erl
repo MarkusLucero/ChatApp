@@ -80,8 +80,8 @@ send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
     %user_status("TODO: Check with real users"),
     %%TODO: Check if we can actually deliver
-    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID},
+    database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     ok.
 
 -spec get_unread_messages(Username, Chat_ID, PID) -> ok when
@@ -207,11 +207,11 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 %% @returns ok
 insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
     case database_api:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) of
-	{error, _Reason} ->
-	    erlang:error('Error inserting comment');
-	{Thread_ID, Username, Comment, {Reply_User, Reply_Comment}} ->
-	    chat_server ! {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment},
-	    ok
+        {error, _Reason} ->
+            erlang:error('Error inserting comment');
+        {Thread_ID, Username, Comment, {Reply_User, Reply_Comment}} ->
+            chat_server ! {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment},
+            ok
     end.
 
 -spec start() -> ok.
@@ -364,18 +364,18 @@ loop(Connection_map) ->
                      end, Connection_map),
 
             loop(maps:filter(fun(_Username, {PID, _Token}) -> PID =/= From end, Connection_map));
-	{insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment} ->
-	    JSON_Message = mochijson:encode(
+        {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment} ->
+            JSON_Message = mochijson:encode(
                              {struct,[{"action", "insert_comment"},
                                       {"thread_id", Thread_ID},
                                       {"username", Username},
                                       {"comment", Comment},
-				      {"reply", {struct, [{"reply_user", Reply_User},
-							  {"reply_comment", Reply_Comment}]}}
-				     ]}),
-	    Fun = fun(_Username, {PID, _Magic_Token}) ->
-			  PID ! {text, JSON_Message}
-		  end,
-	    maps:map(Fun, Connection_map),
+                                      {"reply", {struct, [{"reply_user", Reply_User},
+                                                          {"reply_comment", Reply_Comment}]}}
+                                     ]}),
+            Fun = fun(_Username, {PID, _Magic_Token}) ->
+                          PID ! {text, JSON_Message}
+                  end,
+            maps:map(Fun, Connection_map),
             loop(Connection_map)
     end.
