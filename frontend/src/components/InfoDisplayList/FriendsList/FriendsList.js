@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import add_friend from "../../../img/add_friend.svg";
+import add_friend from "../../../img/add_friend.webp";
 import AddFriend from "./AddFriend";
 import * as actions from "../../../actions/actions";
 

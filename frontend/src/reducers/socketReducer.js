@@ -138,21 +138,10 @@ const socketReducer = (state = initialState, action) => {
             username: action.payload.username,
             /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
             server: {
-              serverName: "Global",
+              serverName: "0",
               serverInformation:
                 "This is the global server that everyone joins. Make threads, comment and be happy peeps.",
-              listOfThreads: [
-                {
-                  rootPost: {
-                    rootHeader: "Hjälp med linux!",
-                    rootComment: "Hej, har nån bra koll på mint??",
-                  },
-                  username: "Skooben",
-                  timestamp: "2020-01-10",
-                  comments: [],
-                  id: "-1",
-                },
-              ],
+              listOfThreads: [],
               members: [action.payload.username],
             },
           };

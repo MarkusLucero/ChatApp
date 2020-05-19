@@ -9,10 +9,9 @@ import ThreadInfo from "./ThreadInfo";
  * @property {string} focusedThread the threadId of the thread we're currently focusing on 
  * @property {Function} handleFocusedThread - callback funktion for setting the focused thread
  * @property {function} resetFocusedThread callback for resetting the focused thread
- * @property {boolean} threadMutex used for conditional rendering of threads
  * @returns a div with the Originalpost and comments
  */
-const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread, threadMutex }) => {
+const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread }) => {
   /* State and callback functions for the SearchBar */
   const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -62,7 +61,7 @@ const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread
       /> */}
       
       <div className="h-screen75">
-      { !focusedThread && threadMutex ? 
+      { !focusedThread ? 
         listOfThreads.map((thread, index) => {
           return <ThreadInfo handleFocusedThread={handleFocusedThread}thread={thread} key={index}/>
       }):null }
