@@ -8,7 +8,7 @@ import React from 'react';
  */
 const ThreadInfo = ({ thread, handleFocusedThread }) => {
     return (
-        <div id ={thread.id} onClick ={handleFocusedThread} className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-700">
+        <div id ={thread.id} onClick ={handleFocusedThread} className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-800 cursor-pointer">
         <div id ={thread.id} className="flex flex-row justify-between">
           <div id = {thread.id}className=" text-3xl text-white pl-2 w-auto">
             {thread.rootPost.rootHeader}
@@ -23,3 +23,4 @@ const ThreadInfo = ({ thread, handleFocusedThread }) => {
 }
 
 export default ThreadInfo;
+
