@@ -41,7 +41,7 @@ const LandingPage = () => {
   const [server, setServer] = React.useState({});
 
   /* Used for locking the threads when updating them from the server */ 
-  const [threadMutex, setThreadMutex] = React.useState(true);
+  const [threadLock, setThreadLock] = React.useState(true);
 
   //server object from redux
   const serverObject = useSelector((state) => state.socketState.server);
@@ -72,7 +72,7 @@ const LandingPage = () => {
         resetFocusedThread={resetFocusedThread}
         handleFocusedPage={handleFocusedPage}
         server={server}
-        setThreadMutex={setThreadMutex} />
+        setThreadLock={setThreadLock} />
       <InfoDisplayList
         handleFocusedChat={handleFocusedChat}
         focusedPage={focusedPage}
@@ -86,7 +86,7 @@ const LandingPage = () => {
         handleFocusedThread={handleFocusedThread}
         focusedThread={focusedThread}
         resetFocusedThread={resetFocusedThread}
-        threadMutex={threadMutex}
+        threadLock={threadLock}
       />
     </div>
   );

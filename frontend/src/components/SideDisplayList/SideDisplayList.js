@@ -7,7 +7,7 @@ import Server from "./Server";
  * @property {function} handleFocusedPage Callback function passed down from LandingPage - Used to get id of what page we click on
  * @property {object} server the global server object
  * @property {function} resetFocusedThread callback for resetting the focused thread
- * @property {function} setThreadMutex callback used in server for locking the threads
+ * @property {function} setThreadLock callback used in server for locking the threads
  * @returns A div containing the global server, Home and logout button
  */
 
@@ -15,7 +15,7 @@ const SideDisplayList = ({
   handleFocusedPage,
   server,
   resetFocusedThread,
-  setThreadMutex,
+  setThreadLock,
 }) => {
   return (
     <div style={{ backgroundColor: "#23272A" }}>
@@ -35,7 +35,7 @@ const SideDisplayList = ({
               server={server}
               handleFocusedPage={handleFocusedPage}
               resetFocusedThread={resetFocusedThread}
-              setThreadMutex={setThreadMutex}
+              setThreadLock={setThreadLock}
             />
           </div>
         </div>

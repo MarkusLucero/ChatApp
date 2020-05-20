@@ -10,16 +10,16 @@ import ThreadContainer from "../ThreadContainer/ThreadContainer";
  * @property {String} focusedThread - a string used to check what thread we are focusing on 
  * @property {Function} handleFocusedThread - callback funktion for setting the focused thread
  * @property {Function} resetFocusedThread - callback for resetting the focused thread
- * @property {boolean} threadMutex - used for conditional rendering of threads
+ * @property {boolean} threadLock - used for conditional rendering of threads
  * @returns the appropriate component that should be displayed
  */
-const FocusedView = ({ focusedChat, focusedPage, focusedThread, handleFocusedThread, resetFocusedThread, threadMutex }) => {
+const FocusedView = ({ focusedChat, focusedPage, focusedThread, handleFocusedThread, resetFocusedThread, threadLock }) => {
   return (
     <>
       {focusedPage === "Home" ? (
         <ChatContainer focusedChat={focusedChat} />
       ) : (
-        <ThreadContainer threadMutex={threadMutex}focusedThread={focusedThread} handleFocusedThread={handleFocusedThread} resetFocusedThread={resetFocusedThread} />
+        <ThreadContainer threadLock={threadLock}focusedThread={focusedThread} handleFocusedThread={handleFocusedThread} resetFocusedThread={resetFocusedThread} />
       )}
     </>
   );

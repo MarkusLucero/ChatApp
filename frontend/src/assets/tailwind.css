@@ -35,6 +35,15 @@
   margin: 0 auto;
 }
 
+.logout-custom-modal {
+  z-index: 99;
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  max-height: 100%;
+  margin: 0 auto;
+}
+
 .addFriend-custom-modal-close {
   position: absolute;
   top: -24px;
