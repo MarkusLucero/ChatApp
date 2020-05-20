@@ -9,9 +9,10 @@ const axios = require("axios");
  * @property {function} handleFocusedPage Callback function passed down from LandingPage - Used to get id of what page we click on
  * @property {object} server the global server object
  * @property {Function} resetFocusedThread - callback for resetting the currently focused thread
+ * @property {function} setThreadLock used for locking the rendering of threads 
  * @returns the button of the global server
  */
-const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
+const Server = ({ server, handleFocusedPage, resetFocusedThread, setThreadLock }) => {
 
     /* useDispatch from dispatch function from store */
     const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
     }
 
     async function fetchThreads() {
+      setThreadLock(false);
         try {
             const response = await axios.post(
               "/",
@@ -47,18 +49,22 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread }) => {
                     threads.push({rootPost: {rootHeader: thread.header, rootComment: thread.text}, username: thread.creator, timestamp: thread.timestamp, comments: thread.comment_list, id: thread.thread_id });
                 };
                 dispatch(actions.addThreads({threads: threads}));
-                }   
+                }
+                setThreadLock(true);
                 break;
               case 404: {
                 console.log(data);
+                setThreadLock(true);
                 break;
               }
               default:
+                setThreadLock(true);
                 alert("cannot fetch threads from server");
                 break;
             }
           } catch (error) {
             console.log(error);
+            setThreadLock(true);
           }
     };
 

@@ -1,6 +1,9 @@
 import React from "react";
 import * as actions from "../../../actions/actions";
 import { useDispatch, useSelector } from "react-redux";
+import logout from "../../../img/logout.svg";
+import LogoutMonad from "./LogoutMonad";
+
 
 const axios = require("axios");
 
@@ -42,7 +45,6 @@ const logoutHandler = async (username, magicToken, setLogoutSuccess) => {
 
 /**
  * Component that handles the logout functionality
- * TODO STYLING!!
  * @returns clickable button that will logout the user
  */
 const Logout = () => {
@@ -50,6 +52,8 @@ const Logout = () => {
   const magicToken = useSelector((state) => state.socketState.magicToken);
   const username = useSelector((state) => state.socketState.username);
   const [logoutSuccess, setLogoutSuccess] = React.useState(false);
+
+  const [logoutMonad, setLogoutMonad] = React.useState(false);
 
   React.useEffect(() => {
     if (logoutSuccess === true) {
@@ -61,10 +65,29 @@ const Logout = () => {
 
   return (
     <div
-      className="text-white cursor-pointer"
-      onClick={() => logoutHandler(username, magicToken, setLogoutSuccess)}
+      className="text-white cursor-pointer flex flex-row justify-center  mb-2"
     >
-      LOGOUT
+      <img
+        src={logout}
+        onMouseEnter={() => {
+          setHovered(!hovered);
+        }}
+        onMouseLeave={() => {
+          setHovered(!hovered);
+        }}
+        className={
+          hovered
+            ? "plusIcon-custom-hover h-10 w-10 cursor-pointer"
+            : "h-10 w-10 cursor-pointer"
+        }
+        onClick={()=>{setLogoutMonad(true)}}
+      />
+      {logoutMonad? (
+         <div className="addFriend-custom-overlay">
+          <LogoutMonad logoutHandler={logoutHandler} setLogoutMonad={setLogoutMonad} username={username} magicToken={magicToken} setLogoutSuccess={setLogoutSuccess}/>
+        </div>
+      ): null}
+
     </div>
   );
 };
