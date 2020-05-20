@@ -52,6 +52,7 @@ const Logout = () => {
   const magicToken = useSelector((state) => state.socketState.magicToken);
   const username = useSelector((state) => state.socketState.username);
   const [logoutSuccess, setLogoutSuccess] = React.useState(false);
+  const [hovered, setHovered] = React.useState(false);
 
   const [logoutMonad, setLogoutMonad] = React.useState(false);
 
