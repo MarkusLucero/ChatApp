@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import * as actions from "../../../actions/actions";
 import { useDispatch, useSelector } from "react-redux";
 import logout from "../../../img/logout.svg";
 import LogoutMonad from "./LogoutMonad";
+
 
 const axios = require("axios");
 
@@ -57,14 +58,11 @@ const Logout = () => {
   React.useEffect(() => {
     if (logoutSuccess === true) {
       dispatch(actions.logOut()); /* Reset socketState */
-      dispatch(
-        actions.resetLoginState()
-      ); /* Reset loginState  -- this will trigger redirect to login page! */
-      console.log("Successfuly logged out!");
+      dispatch(actions.resetLoginState()) /* Reset loginState  -- this will trigger redirect to login page! */
+      console.log("Successfuly logged out!")
     }
   }, [logoutSuccess, dispatch]);
 
-  const [hovered, setHovered] = useState(false);
   return (
     <div
       className="text-white cursor-pointer flex flex-row justify-center  mb-2"
@@ -89,6 +87,7 @@ const Logout = () => {
           <LogoutMonad logoutHandler={logoutHandler} setLogoutMonad={setLogoutMonad} username={username} magicToken={magicToken} setLogoutSuccess={setLogoutSuccess}/>
         </div>
       ): null}
+
     </div>
   );
 };

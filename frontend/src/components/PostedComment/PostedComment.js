@@ -2,6 +2,7 @@ import React from "react";
 import "../../assets/main.css";
 import Reply from "../Reply/Reply";
 import placeholder from "../../img/placeholder.png";
+import Upvote from "../Upvote/Upvote";
 
 const PostedComment = ({
   username,
@@ -18,7 +19,10 @@ const PostedComment = ({
       <div className="text-white w-full">
         {comments.map((comment, index) => (
           <div className=" w-full " key={index}>
-            <span className="">
+            <span className=" inline-flex float-left">
+              <div className="mr-4">
+                <Upvote></Upvote>
+              </div>
               <img
                 className="rounded-full w-12 h-auto  mb-4 mr-4 float-left"
                 alt=""
@@ -30,7 +34,7 @@ const PostedComment = ({
               {console.log(comment)}
               {Object.keys(comment.reply.reply_comment).length !== 0 ? (
                 <div className="quote">
-                  <div className=" font-bold ml-4">
+                  <div className=" font-bold ml-8 ">
                     Originally posted by {""}
                     {console.log(comment.reply)}
                     <span className="font-bold text-blue-700">
@@ -41,7 +45,7 @@ const PostedComment = ({
                   <div className="ml-4 ">{comment.reply.reply_comment}</div>
                 </div>
               ) : null}
-              <div className=" ml-4 ">
+              <div className=" ml-12 ">
                 {" "}
                 {comment.comment}
                 <Reply

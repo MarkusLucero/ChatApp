@@ -64,6 +64,13 @@ friend_request(Username, Friendname, Req0, Opts) ->
    end.    
 
 
+commentList2JSON({Thread_ID, Username, Comment, {Reply_User, Reply_Comment}}) ->
+    Reply = {struct, [{"reply_user", Reply_User},
+                      {"reply_comment", Reply_Comment}]},
+    {struct, [{"thread_id", Thread_ID},
+              {"username", Username},
+              {"comment", Comment},
+              {"reply", Reply}]}.
 
 request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
     io:format("REQUESTING THREAD: ~p~n", [Thread_ID]),
@@ -76,13 +83,14 @@ request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
                     Req3 = cowboy_req:reply(400, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
                     {ok, Req3, Opts};
                 {Server, Creator, Header, Text, Timestamp, Comments} ->
+                    CommentList = [commentList2JSON(Comment) || Comment <- Comments],
                     JSON_Response = {struct,[{"action", "fetch_thread"},
                                              {"server_name", Server},
                                             {"creator", Creator},
                                              {"header", Header},
                                              {"text", Text},
                                              {"timestamp", Timestamp},
-                                             {"comment_list", {array, Comments}}]},
+                                             {"comment_list", {array, CommentList}}]},
                     Body = mochijson:encode(JSON_Response),
                     Req3 = cowboy_req:reply(200, #{<<"content-type">> => <<"text/plain">> }, Body, Req0),
                     {ok, Req3, Opts}
@@ -99,6 +107,7 @@ fetch_thread_JSON(Thread_ID) ->
         {error, _Reason} ->
             erlang:error(badarg);
         {Server, Creator, Header, Text, Timestamp, Comments} ->
+            CommentList = [commentList2JSON(Comment) || Comment <- Comments],
             {struct,[{"action", "fetch_thread"},
                      {"thread_id", Thread_ID},
                      {"server_name", Server},
@@ -106,7 +115,7 @@ fetch_thread_JSON(Thread_ID) ->
                      {"header", Header},
                      {"text", Text},
                      {"timestamp", Timestamp},
-                     {"comment_list", {array, Comments}}]}
+                     {"comment_list", {array, CommentList}}]}
     end.
 
 request_server_contents(Server_Name, Magic_Token, Username, Req0, Opts) ->

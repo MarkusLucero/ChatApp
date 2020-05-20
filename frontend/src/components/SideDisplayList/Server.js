@@ -69,7 +69,7 @@ const Server = ({ server, handleFocusedPage, resetFocusedThread, setThreadLock }
     };
 
     return (
-        <div id={server.serverName} onClick={handle} className="text-white rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg cursor-pointer hover:bg-gray-500 flex items-center justify-center"> 
+        <div id={server.serverName} onClick={handle} className="rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg hover:bg-gray-500 flex items-center justify-center"> 
             {server.serverName}
         </div>
     )

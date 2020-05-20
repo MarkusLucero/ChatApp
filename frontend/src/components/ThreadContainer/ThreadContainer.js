@@ -66,6 +66,7 @@ const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread
         listOfThreads.map((thread, index) => {
           return <ThreadInfo handleFocusedThread={handleFocusedThread}thread={thread} key={index}/>
       }):null }
+  
       {focusedThread && thread ? <OriginalPost handleFocusedThread={handleFocusedThread} thread={thread} focusedThread={focusedThread} resetFocusedThread={resetFocusedThread} /> : null}
       {focusedThread && thread ? <CommentContainer thread={thread} focusedThread={focusedThread} /> : null}
       </div>

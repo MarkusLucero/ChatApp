@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logout from "./Logout/Logout.js";
+import Logout from "./Logout/Logout.js"
 import Server from "./Server";
 
 /**
@@ -42,7 +42,12 @@ const SideDisplayList = ({
       <div className=" mt-auto">
         <Logout />
       </div>
+      <div className=" h-auto">
+        <div className="flex flex-col justify-between">
+            <Server server={server} handleFocusedPage = {handleFocusedPage} resetFocusedThread={resetFocusedThread}/>
+        </div>
       </div>
+      <Logout/>
     </div>
   );
 };

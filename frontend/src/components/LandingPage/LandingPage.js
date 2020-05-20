@@ -42,7 +42,7 @@ const LandingPage = () => {
 
   /* Used for locking the threads when updating them from the server */ 
   const [threadLock, setThreadLock] = React.useState(true);
-
+  
   //server object from redux
   const serverObject = useSelector((state) => state.socketState.server);
 
