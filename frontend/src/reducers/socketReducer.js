@@ -190,6 +190,7 @@ const socketReducer = (state = initialState, action) => {
                 state.listOfDms[index].messages.push({
                   message: parsedData.message,
                   username: parsedData.user_id,
+                  timestamp: parsedData.timestamp,
                 }),
               ],
             };
@@ -257,6 +258,7 @@ const socketReducer = (state = initialState, action) => {
 
       if (index !== -1) {
         const msgObject = action.payload;
+
         state.socket.send(JSON.stringify(msgObject));
 
         /* update listOfDms in state */
@@ -264,6 +266,7 @@ const socketReducer = (state = initialState, action) => {
         updateListOfDms[index].messages.push({
           message: msgObject.message,
           username: msgObject.user_id,
+          timestamp: msgObject.timestamp,
         });
 
         return {
