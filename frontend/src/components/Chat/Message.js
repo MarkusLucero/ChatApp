@@ -16,7 +16,7 @@ const Message = ({ message }) => {
       <h1 className="font-medium">
         {message.username + "  "}
         {/* TODO -- SET REAL TIMESTAMPS */}
-        <span className="font-light text-xs text-right">today...</span>
+  <span className="font-light text-xs text-right">{message.timestamp}</span>
       </h1>
       <p className="font-light"> {message.message}</p>
     </div>
