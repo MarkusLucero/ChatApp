@@ -180,6 +180,7 @@ const socketReducer = (state = initialState, action) => {
               username: parsedData.user_id,
             };
           case "send_message":
+            console.log(parsedData);
             /* add the new msg object to the right dm object */
             const index = getChatIndex(state.listOfDms, parsedData.chat_id);
             return {
