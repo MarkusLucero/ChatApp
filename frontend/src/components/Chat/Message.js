@@ -7,6 +7,11 @@ import "../../assets/main.css";
  * @returns a div containing the message with appropriate styles
  */
 const Message = ({ message }) => {
+  const date = new Date(); 
+  const timestamp = date.getFullYear().toString()+"-"+date.getFullmonth().toString()+"-"+today.getDate().toString();
+  const timestampTime = message.timestamp.split(' ')[1]; 
+  const timestampDate = message.timestamp.split(' ')[0];
+
 
   return (
     <div
@@ -15,8 +20,7 @@ const Message = ({ message }) => {
     >
       <h1 className="font-medium">
         {message.username + "  "}
-        {/* TODO -- SET REAL TIMESTAMPS */}
-  <span className="font-light text-xs text-right">{message.timestamp}</span>
+    <span className="font-light text-xs text-right">{timestamp == timestampDate ? ("Today at:" + timestampTime ): (messagemessage.timestamp)}</span>
       </h1>
       <p className="font-light"> {message.message}</p>
     </div>
