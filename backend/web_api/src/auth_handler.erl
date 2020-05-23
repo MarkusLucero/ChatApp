@@ -68,7 +68,7 @@ commentList2JSON({Thread_ID, Username, Comment, {Reply_User, Reply_Comment}}) ->
     Reply = {struct, [{"reply_user", Reply_User},
                       {"reply_comment", Reply_Comment}]},
     {struct, [{"thread_id", Thread_ID},
-              {"username", Username},
+              {"user_id", Username},
               {"comment", Comment},
               {"reply", Reply}]}.
 
