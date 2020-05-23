@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import plus from "../../../img/plus.svg";
 import StartChat from "./StartChat";
 import { useSelector } from "react-redux";
+import ReactTooltip from "react-tooltip";
 
 /**
  * contains the list of available direct messages that we can chat in
@@ -60,6 +61,8 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
       >
         Direct Messages
         <img
+          data-tip
+          data-for="createChatTip"
           onClick={() => {
             setShowAddChat(true);
           }}
@@ -77,6 +80,9 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
               : "h-6 w-6 cursor-pointer"
           }
         />
+        <ReactTooltip id="createChatTip" place="right" effect="solid">
+          Create a new chat!
+        </ReactTooltip>
       </div>
 
       <div ref={addChatModal}>
@@ -90,7 +96,6 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
       </div>
       <div className="flex flex-col">
         {chats.map((chat, index) => {
-          console.log(chat);
           return (
             <div
               onClick={handleFocusedChat}
@@ -98,8 +103,8 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
               id={chat.chatID}
               className="text-white text-xl hover:bg-gray-500 cursor-pointer flex flex-row justify-between"
             >
-            {/* TODO FIX SAME ID BAD PRAXIS */}
-              <div id={chat.chatID} >{chat.chatName}</div>
+              {/* TODO FIX SAME ID BAD PRAXIS */}
+              <div id={chat.chatID}>{chat.chatName}</div>
               <div className="text-red-700">
                 {focusedChat === chat.chatID
                   ? ""

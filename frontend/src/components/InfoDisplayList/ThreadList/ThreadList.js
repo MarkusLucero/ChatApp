@@ -2,12 +2,13 @@ import React, { useRef, useEffect } from "react";
 import plus from "../../../img/plus.svg";
 import CreateThread from "./CreateThread";
 import { useSelector } from "react-redux";
+import ReactTooltip from "react-tooltip";
 
 /**
  * ThreadList is the component which lists all threads the user has access to
  * @property {String} focusedPage - a string used to check what page we are focusing on
  * @property {string} username  username of the logged in user
- * @property {function} handleFocusedThread callback used when changing what thread to focus on 
+ * @property {function} handleFocusedThread callback used when changing what thread to focus on
  * @returns A div containing all threads that the logged in user can access
  */
 const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
@@ -31,8 +32,7 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
     }
   }, [listOfThreads]);
   /*filter all threads matching the currently logged in username*/
-  const yourThreads = threads.filter(thread => thread.username === username);
-  
+  const yourThreads = threads.filter((thread) => thread.username === username);
 
   return (
     <div className="flex flex-col ml-2">
@@ -40,8 +40,10 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
         id="threadListHeader"
         className="text-white text-xl h-auto border-solid border-b-2 border-gray-700  mt-4 flex flex-row justify-between"
       >
-        Threads created by you: 
+        Threads created by you:
         <img
+          data-tip
+          data-for="createThreadTip"
           src={plus}
           onMouseEnter={() => {
             setHovered(!hovered);
@@ -59,6 +61,9 @@ const ThreadList = ({ focusedPage, username, handleFocusedThread }) => {
             setShowCreateThread(true);
           }}
         />
+        <ReactTooltip id="createThreadTip" place="right" effect="solid">
+          Create a new thread!
+        </ReactTooltip>
       </div>
       <div>
         {showCreateThread ? (
