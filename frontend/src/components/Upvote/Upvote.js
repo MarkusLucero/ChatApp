@@ -3,6 +3,10 @@ import Up from "../../img/uploading.svg";
 import Down from "../../img/multimedia-option.svg";
 
 const Upvote = () => {
+    const [votes, setVotes] = useState(0);
+    
+
+
   return (
     <div>
       <img alt="" src={Up} className="h-4 w-4"></img>
