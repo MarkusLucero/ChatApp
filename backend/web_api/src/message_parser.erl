@@ -19,40 +19,40 @@ handle_message(Msg, PID) ->
         {struct,[{"action", "login"},
                  {"username", Username},
                  {"magictoken", {struct,[{"action", "login"},
-					 {"magic_token", Magic_token}]}}]} ->
+                                         {"magic_token", Magic_token}]}}]} ->
             chat_server:login_user(Username, Magic_token, PID);
         {struct,[{"action", "send_message"},
                 {"chat_id", Chat_ID},
                 {"user_id", Username},
                 {"message", Message},
-                {"timestamp", _}]} ->
-            chat_server:send_message(Username, Chat_ID, Message, "2020-04-21 15:30:31", PID);
+                {"timestamp", Timestamp}]} ->
+            chat_server:send_message(Username, Chat_ID, Message, Timestamp, PID);
         {struct,[{"action", "request_chat"},
                  {"chat_id", Chat_ID},
                  {"from", Username}]} ->
             chat_server:get_unread_messages(Chat_ID, Username, PID);
-	{struct,[{"action", "friend_request"},
-		 {"user_id", Friendname},
-		 {"from", Username}]} ->
-	    chat_server:send_friend_request(Username, Friendname);
-	{struct,[{"action", "chat_request"},
+        {struct,[{"action", "friend_request"},
+                 {"user_id", Friendname},
+                 {"from", Username}]} ->
+            chat_server:send_friend_request(Username, Friendname);
+        {struct,[{"action", "chat_request"},
                  {"chat_name", Chat_Name},
                  {"from", Username},
-		 {"members", {array,Members}}]} ->
+                 {"members", {array,Members}}]} ->
             chat_server:send_chat(Chat_Name, Username, Members);
-	{struct,[{"serverName", Server_Name},
+        {struct,[{"serverName", Server_Name},
                  {"thread_id", _Thread_ID},
                  {"username", Username},
-		 {"root_post", {struct, [{"root_header", Root_Header},
-					{"root_cooment", Root_Comment}]}},
-		 {"timestamp", _Timestamp},
+                 {"root_post", {struct, [{"root_header", Root_Header},
+                                        {"root_cooment", Root_Comment}]}},
+                 {"timestamp", _Timestamp},
                  {"comments", {array, _CommentList}}]} ->
             chat_server:create_thread(Server_Name, Username, Root_Header, Root_Comment);
-	{struct,[{"thread_id", Thread_ID},
-		 {"index", Index},
-		 {"reply_index", Reply_Index},
+        {struct,[{"thread_id", Thread_ID},
+                 {"index", Index},
+                 {"reply_index", Reply_Index},
                  {"username", Username},
-		 {"comment", Comment}]} ->
+                 {"comment", Comment}]} ->
             chat_server:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment);
         _ -> erlang:error('unknown message')
     end,

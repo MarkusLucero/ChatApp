@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import add_friend from "../../../img/add_friend.webp";
+import add_friend from "../../../img/add_friend.svg";
 import AddFriend from "./AddFriend";
 import * as actions from "../../../actions/actions";
-
+import ReactTooltip from "react-tooltip";
 /**
  * FriendsList contains a list of the users friends
  * @returns a div containing all friends for the logged in user
  */
 
 const FriendsList = () => {
-
   const dispatch = useDispatch();
 
   const currentFriends = useSelector(
@@ -41,12 +40,12 @@ const FriendsList = () => {
   /* when addSuccesful changes and username is not null, refire and add a friend into the array of friends */
   React.useEffect(() => {
     if (addSuccessful && username) {
-      dispatch(actions.addFriend({username}))
+      dispatch(actions.addFriend({ username }));
       setUsername("");
       setAddSuccessful(false);
     }
-  }, [addSuccessful]); 
-  
+  }, [addSuccessful]);
+
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
     if (currentFriends != null) {
@@ -62,34 +61,48 @@ const FriendsList = () => {
       >
         Friends
         <img
+          data-tip
+          data-for="addFriendTip"
           src={add_friend}
           alt=""
-          className= {hovered ? 'h-6 w-6 plusIcon-custom-hover cursor-pointer' : 'h-6 w-6 cursor-pointer'}
+          className={
+            hovered
+              ? "h-6 w-6 plusIcon-custom-hover cursor-pointer"
+              : "h-6 w-6 cursor-pointer"
+          }
           onClick={() => setShow(true)}
-          onMouseEnter= {()=>{setHovered(!hovered)}}
-          onMouseLeave = {()=>{setHovered(!hovered)}}
-        />{" "}
+          onMouseEnter={() => {
+            setHovered(!hovered);
+          }}
+          onMouseLeave={() => {
+            setHovered(!hovered);
+          }}
+        />
+        <ReactTooltip id="addFriendTip" place="right" effect="solid">
+          Add a new friend!
+        </ReactTooltip>
         {show ? (
-
-    <div className="addFriend-custom-overlay">
-          <AddFriend
-            userInput={username}
-            requester={requester}
-            handleInputChange={handleInputChange}
-            setAddSuccessful={setAddSuccessful}
-            currentFriends={currentFriends}
-            show={show}
-            setShow={setShow}
-            from={requester}
-          ></AddFriend>
+          <div className="addFriend-custom-overlay">
+            <AddFriend
+              userInput={username}
+              requester={requester}
+              handleInputChange={handleInputChange}
+              setAddSuccessful={setAddSuccessful}
+              currentFriends={currentFriends}
+              show={show}
+              setShow={setShow}
+              from={requester}
+            ></AddFriend>
           </div>
-        ) : null 
-        }
+        ) : null}
       </div>
       <div className="flex flex-col">
         {friends.map((friend, index) => {
           return (
-            <div className="text-white text-xl hover:bg-gray-500 cursor-pointer" key={index}>
+            <div
+              className="text-white text-xl hover:bg-gray-500 cursor-pointer"
+              key={index}
+            >
               {friend}
             </div>
           );

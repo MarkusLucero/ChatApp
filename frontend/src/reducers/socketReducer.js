@@ -156,18 +156,17 @@ const socketReducer = (state = initialState, action) => {
               parsedData.thread_id,
               state.server.listOfThreads
             );
+            const threads = state.server.listOfThreads;
+            threads[iT].comments.push({
+              user_id: parsedData.username,
+              comment: parsedData.comment,
+              reply: parsedData.reply,
+            });
             return {
               ...state,
               server: {
                 ...state.server,
-                listOfThreads: [
-                  ...state.server.listOfThreads,
-                  state.server.listOfThreads[iT].comments.push({
-                    user_id: parsedData.username,
-                    comment: parsedData.comment,
-                    reply: parsedData.reply,
-                  }),
-                ],
+                listOfThreads: threads             
               },
             };
           case "init_login":
