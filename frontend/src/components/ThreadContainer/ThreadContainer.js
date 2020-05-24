@@ -13,18 +13,6 @@ import ThreadInfo from "./ThreadInfo";
  * @returns a div with the Originalpost and comments
  */
 const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread, threadLock }) => {
-  /* State and callback functions for the SearchBar */
-  const [searchTerm, setSearchTerm] = React.useState("");
-
-
-  /**
-   * Set the state of searchTerm to the value of the input field when that changes
-   * @param event the event object of the window
-   */
-  const handleSearchInput = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
     
     // list of all threads in server object from redux store
     const listOfThreads = useSelector(
@@ -53,15 +41,9 @@ const ThreadContainer = ({focusedThread, handleFocusedThread, resetFocusedThread
       }
     }, [focusedThread, listOfThreads]);
   return (
-    <div className="focused-view-custom-bg text-white flex flex-col content-center ">
-     {/*<SearchBar
-        id="search-chat"
-        value={searchTerm}
-        onButtonClick={handleSearchSubmit}
-        onInputChange={handleSearchInput}
-      /> */}
+    <div className="focused-view-custom-bg text-white flex flex-col content-center">
       
-      <div className="h-screen75">
+      <div className="h-screen75  ml-5 mr-5">
       { !focusedThread && threadLock ? 
         listOfThreads.map((thread, index) => {
           return <ThreadInfo handleFocusedThread={handleFocusedThread}thread={thread} key={index}/>
