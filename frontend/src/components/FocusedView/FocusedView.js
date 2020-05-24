@@ -20,7 +20,7 @@ const FocusedView = ({ focusedChat, focusedPage, focusedThread, handleFocusedThr
         <ChatContainer focusedChat={focusedChat} />
       ) : (
 
-        <ThreadContainer threadLock={threadLock}focusedThread={focusedThread} handleFocusedThread={handleFocusedThread} resetFocusedThread={resetFocusedThread} />
+        <ThreadContainer threadLock={threadLock} focusedThread={focusedThread} handleFocusedThread={handleFocusedThread} resetFocusedThread={resetFocusedThread} />
       )}
     </>
   );
