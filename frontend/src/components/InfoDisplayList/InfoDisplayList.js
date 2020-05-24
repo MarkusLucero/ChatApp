@@ -16,7 +16,7 @@ import MessagesList from './MessagesList/MessagesList';
  * @property {function} handleFocusedThread callback function used to get the target of what we are clicking on in ThreadList
  * returns a div containing the component InformationHeader, FriendsList and MessagesList
  */
-const InfoDisplayList = ({handleFocusedChat, focusedPage, focusedChat, handleFocusedThread}) => {
+const InfoDisplayList = ({handleFocusedChat, focusedPage, focusedChat, handleFocusedThread, setFocusedChat}) => {
 
     /* get the logged in  username from redux store */
     const username = useSelector((state) => state.socketState.username);
@@ -24,8 +24,8 @@ const InfoDisplayList = ({handleFocusedChat, focusedPage, focusedChat, handleFoc
     return (
         <div style={{backgroundColor: "#2C2F33"}} className="p-1">
             <InformationHeader username = {username} focusedPage={focusedPage}/>
-            {focusedPage === "Home" ? <FriendsList /> : <ServerInformation focusedPage={focusedPage} />}
-            {focusedPage === "Home" ? <MessagesList  username = {username} focusedChat={focusedChat} handleFocusedChat = {handleFocusedChat} /> : <ThreadList handleFocusedThread={handleFocusedThread} username = {username} focusedPage={focusedPage}/> }
+            {focusedPage === "Home" ? <FriendsList setFocusedChat={setFocusedChat} myUsername={username} handleFocusedChat = {handleFocusedChat}/> : <ServerInformation focusedPage={focusedPage} />}
+            {focusedPage === "Home" ? <MessagesList  username = {username} focusedChat={focusedChat} handleFocusedChat = {handleFocusedChat}/> : <ThreadList handleFocusedThread={handleFocusedThread} username = {username} focusedPage={focusedPage}/> }
         </div>
     )
 }
