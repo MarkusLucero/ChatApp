@@ -76,13 +76,17 @@ const ChatContainer = ({ focusedChat }) => {
    * @param event the event object of the window
    */
   const sendMessage = (event) => {
+    const today = new Date(); 
+    const month = today.getMonth() + 1 ; //January is 0, need to add 1 
+    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+today.getHours().toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
     event.preventDefault();
-    setMessages([...messages, { message: newMessage, username: myUsername }]);
+    setMessages([...messages, { message: newMessage, username: myUsername, timestamp: timestamp }]);
     dispatch(
       actions.sendMessage({
         message: newMessage,
         username: myUsername,
         chatID: focusedChat,
+        timestamp: timestamp,
       })
     );
     setNewMessage("");

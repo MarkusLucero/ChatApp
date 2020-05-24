@@ -145,8 +145,7 @@ const socketReducer = (state = initialState, action) => {
             /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
             server: {
               serverName: "0",
-              serverInformation:
-                "This is the global server that everyone joins. Make threads, comment and be happy peeps.",
+              serverInformation:"",
               listOfThreads: [],
               members: [action.payload.username],
             },
@@ -191,6 +190,7 @@ const socketReducer = (state = initialState, action) => {
               username: parsedData.user_id,
             };
           case "send_message":
+            console.log(parsedData);
             /* add the new msg object to the right dm object */
             const index = getChatIndex(state.listOfDms, parsedData.chat_id);
             return {
@@ -201,6 +201,7 @@ const socketReducer = (state = initialState, action) => {
                 state.listOfDms[index].messages.push({
                   message: parsedData.message,
                   username: parsedData.user_id,
+                  timestamp: parsedData.timestamp,
                 }),
               ],
             };
@@ -268,6 +269,7 @@ const socketReducer = (state = initialState, action) => {
 
       if (index !== -1) {
         const msgObject = action.payload;
+
         state.socket.send(JSON.stringify(msgObject));
 
         /* update listOfDms in state */
@@ -275,6 +277,7 @@ const socketReducer = (state = initialState, action) => {
         updateListOfDms[index].messages.push({
           message: msgObject.message,
           username: msgObject.user_id,
+          timestamp: msgObject.timestamp,
         });
 
         return {

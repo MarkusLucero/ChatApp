@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
  */
 const ServerInformation = ({ focusedPage }) => {
 
-  const serverDescription = useSelector(state => state.socketState.server.serverInformation)
+  //const serverDescription = useSelector(state => state.socketState.server.serverInformation)
 
   return (
     <div className="flex flex-col ml-2">
@@ -20,7 +20,7 @@ const ServerInformation = ({ focusedPage }) => {
         Beskrivning
       </div>
       <div id="serverInformation" className="text-white">
-        {serverDescription}
+        This is the global server that everyone joins. Make threads, comment and be happy peeps.
       </div>
     </div>
   );

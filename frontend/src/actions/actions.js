@@ -56,7 +56,7 @@ export function sendMessage(data) {
       chat_id: data.chatID,
       user_id: data.username,
       message: data.message,
-      timestamp: null,
+      timestamp: data.timestamp,
     },
   };
 }
