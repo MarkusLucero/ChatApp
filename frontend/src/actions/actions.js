@@ -22,6 +22,30 @@ const ADD_THREADS = "ADD_THREADS";
 const ADD_COMMENT = "ADD_COMMENT";
 const ADD_REPLY = "ADD_REPLY";
 const RESET_LAST_SEEN = "RESET_LAST_SEEN";
+const UPVOTE = "UPVOTE";
+const DOWNVOTE = "DOWNVOTE"
+
+
+export function upVote(data){
+  return{
+    type: UPVOTE,
+    payload: {
+      action:"upvote",
+      thread_id: data.thread_id,
+      index: data.index,
+    }
+  }
+}
+export function downVote(data){
+  return{
+    type: DOWNVOTE,
+    payload: {
+      action:"downvote",
+      thread_id: data.thread_id,
+      index: data.index,
+    }
+  }
+}
 
 
 export function sendMessage(data) {

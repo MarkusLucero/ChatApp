@@ -83,17 +83,23 @@ const socketReducer = (state = initialState, action) => {
       state.socket.send(JSON.stringify(action.payload));
       console.log(state.socket);
       return state;
+    case "UPVOTE":
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
+    case "DOWNVOTE":
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
-    
-    case "ADD_THREADS": 
-    return{
-      ...state,
-      server: {
-        ... state.server, 
-        listOfThreads: action.payload.threads     
-        }
+
+    case "ADD_THREADS":
+      return {
+        ...state,
+        server: {
+          ...state.server,
+          listOfThreads: action.payload.threads,
+        },
       };
     case "ADDFRIEND":
       return {
@@ -151,6 +157,10 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+          case "upvote":
+            return;
+          case "downvote":
+            return;
           case "insert_comment":
             let iT = getThreadIndex(
               parsedData.thread_id,
@@ -160,13 +170,14 @@ const socketReducer = (state = initialState, action) => {
             threads[iT].comments.push({
               user_id: parsedData.username,
               comment: parsedData.comment,
+              rating: 0,
               reply: parsedData.reply,
             });
             return {
               ...state,
               server: {
                 ...state.server,
-                listOfThreads: threads             
+                listOfThreads: threads,
               },
             };
           case "init_login":

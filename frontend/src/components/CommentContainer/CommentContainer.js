@@ -52,6 +52,7 @@ const CommentContainer = ({ thread }) => {
             thread_id: thread.id,
             index: commentCounter.toString(),
             reply_index: "",
+            rating: "0",
             username: poster,
             comment: comment,
           })
@@ -75,6 +76,7 @@ const CommentContainer = ({ thread }) => {
           thread_id: thread.id,
           index: commentCounter.toString(),
           reply_index: index.toString(),
+          rating: "0",
           username: poster,
           comment: reply,
         })

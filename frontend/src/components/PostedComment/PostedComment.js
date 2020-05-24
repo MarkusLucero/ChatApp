@@ -20,7 +20,7 @@ const PostedComment = ({
           <div className=" w-full " key={index}>
             <span className=" inline-flex float-left">
               <div className="mr-4">
-                <Upvote comment={comment} ></Upvote>
+                <Upvote comment={comment} index={index}></Upvote>
               </div>
               <img
                 className="rounded-full w-12 h-auto  mb-4 mr-4 float-left"
