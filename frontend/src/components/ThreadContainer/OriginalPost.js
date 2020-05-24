@@ -10,7 +10,7 @@ const OriginalPost = ({ thread, resetFocusedThread }) => {
 
   console.log(thread);
   return (
-      <div onClick={resetFocusedThread} className="rounded border-2 border-solid border-black w-full p-2 mt-2 flex flex-col shadow-inner shadow-lg bg-gray-700">
+      <div onClick={resetFocusedThread} style={{ backgroundColor: "#2C2F33" }} className="w-full p-2 mt-3 flex flex-col shadow-inner shadow-lg">
         <div className="flex flex-row justify-between">
           <div className=" text-3xl text-white pl-2 w-auto">
             {thread.rootPost.rootHeader}
