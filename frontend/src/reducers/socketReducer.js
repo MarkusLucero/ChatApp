@@ -145,7 +145,7 @@ const socketReducer = (state = initialState, action) => {
             /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
             server: {
               serverName: "0",
-              serverInformation:"",
+              serverInformation: "",
               listOfThreads: [],
               members: [action.payload.username],
             },
@@ -156,10 +156,51 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
-          case "upvote":
-            return;
-          case "downvote":
-            return;
+          case "upvote": {
+            let iT = getThreadIndex(
+              parsedData.thread_id,
+              state.server.listOfThreads
+            );
+            const threads = state.server.listOfThreads;
+            return {
+              ...state,
+              server: {
+                ...state.server,
+                listOfThreads: [
+                  ...state.server.listOfThreads.threads[iT],
+                  {
+                    comments: {
+                      ...state.server.listOfThreads.threads[iT].comments,
+                      rating: parsedData.rating,
+                    },
+                  },
+                ],
+              },
+            };
+          }
+          /* needs threadId, comment index and new rating */
+          case "downvote": {
+            let iT = getThreadIndex(
+              parsedData.thread_id,
+              state.server.listOfThreads
+            );
+            const threads = state.server.listOfThreads;
+            return {
+              ...state,
+              server: {
+                ...state.server,
+                listOfThreads: [
+                  ...state.server.listOfThreads.threads[iT],
+                  {
+                    comments: {
+                      ...state.server.listOfThreads.threads[iT].comments,
+                      rating: parsedData.rating,
+                    },
+                  },
+                ],
+              },
+            };
+          }
           case "insert_comment":
             let iT = getThreadIndex(
               parsedData.thread_id,
