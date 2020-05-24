@@ -77,6 +77,7 @@ login_user(Username, Magic_token, PID) ->
 %% @returns ok For every message.
 send_message(From_Username, Chat_ID, Message, Timestamp, PID) ->
     chat_members(Chat_ID),
+    io:format("Timestamp on message: ~s~n", [Timestamp]),
     chat_server ! {send_message, From_Username, Chat_ID, Message, Timestamp, PID},
     database_api:insert_chat(From_Username, Chat_ID, {Timestamp, Message}, 1),
     ok.
@@ -273,6 +274,7 @@ loop(Connection_map) ->
                                       {"user_id", From_Username},
                                       {"message", Message},
                                       {"timestamp", Timestamp}]}),
+            io:format("Message being sent: ~p~n", [JSON_Message]),
             case database_api:fetch_chat_members(Chat_ID) of
                 {error, _} -> io:format("FAILED TO FIND CHAT MEMBERS: ~s~n", [Chat_ID]), loop(Connection_map);
                 Members -> 
