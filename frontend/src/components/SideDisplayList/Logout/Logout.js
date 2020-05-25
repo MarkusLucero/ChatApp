@@ -3,8 +3,7 @@ import * as actions from "../../../actions/actions";
 import { useDispatch, useSelector } from "react-redux";
 import logout from "../../../img/logout.svg";
 import LogoutMonad from "./LogoutMonad";
-
-
+import ReactTooltip from "react-tooltip";
 const axios = require("axios");
 
 /**
@@ -56,17 +55,19 @@ const Logout = () => {
   React.useEffect(() => {
     if (logoutSuccess === true) {
       dispatch(actions.logOut()); /* Reset socketState */
-      dispatch(actions.resetLoginState()) /* Reset loginState  -- this will trigger redirect to login page! */
-      console.log("Successfuly logged out!")
+      dispatch(
+        actions.resetLoginState()
+      ); /* Reset loginState  -- this will trigger redirect to login page! */
+      console.log("Successfuly logged out!");
     }
   }, [logoutSuccess, dispatch]);
 
   return (
-    <div
-      className="text-white cursor-pointer flex flex-row justify-center  mb-2"
-    >
+    <div className="text-white cursor-pointer flex flex-row justify-center  mb-2">
       <img
         alt={logout}
+        data-tip
+        data-for="logoutUser"
         src={logout}
         onMouseEnter={() => {
           setHovered(!hovered);
@@ -76,17 +77,33 @@ const Logout = () => {
         }}
         className={
           hovered
-            ? "plusIcon-custom-hover h-10 w-10 cursor-pointer"
-            : "h-10 w-10 cursor-pointer"
+            ? "plusIcon-custom-hover h-8 w-8 cursor-pointer"
+            : "h-8 w-8 cursor-pointer"
         }
-        onClick={()=>{setLogoutMonad(true)}}
+        onClick={() => {
+          setLogoutMonad(true);
+        }}
+        alt="logout button"
       />
-      {logoutMonad? (
-         <div className="addFriend-custom-overlay">
-          <LogoutMonad logoutHandler={logoutHandler} setLogoutMonad={setLogoutMonad} username={username} magicToken={magicToken} setLogoutSuccess={setLogoutSuccess}/>
+      <ReactTooltip
+        id="logoutUser"
+        place="right"
+        effect="solid"
+        backgroundColor="black"
+      >
+        Logout
+      </ReactTooltip>
+      {logoutMonad ? (
+        <div className="addFriend-custom-overlay">
+          <LogoutMonad
+            logoutHandler={logoutHandler}
+            setLogoutMonad={setLogoutMonad}
+            username={username}
+            magicToken={magicToken}
+            setLogoutSuccess={setLogoutSuccess}
+          />
         </div>
-      ): null}
-
+      ) : null}
     </div>
   );
 };

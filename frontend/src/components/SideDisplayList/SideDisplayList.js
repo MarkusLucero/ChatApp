@@ -1,6 +1,9 @@
 import React from "react";
 import Logout from "./Logout/Logout.js";
 import Server from "./Server";
+import homeButton from "../../img/home.svg";
+import homeButtonHover from "../../img/homeHover.svg";
+import ReactTooltip from "react-tooltip";
 
 /**
  * SideDisplayList holds all components in the side display - servers, add server, profile
@@ -17,19 +20,37 @@ const SideDisplayList = ({
   resetFocusedThread,
   setThreadLock,
 }) => {
+  const [hovered, setHovered] = React.useState(false);
   return (
     <div style={{ backgroundColor: "#23272A" }}>
       <div className="flex flex-col h-full">
-        <div className="border-solid border-b-2 border-gray-800 h-20">
-          <h1
-            id="Home"
-            className="cursor-pointer rounded-full h-16 w-16 mb-2 mt-2 input-box-custom-bg text-white hover:bg-gray-500 flex items-center justify-center"
-            onClick={handleFocusedPage}
+        <div className="border-solid border-b-2 border-gray-800 h-20 flex flex-row justify-center">
+          <ReactTooltip
+            id="goToHome"
+            place="right"
+            effect="solid"
+            backgroundColor="black"
           >
-            HOME
-          </h1>
+            Home Screen
+          </ReactTooltip>
+          <img
+            data-tip
+            data-for="goToHome"
+            onMouseEnter={() => {
+              setHovered(!hovered);
+            }}
+            onMouseLeave={() => {
+              setHovered(!hovered);
+            }}
+            id="Home"
+            src={hovered ? homeButtonHover : homeButton}
+            className="cursor-pointer h-12 w-12 pt-2 mt-2 text-center"
+            onClick={handleFocusedPage}
+            alt="home button"
+          />
         </div>
         <div className=" h-auto">
+
           <div className="flex flex-col justify-between">
             <Server
               server={server}
