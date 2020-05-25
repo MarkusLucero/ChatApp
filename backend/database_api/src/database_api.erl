@@ -15,17 +15,18 @@ get_timestamp() ->
 -spec start() -> ok.
 
 start() ->
-    DB = erl_to_sql:init("PostgreSQL test", "adrenaline", "1234"),
+    %%  DB = erl_to_sql:init("PostgreSQL test", "adrenaline", "1234"),
     %%  io:format("database:start() -> DB = ~p~n", [DB]),
-    register(database, DB),
+    %%  register(database, DB),
+    odbc:start(),
+    erl_to_sql:start_link(),
     ok.
 
 %% @doc stop connection with database then terminates.
 -spec stop() -> ok.
 
 stop() ->
-    database ! stop,
-    ok.
+    erl_to_sql:stop().
 
 %% @doc Store information about a user in the database. 
 %% @param Username The users ID.
@@ -38,9 +39,7 @@ stop() ->
       TimeStamp::list().
 
 insert_user(Username, Password, _TimeStamp) ->
-    database ! {insert_user,Username, Password, get_timestamp(), self()},
-
-    receive
+    case erl_to_sql:insert_user(Username, Password, get_timestamp()) of
         ok ->
             ok;
         {error, user_exist} ->
@@ -59,8 +58,7 @@ insert_user(Username, Password, _TimeStamp) ->
       Friend::list().
 
 insert_friend(Username, Friend) ->
-    database ! {insert_friend,Username, Friend, self()},
-    receive
+    case erl_to_sql:insert_friend(Username, Friend) of
         ok ->
             ok;
         {error, Reason} ->
@@ -84,8 +82,7 @@ insert_friend(Username, Friend) ->
       Status::term().
 
 create_chat(Chat_Name, Creator, Members) ->
-    database ! {create_chat, Chat_Name, Creator, Members, self()},
-    receive
+    case erl_to_sql:create_chat(Chat_Name, Creator, Members) of
         {ok, Chat_ID} ->
             Chat_ID;
         {error, Reason} ->
@@ -109,8 +106,7 @@ create_chat(Chat_Name, Creator, Members) ->
       Status::term().
 
 insert_chat(From_Username, Chat_ID, {_TimeStamp, Msg}, Status) ->
-    database ! {insert_chat, From_Username, Chat_ID, {get_timestamp(), Msg}, Status, self()},
-    receive
+    case erl_to_sql:insert_chat(From_Username, Chat_ID, {get_timestamp(), Msg}, Status) of
         ok ->
             ok;
         {error, Reason} ->
@@ -126,9 +122,8 @@ insert_chat(From_Username, Chat_ID, {_TimeStamp, Msg}, Status) ->
       TimeStamp::list().
 
 fetch_user(Username) ->
-    database ! {fetch_user,Username, self()},
     io:format("~p~n", [Username]),
-    receive
+    case erl_to_sql:fetch_user(Username) of
         {error, no_user} ->
             {error, "Username not found in database."};
         {Username, Password, TimeStamp} ->
@@ -145,9 +140,7 @@ fetch_user(Username) ->
       Friends::term().
 
 fetch_friendlist(Username) ->
-    database ! {fetch_friendlist, Username, self()},
-
-    receive
+    case erl_to_sql:fetch_friendlist(Username) of
         {error, no_user} ->
             {error, "No user id exists for that username"};
         {error, no_friendlist} ->
@@ -166,9 +159,7 @@ fetch_friendlist(Username) ->
       Chat_Data::term().
 
 fetch_chat(Chat_ID) ->
-    database ! {fetch_chat, Chat_ID, self()},
-
-    receive
+    case erl_to_sql:fetch_chat(Chat_ID) of
         {error, _} ->
             {error, "Chat_ID not found in database."};
 
@@ -183,9 +174,7 @@ fetch_chat(Chat_ID) ->
 %% @param Chat_ID The chat ID..
 %% @returns [{"member1", "member2",..}] if fetch from database was successfull, {error, Reason} if not.
 fetch_chat_members(Chat_ID) ->
-    database ! {fetch_chat_members, Chat_ID, self()},
-
-    receive
+    case erl_to_sql:fetch_chat_members(Chat_ID) of
         {_,_, Members} ->
             Members;
         {error, _} ->
@@ -198,8 +187,7 @@ fetch_chat_members(Chat_ID) ->
 %% @param Chat_ID The chat ID.
 %% @returns [{Sender, Msg, Status}] if fetch from database was successfull, {error, Reason} if not.
 fetch_chat_undelivered(Chat_ID) ->
-    database ! {fetch_chat_undelivered, Chat_ID, self()},
-    receive
+    case erl_to_sql:fetch_chat_undelivered(Chat_ID) of
         {_,_,Content} ->
 	    Content;
         {error, no_chat} ->
@@ -212,9 +200,7 @@ fetch_chat_undelivered(Chat_ID) ->
 %% @param Username The username to fetch chats from.
 %% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Status}]}] if fetch from database was successfull, [] (empty list) if not.
 fetch_all_chats(Username) ->
-    database ! {fetch_all_chats, Username, self()},
-
-    receive
+    case erl_to_sql:fetch_all_chats(Username) of
         {error, _} ->
             [];
 
@@ -242,9 +228,7 @@ fetch_all_chats(Username) ->
       Thread_ID::term().
 
 create_thread(Username, Server, Header, Text) ->
-    database ! {create_thread, Username, Server, Header, Text, get_timestamp(), self()},
-
-    receive
+    case erl_to_sql:create_thread(Username, Server, Header, Text, get_timestamp()) of
         {error, Reason} ->
             {error, Reason};
         {ok, Thread_ID} ->
@@ -266,8 +250,7 @@ create_thread(Username, Server, Header, Text) ->
       Text::list().
 
 fetch_thread(Thread_ID) ->
-    database ! {fetch_thread, Thread_ID, self()},
-    receive
+    case erl_to_sql:fetch_thread(Thread_ID) of
         {error, Reason} ->
             {error, Reason};
         {ok, {Server, Creator, Header, Text, Timestamp, null}} ->
@@ -283,8 +266,7 @@ fetch_thread(Thread_ID) ->
 -spec fetch_thread_IDs() -> list(list()).
 
 fetch_thread_IDs() ->
-    database ! {fetch_thread_IDs, self()},
-    receive
+    case erl_to_sql:fetch_thread_IDs() of
         {error, Reason} ->
             {error, Reason};
         {ok, ThreadList} ->
@@ -309,8 +291,7 @@ fetch_thread_IDs() ->
       Comment::term().
 
 insert_comment(Thread_ID, Index, Reply_Index, Username, Text) ->
-    database ! {insert_comment, Thread_ID, Index, Reply_Index, Username, Text, get_timestamp(), self()},
-    receive
+    case erl_to_sql:insert_comment(Thread_ID, Index, Reply_Index, Username, Text, get_timestamp()) of
         {error, Reason} ->
             {error, Reason};
         {ok, Comment_ID} ->
@@ -332,12 +313,11 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Text) ->
 %% called automatically by database_api:test()
 
 start_test_() ->
-    odbc:start(),
     [?_assertEqual(start(), ok)
     ].
 
 insert_user_test() ->
-    database ! reset_tests,
+    erl_to_sql:reset_tests(),
     %% This will produce a badmatch error if left hand side (ok) dont match with the right hand side (return value of insert_user). i.e this test will fail if they dont match. 
     ok = insert_user("testuser1", "testpassword1","2020-10-19 01:00:00"),
     ok = insert_user("testfriend1", "testpassword1","2020-10-19 01:00:00"),
@@ -355,13 +335,11 @@ create_chat_test() ->
     _ = create_chat("skolchatten","testuser1", ["testuser1"]).
 
 insert_chat_test() ->
-    database ! {get_group_id,"festchatten", self()},
-    receive
+    case erl_to_sql:get_group_id("festchatten") of
         Group_ID1 ->
             ok = insert_chat("testuser1", Group_ID1,{"2020-10-19 01:00:00", "test message1!!!"}, 1)
     end,
-    database ! {get_group_id, "skolchatten", self()},
-    receive
+    case erl_to_sql:get_group_id("skolchatten") of
         Group_ID2 ->
             ok = insert_chat("testfriend1", Group_ID2,{"2020-10-19 01:00:05", "test message2!!!"}, 0)
     end.
@@ -374,16 +352,14 @@ fetch_user_test() ->
     {error, _} = fetch_user("Invalid username").
 
 fetch_chat_test() ->
-    database ! {get_group_id,"festchatten", self()},
-    receive
+    case erl_to_sql:get_group_id("festchatten") of
         Group_ID1 ->
             {_, "festchatten", [{Sender1, Msg1, Status1}]} = fetch_chat(Group_ID1),         
             "testuser1" = Sender1,
             "test message1!!!" = Msg1,
             1 = Status1
     end,
-    database ! {get_group_id, "skolchatten", self()},
-    receive
+    case erl_to_sql:get_group_id("skolchatten") of
         Group_ID2 ->
 	    {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
             "testfriend1" = Sender2,
@@ -396,8 +372,7 @@ fetch_chat_test() ->
 
 
 fetch_chat_members_test() ->
-    database ! {get_group_id,"festchatten", self()},
-    receive
+    case erl_to_sql:get_group_id("festchatten") of
         Group_ID ->
             [{"testuser1"}, {"testfriend1"}] = fetch_chat_members(Group_ID)
     end,
@@ -440,11 +415,11 @@ insert_comment_test() ->
 
 
 stop_test_() ->
-    %% database ! reset_tests,
-    %% database ! {remove_user, "testuser1"},
-    %% database ! {remove_user, "testfriend1"},
-    %% database ! {remove_table, "chat_id_1"},
-    %% database ! {remove_friendlist, "testuser1"}, 
+    %% erl_to_sql:reset_tests(),
+    %% erl_to_sql:remove_user("testuser1"),
+    %% erl_to_sql:remove_user("testfriend1"),
+    %% erl_to_sql:remove_table("chat_id_1"),
+    %% erl_to_sql:remove_friendlist("testuser1"), 
     timer:sleep(1000),
     [?_assertEqual(stop(), ok)
     ].
