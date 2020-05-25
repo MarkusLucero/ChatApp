@@ -85,7 +85,11 @@ const ChatContainer = ({ focusedChat }) => {
     const today = new Date(); 
     const month = today.getMonth() + 1 ; //January is 0, need to add 1 
     const hours = today.getHours() - 2; //convert to UTC
-    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+hours.toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
+    var minutes = today.getMinutes(); 
+    if(minutes < 10 ){
+      minutes = "0" + minutes.toString();
+    }else{minutes = minutes.toString();}
+    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+hours.toString()+":"+minutes+":"+today.getSeconds().toString();   
     event.preventDefault();
     setMessages([...messages, { message: newMessage, username: myUsername, timestamp: timestamp }]);
     dispatch(

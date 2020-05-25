@@ -10,7 +10,7 @@ const Message = ({ message }) => {
   const date = new Date(); 
   const month = date.getMonth() +1; 
   const timestamp = date.getFullYear().toString()+"-"+month.toString()+"-"+date.getDate().toString();
-  const timestampTime = message.timestamp.split(' ')[1].slice(0,4); 
+  const timestampTime = message.timestamp.split(' ')[1].slice(0,5); 
   const timestampDate = message.timestamp.split(' ')[0];
   const stampWithoutSec = message.timestamp.slice(0,15);
 
