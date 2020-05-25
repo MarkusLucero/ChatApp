@@ -63,7 +63,8 @@
 }
 
 .plusIcon-custom-hover {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(39%) saturate(304%) hue-rotate(291deg) brightness(98%) contrast(106%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(39%) saturate(304%)
+    hue-rotate(291deg) brightness(98%) contrast(106%);
 }
 /* Chat Container */
 textarea {
@@ -97,19 +98,17 @@ textarea {
 
 .commentField {
   display: flex;
-  background-color: #23272A;
+  background-color: #23272a;
   align-items: center;
   border: solid 1px #3d4953;
   border-radius: 8px;
   max-width: 100%;
   min-width: 100%;
   padding: 12px;
-
 }
 .commentContainerBg {
   background: #1d252c;
   border-radius: 10px;
-
 }
 .break {
   flex-basis: 100%;
@@ -117,7 +116,7 @@ textarea {
 }
 
 .quote {
-  display:flex;
+  display: flex;
   flex-wrap: wrap;
   margin-left: 30px;
   margin-top: 15px;
@@ -126,4 +125,52 @@ textarea {
   width: 70%;
   border-radius: 8px;
   border-width: 1px;
+}
+
+.login-bg {
+  background: url(../background_night.png) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.nav {
+  background-color: #010114;
+  position: fixed;
+  width: 100%;
+}
+.nav-button {
+  margin-bottom: 50em;
+  margin-left: 90em;
+  float: right;
+}
+a:checked {
+  background: red;
+}
+
+@keyframes slidein-left {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slidein-right {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+h1 {
+  animation: 3s slidein-right;
+}
+
+h2 {
+  animation: 3s slidein-left;
 }

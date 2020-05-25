@@ -11179,6 +11179,27 @@ textarea {
   border-width: 1px;
 }
 
+.login-bg{
+  background: url(../background_night.png) no-repeat center center fixed;
+  background-size: cover;
+}
+
+.nav {
+  background-color: #010114;
+  position: fixed;
+  width: 100%;
+}
+
+.nav-button {
+  margin-bottom: 50em;
+  margin-left: 90em;
+  float: right;
+}
+
+a:checked {
+  background: red;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;
