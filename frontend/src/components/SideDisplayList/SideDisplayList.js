@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Logout from "./Logout/Logout.js";
 import Server from "./Server";
 import homeButton from "../../img/home.svg";
