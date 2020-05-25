@@ -57,6 +57,12 @@ loop(Ref) ->
         {insert_comment, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From} ->
             insert_comment(Ref, Thread_ID, Parent_ID, Reply_ID, Username, Text, Timestamp, From);
 
+	{upvote, Thread_ID, Index, From} ->
+            upvote(Ref, Thread_ID, Index, From);
+
+	{downvote, Thread_ID, Index, From} ->
+            downvote(Ref, Thread_ID, Index, From);
+
         stop ->
             odbc:disconnect(Ref),
             odbc:stop(),
@@ -73,6 +79,7 @@ loop(Ref) ->
             odbc:sql_query(Ref, "DELETE FROM friendlist * WHERE username = 'testfriend1';"),
             odbc:sql_query(Ref, "DELETE FROM commentlist * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM commentlist * WHERE username = 'testfriend1';"),
+	    odbc:sql_query(Ref, "DELETE FROM threadlist * WHERE server_id = 0;"),
             odbc:sql_query(Ref, "DELETE FROM thread * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testuser1';"),
             odbc:sql_query(Ref, "DELETE FROM users * WHERE username = 'testfriend1';");
@@ -272,9 +279,9 @@ insert_comment(Ref, Thread_ID, Index, Reply_Index, Username, Text, Timestamp, Fr
 
     Status = case Reply_Index of
 		 "" ->
-		     (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');"));
+		    (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, text, timestamp, rating) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "', 0);"));
 		 _ ->
-		     (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, reply_index, text, timestamp) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", " ++ Reply_Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "');"))
+		     (catch odbc:sql_query(Ref, "INSERT INTO commentlist (thread_id, user_id, username, index, reply_index, text, timestamp, rating) VALUES (" ++ Thread_ID ++ ", " ++ User_ID ++ ", '" ++ Username ++ "', " ++ Index ++ ", " ++ Reply_Index ++ ", '" ++ Text ++ "', '" ++ Timestamp ++ "', 0);"))
 	     end,
 
     case Status of
@@ -287,7 +294,19 @@ insert_comment(Ref, Thread_ID, Index, Reply_Index, Username, Text, Timestamp, Fr
     end,
     loop(Ref).
 
+upvote(Ref, Thread_ID, Index, From) ->
+    catch odbc:sql_query(Ref, "UPDATE commentlist SET rating = rating + 1
+WHERE (thread_id = " ++ Thread_ID ++ " AND index = " ++ Index ++ ");"),
+    
+    {selected, _, [{Rating}]} = (catch odbc:sql_query(Ref, "SELECT rating FROM commentlist WHERE (thread_id = " ++ Thread_ID ++ " AND index = " ++ Index ++ ");")),
+     From ! {ok, Rating}.
 
+downvote(Ref, Thread_ID, Index, From) ->
+    catch odbc:sql_query(Ref, "UPDATE commentlist SET rating = rating - 1
+WHERE (thread_id = " ++ Thread_ID ++ " AND index = " ++ Index ++ ");"),
+    
+    {selected, _, [{Rating}]} = (catch odbc:sql_query(Ref, "SELECT rating FROM commentlist WHERE (thread_id = " ++ Thread_ID ++ " AND index = " ++ Index ++ ");")),
+     From ! {ok, Rating}.
 
 
 
@@ -336,7 +355,7 @@ fetch_all_chats_helper([{Chat_ID}|Tail], All_Chats, Ref) ->
 
 
 fetch_comment(Ref, Comment_ID) ->
-    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp FROM commentlist WHERE commentlist_id = " ++ Comment_ID ++ ";")),
+    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp, rating FROM commentlist WHERE commentlist_id = " ++ Comment_ID ++ ";")),
 
     case Status of
 	{selected, _, []} ->
@@ -349,7 +368,7 @@ fetch_comment(Ref, Comment_ID) ->
     end.
 
 fetch_all_comments(Ref, Thread_ID) ->
-    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp FROM commentlist WHERE thread_id = '" ++ Thread_ID ++ "';")),
+    Status = (catch odbc:sql_query(Ref, "SELECT commentlist_id, thread_id, index, reply_index, username, text, timestamp, rating FROM commentlist WHERE thread_id = '" ++ Thread_ID ++ "';")),
 
     case Status of
 	{selected, _, []} ->
@@ -370,13 +389,13 @@ stringify_timestamp({Date,Time}) ->
     integer_to_list(Year) ++ "-" ++ integer_to_list(Month) ++ "-" ++ integer_to_list(Day) ++ " " ++ integer_to_list(Hour) ++ ":" ++ integer_to_list(Minute) ++ ":" ++ integer_to_list(Second).
 
 
-refactor_comment(Ref, {_Comment_ID, Thread_ID, _Index, Reply_Index, Username, Text, _Timestamp}) ->    
+refactor_comment(Ref, {_Comment_ID, Thread_ID, _Index, Reply_Index, Username, Text, _Timestamp, Rating}) ->    
     case Reply_Index of
 	null ->
-	    {Thread_ID, Username, Text, {"", ""}};
+	    {Thread_ID, Username, Text, Rating, {"", ""}};
 	_ ->
 	    {selected, _, [{Reply_User, Reply_Text}]} = (catch odbc:sql_query(Ref, "SELECT username, text FROM commentlist WHERE (thread_id = " ++ Thread_ID ++ " AND index =  " ++ Reply_Index ++ ");")),
-	    {Thread_ID, Username, Text, {Reply_User, Reply_Text}}
+	    {Thread_ID, Username, Text, Rating, {Reply_User, Reply_Text}}
     end.
 
 
