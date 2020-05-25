@@ -249,8 +249,10 @@ loop(Connection_map) ->
                     io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
                     %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
+                    Members = fun(ID) -> [Tuple] = database_api:fetch_chat_members(ID), tuple_to_list(Tuple),
                     List_of_DMs = [{struct, [{"chatName", Chat_Name}, 
                                              {"chatID", Chat_ID},
+                                             {"members", {array, Members(Chat_ID)}},
                                              {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
                                             ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
                     io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
