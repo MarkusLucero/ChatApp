@@ -11,14 +11,10 @@ get_timestamp() ->
     {{Year, Month, Day}, {Hour, Minute, Second}} = calendar:universal_time(),
     lists:flatten(io_lib:format("~p-~p-~p ~p:~p:~p", [Year, Month, Day, Hour, Minute, Second])).
 
-%% @doc Initilize odbc connection and logs in to database.
--spec start() -> ok.
-
 start() ->
     %%  DB = erl_to_sql:init("PostgreSQL test", "adrenaline", "1234"),
     %%  io:format("database:start() -> DB = ~p~n", [DB]),
     %%  register(database, DB),
-    odbc:start(),
     erl_to_sql:start_link(),
     ok.
 

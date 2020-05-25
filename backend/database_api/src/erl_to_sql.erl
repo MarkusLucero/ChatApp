@@ -23,6 +23,7 @@ start_link() ->
 % called when server starts up
 init(_Args) ->
     process_flag(trap_exit, true),
+    odbc:start(),
     {ok, _DBRef} = odbc:connect("DSN="++?DSN++";UID="++?UID++";PWD="++?PWD, []).
 
 % called before server shuts down
