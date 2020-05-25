@@ -88,10 +88,32 @@ const Login = () => {
       style={{
         backgroundImage: "url(" + require("../../background_night.png") + ")",
       }}
-      className="flex items-center justify-center h-screen bg-scroll"
+      className="flex items-center justify-center h-screen bg-scroll "
     >
+      <ul className="flex justify-center mr-24">
+        <li className="mr-6">
+          <a className="text-blue-500 hover:text-blue-800" href="#">
+            Active
+          </a>
+        </li>
+        <li className="mr-6">
+          <a className="text-blue-500 hover:text-blue-800" href="#">
+            Link
+          </a>
+        </li>
+        <li className="mr-6">
+          <a className="text-blue-500 hover:text-blue-800" href="#">
+            Link
+          </a>
+        </li>
+        <li className="mr-6">
+          <a className="text-gray-400 cursor-not-allowed" href="#">
+            Disabled
+          </a>
+        </li>
+      </ul>
       <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+        className="bg-gray-400 shadow-md rounded px-8 pt-6 pb-8 mb-4 "
         onSubmit={formik.handleSubmit}
       >
         <p className=" justify-center">Welcome!</p>
