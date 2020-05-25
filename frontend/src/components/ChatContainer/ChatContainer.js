@@ -58,10 +58,8 @@ const ChatContainer = ({ focusedChat }) => {
    * @return {array} array containing the list of message objects from the corresponding DM object
    */
   const rightChat = (list) => {
-    console.log(list);
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
-        console.log(chat);
         return chat;
       }
     }
@@ -79,7 +77,8 @@ const ChatContainer = ({ focusedChat }) => {
   const sendMessage = (event) => {
     const today = new Date(); 
     const month = today.getMonth() + 1 ; //January is 0, need to add 1 
-    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+today.getHours().toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
+    const hours = today.getHours() - 2; //convert to UTC
+    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+hours.toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
     event.preventDefault();
     setMessages([...messages, { message: newMessage, username: myUsername, timestamp: timestamp }]);
     dispatch(
@@ -106,10 +105,8 @@ const ChatContainer = ({ focusedChat }) => {
   React.useEffect(() => {
     if (listOfDms !== null && searching === false) {
       const chat =rightChat(listOfDms);
-      console.log(chat);
       setMessages(chat.messages);
       setChatName(chat.chatName);
-      console.log(chat.chatName);
     }
   }, [focusedChat, listOfDms, searching]);
 

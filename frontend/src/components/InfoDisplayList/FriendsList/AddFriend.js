@@ -69,7 +69,7 @@ const AddFriend = ({
   const monad = useRef();
   /*Handle click outside createThread modal */
   const handleClick = (e) => {
-    if (show == true) {
+    if (show === true) {
       if (monad.current.contains(e.target)) {
         // inside click
         return;

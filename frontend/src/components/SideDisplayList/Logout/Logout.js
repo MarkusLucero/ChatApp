@@ -69,6 +69,7 @@ const Logout = () => {
       className="text-white cursor-pointer flex flex-row justify-center  mb-2"
     >
       <img
+        alt={logout}
         src={logout}
         onMouseEnter={() => {
           setHovered(!hovered);

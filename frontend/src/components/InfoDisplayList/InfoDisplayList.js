@@ -1,5 +1,5 @@
 import React  from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import InformationHeader from './InformationHeader/InformationHeader';
 import FriendsList from './FriendsList/FriendsList';
 import ServerInformation from './InformationHeader/ServerInformation';

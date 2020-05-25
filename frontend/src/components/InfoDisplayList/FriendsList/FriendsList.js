@@ -57,10 +57,10 @@ const FriendsList = ({ myUsername, setFocusedChat}) => {
   const [newChat, setNewChat] = useState(false);
 
   React.useEffect(()=>{
-    if(currentChats !=null && currentChats !=[]){
+    if(currentChats !=null && currentChats !==[]){
       let difference = currentChats.filter(x => !allChats.includes(x));
       setAllChats(currentChats);
-      if(newChat && difference.length != 0 && allChats != []){
+      if(newChat && difference.length !== 0 && allChats !== []){
         setFocusedChat(difference[0].chatID);
         setNewChat(false);
       }
