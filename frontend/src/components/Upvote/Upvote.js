@@ -47,14 +47,14 @@ const Upvote = ({ comment, index }) => {
       <img
         alt=""
         src={Up}
-        className="h-4 w-4"
+        className="cursor-pointer h-4 w-4"
         onClick={() => {
           setVoteUp(!voteUp);
           setInFlight(true);
           setVoteDown(false);
         }}
       ></img>
-      <div className="ml-1">
+      <div className="cursor-default ml-1">
         {voteUp ? votes + 1 : ""}
         {voteDown ? votes - 1 : ""}
         {voteUp || voteDown ? "" : votes}
@@ -62,7 +62,7 @@ const Upvote = ({ comment, index }) => {
       <img
         alt=""
         src={Down}
-        className="h-4 w-4"
+        className="cursor-pointer h-4 w-4"
         onClick={() => {
           setVoteDown(!voteDown);
           setInFlight(true);

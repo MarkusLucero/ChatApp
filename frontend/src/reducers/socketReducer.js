@@ -210,7 +210,7 @@ const socketReducer = (state = initialState, action) => {
             threads[iT].comments.push({
               user_id: parsedData.username,
               comment: parsedData.comment,
-              rating: 0,
+              rating: parsedData.rating,
               reply: parsedData.reply,
             });
             return {

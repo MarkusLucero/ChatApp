@@ -22,6 +22,7 @@ const PostedComment = ({
               <div className="mr-4">
                 <Upvote comment={comment} index={index}></Upvote>
               </div>
+              {console.log(comments)};
               <img
                 className="rounded-full w-12 h-auto  mb-4 mr-4 float-left"
                 alt=""
