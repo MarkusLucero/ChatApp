@@ -253,7 +253,7 @@ loop(Connection_map) ->
                     List_of_DMs = [{struct, [{"chatName", Chat_Name}, 
                                              {"chatID", Chat_ID},
                                              {"members", {array, Members(Chat_ID)}},
-                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
+                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}, {"timestamp", Tiemstamp}]} || {Src, Msg, Timestamp} <- Messages]}}
                                             ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
                     io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(

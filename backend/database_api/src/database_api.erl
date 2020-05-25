@@ -64,7 +64,7 @@ insert_friend(Username, Friend) ->
         ok ->
             ok;
         {error, Reason} ->
-	    {error, Reason};
+            {error, Reason};
         Msg ->
             io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
     end.
@@ -201,7 +201,7 @@ fetch_chat_undelivered(Chat_ID) ->
     database ! {fetch_chat_undelivered, Chat_ID, self()},
     receive
         {_,_,Content} ->
-	    Content;
+            Content;
         {error, no_chat} ->
             {error, "Chat_ID not found in database."};
         Msg ->
@@ -210,7 +210,7 @@ fetch_chat_undelivered(Chat_ID) ->
 
 %% @doc Fetch all chats and messages asociated with a user.
 %% @param Username The username to fetch chats from.
-%% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Status}]}] if fetch from database was successfull, [] (empty list) if not.
+%% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Timestamp}]}] if fetch from database was successfull, [] (empty list) if not.
 fetch_all_chats(Username) ->
     database ! {fetch_all_chats, Username, self()},
 
@@ -385,7 +385,7 @@ fetch_chat_test() ->
     database ! {get_group_id, "skolchatten", self()},
     receive
         Group_ID2 ->
-	    {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
+            {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
             "testfriend1" = Sender2,
             "test message2!!!" = Msg2,
             0 = Status2
