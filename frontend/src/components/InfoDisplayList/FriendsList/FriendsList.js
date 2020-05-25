@@ -75,8 +75,8 @@ const FriendsList = ({ myUsername, setFocusedChat}) => {
 
   const startChat = (e) => {
     //cant start a chat if there's allready one with that person 
-
-    if(!allChats.includes(e.target.id)){
+    if(!allChats.map(chat => chat.chatName === e.target.id).includes(true)){
+      console.log("creating new chat");
       const data = { chatName: e.target.id , from: myUsername, members: [myUsername, e.target.id] };
       dispatch(actions.startChat(data));
       setNewChat(true);
