@@ -498,7 +498,7 @@ upvote_and_downvote_test() ->
 
 
 stop_test_() ->
-    %%database ! reset_tests,
+    database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
     %% database ! {remove_user, "testfriend1"},
     %% database ! {remove_table, "chat_id_1"},

@@ -64,12 +64,13 @@ friend_request(Username, Friendname, Req0, Opts) ->
    end.    
 
 
-commentList2JSON({Thread_ID, Username, Comment, {Reply_User, Reply_Comment}}) ->
+commentList2JSON({Thread_ID, Username, Comment, Rating, {Reply_User, Reply_Comment}}) ->
     Reply = {struct, [{"reply_user", Reply_User},
                       {"reply_comment", Reply_Comment}]},
     {struct, [{"thread_id", Thread_ID},
               {"user_id", Username},
               {"comment", Comment},
+	      {"rating", Rating},
               {"reply", Reply}]}.
 
 request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
@@ -86,7 +87,7 @@ request_thread(Thread_ID, Magic_Token, Username, Req0, Opts) ->
                     CommentList = [commentList2JSON(Comment) || Comment <- Comments],
                     JSON_Response = {struct,[{"action", "fetch_thread"},
                                              {"server_name", Server},
-                                            {"creator", Creator},
+					     {"creator", Creator},
                                              {"header", Header},
                                              {"text", Text},
                                              {"timestamp", Timestamp},

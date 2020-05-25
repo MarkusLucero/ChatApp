@@ -70,7 +70,7 @@ index BIGINT,
 reply_index BIGINT,
 text TEXT,
 timestamp TIMESTAMP,
-rating INTEGER NOT NULL,
+rating INTEGER,
 CONSTRAINT commentlist_fk1 FOREIGN KEY (user_id) REFERENCES users(user_id),
 CONSTRAINT commentlist_fk2 FOREIGN KEY (thread_id) REFERENCES thread(thread_id));
 
