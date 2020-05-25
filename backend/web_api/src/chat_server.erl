@@ -205,10 +205,11 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 %% @returns ok
 insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
     case database_api:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) of
-        {error, _Reason} ->
+        {error, Reason} ->
+	    io:format("~n~p~n", [Reason]),
             erlang:error('Error inserting comment');
-        {Thread_ID, Username, Comment, {Reply_User, Reply_Comment}} ->
-            chat_server ! {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment},
+        {Thread_ID, Username, Comment, Rating, {Reply_User, Reply_Comment}} ->
+            chat_server ! {insert_comment, Thread_ID, Username, Comment, Rating, Reply_User, Reply_Comment},
             ok
     end.
 
@@ -397,12 +398,13 @@ loop(Connection_map) ->
                      end, Connection_map),
 
             loop(maps:filter(fun(_Username, {PID, _Token}) -> PID =/= From end, Connection_map));
-        {insert_comment, Thread_ID, Username, Comment, Reply_User, Reply_Comment} ->
+        {insert_comment, Thread_ID, Username, Comment, Rating, Reply_User, Reply_Comment} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "insert_comment"},
                                       {"thread_id", Thread_ID},
                                       {"username", Username},
                                       {"comment", Comment},
+				      {"rating", Rating},
                                       {"reply", {struct, [{"reply_user", Reply_User},
                                                           {"reply_comment", Reply_Comment}]}}
                                      ]}),
