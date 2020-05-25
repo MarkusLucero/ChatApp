@@ -8,6 +8,7 @@ async function friendRequest({
   requester,
   from,
   setErrorMsg,
+  setShow,
 }) {
 
   if (userInput !== "" && userInput !== requester && !currentFriends.includes(userInput)) {
@@ -25,6 +26,7 @@ async function friendRequest({
         case 200: {
           setAddSuccessful(true);
           setErrorMsg(false);
+          setShow(false);
           break;
         }
         case 403: {
@@ -111,6 +113,7 @@ const AddFriend = ({
               requester,
               from,
               setErrorMsg,
+              setShow,
             })
           }
         >

@@ -14,7 +14,7 @@ import InputBox from "./InputBox";
  */
 const SearchBar = ({id, value, onButtonClick, onInputChange, placeHolder}) => {
   return (
-    <div className="mt-10">
+    <div className="">
       <InputBox
         inputStyles = "w-3/4 text-white input-box-custom-bg shadow appearance-none rounded-full py-2 px-3 focus:outline-none "
         id={id}

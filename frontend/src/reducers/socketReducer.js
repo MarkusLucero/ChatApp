@@ -291,9 +291,11 @@ const socketReducer = (state = initialState, action) => {
     case "RESET_LAST_SEEN":
       /* Reset the since last seen counter to 0 */
       const i = getChatIndex(state.listOfDms, action.payload.chatID);
+      const DMs = state.listOfDms;
+      DMs[i].sinceLastSeen = 0; 
       return {
         ...state,
-        listOfDms: [...state.listOfDms, (state.listOfDms[i].sinceLastSeen = 0)],
+        listOfDms: DMs,
       };
 
     default:

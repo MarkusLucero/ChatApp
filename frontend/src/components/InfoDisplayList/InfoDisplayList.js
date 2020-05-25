@@ -24,7 +24,7 @@ const InfoDisplayList = ({handleFocusedChat, focusedPage, focusedChat, handleFoc
     return (
         <div style={{backgroundColor: "#2C2F33"}} className="p-1">
             <InformationHeader username = {username} focusedPage={focusedPage}/>
-            {focusedPage === "Home" ? <FriendsList setFocusedChat={setFocusedChat} myUsername={username} handleFocusedChat = {handleFocusedChat}/> : <ServerInformation focusedPage={focusedPage} />}
+            {focusedPage === "Home" ? <FriendsList setFocusedChat={setFocusedChat} myUsername={username}/> : <ServerInformation focusedPage={focusedPage} />}
             {focusedPage === "Home" ? <MessagesList  username = {username} focusedChat={focusedChat} handleFocusedChat = {handleFocusedChat}/> : <ThreadList handleFocusedThread={handleFocusedThread} username = {username} focusedPage={focusedPage}/> }
         </div>
     )

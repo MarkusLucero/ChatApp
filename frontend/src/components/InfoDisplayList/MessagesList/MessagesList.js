@@ -52,7 +52,7 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
   };
   /*Keep track of the modal */
   const addChatModal = useRef();
-  
+
   return (
     <div className="flex flex-col ml-2">
       <div
@@ -104,7 +104,7 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
               className="text-white text-xl hover:bg-gray-500 cursor-pointer flex flex-row justify-between"
             >
               {/* TODO FIX SAME ID BAD PRAXIS */}
-              <div id={chat.chatID}>{/*chat.members.length == 2 ? (chat.members.filter(m=> m != username)[0]) : (chat.chatName)*/ } </div>
+              <div id={chat.chatID}>{chat.chatName} </div>
               <div className="text-red-700">
                 {focusedChat === chat.chatID
                   ? ""

@@ -7,10 +7,11 @@ import ReactTooltip from "react-tooltip";
 /**
  * FriendsList contains a list of the users friends
  * @param {string} myUsername The currently logged in used
+ * @param {function} setFocusedChat callback for focusing on a chat
  * @returns a div containing all friends for the logged in user
  */
 
-const FriendsList = ({ myUsername, handleFocusedChat, setFocusedChat}) => {
+const FriendsList = ({ myUsername, setFocusedChat}) => {
   const dispatch = useDispatch();
 
   const currentFriends = useSelector(

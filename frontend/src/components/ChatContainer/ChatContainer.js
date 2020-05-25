@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
 import Chat from "../Chat/Chat";
@@ -61,7 +61,8 @@ const ChatContainer = ({ focusedChat }) => {
     console.log(list);
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
-        return chat.messages;
+        console.log(chat);
+        return chat;
       }
     }
     return [];
@@ -100,16 +101,23 @@ const ChatContainer = ({ focusedChat }) => {
     setNewMessage(event.target.value);
   };
 
+  const [chatName, setChatName] = useState("");
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
-
   React.useEffect(() => {
     if (listOfDms !== null && searching === false) {
-      setMessages(rightChat(listOfDms));
+      const chat =rightChat(listOfDms);
+      console.log(chat);
+      setMessages(chat.messages);
+      setChatName(chat.chatName);
+      console.log(chat.chatName);
     }
   }, [focusedChat, listOfDms, searching]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
+      <div className="text-3xl text-white self-center">
+        {chatName}
+      </div>
       {focusedChat ? (
         <SearchBar
           id="search-chat"
