@@ -79,21 +79,19 @@ const socketReducer = (state = initialState, action) => {
         firstWelcome: firstWelcome,
       };
     case "ADD_COMMENT":
-      console.log(state.socket.explicitOriginalTarget);
       state.socket.send(JSON.stringify(action.payload));
-      console.log(state.socket);
       return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
-    
-    case "ADD_THREADS": 
-    return{
-      ...state,
-      server: {
-        ... state.server, 
-        listOfThreads: action.payload.threads     
-        }
+
+    case "ADD_THREADS":
+      return {
+        ...state,
+        server: {
+          ...state.server,
+          listOfThreads: action.payload.threads,
+        },
       };
     case "ADDFRIEND":
       return {
@@ -139,7 +137,7 @@ const socketReducer = (state = initialState, action) => {
             /* set hardcoded server oject with name of GLOBAL, empty thread list and member list with only urself */
             server: {
               serverName: "0",
-              serverInformation:"",
+              serverInformation: "",
               listOfThreads: [],
               members: [action.payload.username],
             },
@@ -165,13 +163,31 @@ const socketReducer = (state = initialState, action) => {
               ...state,
               server: {
                 ...state.server,
-                listOfThreads: threads             
+                listOfThreads: threads,
               },
             };
           case "init_login":
-            const listOfDms = parsedData.list_of_dms.map((obj) => {
-              return { ...obj, sinceLastSeen: 0 }; /* used for notifications */
-            });
+            var listOfDms = [];
+            for (let DM of parsedData.list_of_dms) {
+              if (DM.members.length === 2 && DM.members.includes(DM.chatName)) {
+                let chatname = DM.members.filter(
+                  (m) => m !== state.username
+                )[0];
+                listOfDms.push({
+                  ...DM,
+                  sinceLastSeen: 0,
+                  chatName: chatname,
+                });
+              } else {
+                listOfDms.push({
+                  ...DM,
+                  sinceLastSeen: 0,
+                });
+              }
+            }
+            //const listOfDms = parsedData.list_of_dms.map((obj) => {
+            //  return { ...obj, sinceLastSeen: 0 }; /* used for notifications */
+            //});
             return {
               ...state,
               listOfDms: listOfDms,
@@ -182,28 +198,37 @@ const socketReducer = (state = initialState, action) => {
             console.log(parsedData);
             /* add the new msg object to the right dm object */
             const index = getChatIndex(state.listOfDms, parsedData.chat_id);
+            state.listOfDms[index].sinceLastSeen++;
+            state.listOfDms[index].messages.push({
+              message: parsedData.message,
+              username: parsedData.user_id,
+              timestamp: parsedData.timestamp,
+            });
             return {
               ...state,
-              listOfDms: [
-                ...state.listOfDms,
-                state.listOfDms[index].sinceLastSeen++,
-                state.listOfDms[index].messages.push({
-                  message: parsedData.message,
-                  username: parsedData.user_id,
-                  timestamp: parsedData.timestamp,
-                }),
-              ],
+              listOfDms: [...state.listOfDms],
             };
           case "chat_request":
             /* insert a new chat object to listOfDms */
             if (parsedData.status === "ok") {
+              var chatname;
+              if (
+                parsedData.members.length === 2 &&
+                parsedData.members.includes(parsedData.chat_name)
+              ) {
+                chatname = parsedData.members.filter(
+                  (m) => m !== state.username
+                )[0];
+              } else {
+                chatname = parsedData.chat_name;
+              }
               return {
                 ...state,
                 listOfDms: [
                   ...state.listOfDms,
                   /* newly inserted object */
                   {
-                    chatName: parsedData.chat_name,
+                    chatName: chatname,
                     chatID: parsedData.chat_id,
                     messages: [],
                     members: parsedData.members,
@@ -291,9 +316,11 @@ const socketReducer = (state = initialState, action) => {
     case "RESET_LAST_SEEN":
       /* Reset the since last seen counter to 0 */
       const i = getChatIndex(state.listOfDms, action.payload.chatID);
+      const DMs = state.listOfDms;
+      DMs[i].sinceLastSeen = 0;
       return {
         ...state,
-        listOfDms: [...state.listOfDms, (state.listOfDms[i].sinceLastSeen = 0)],
+        listOfDms: DMs,
       };
 
     default:

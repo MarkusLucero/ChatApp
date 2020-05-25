@@ -8,6 +8,7 @@ async function friendRequest({
   requester,
   from,
   setErrorMsg,
+  setShow,
 }) {
 
   if (userInput !== "" && userInput !== requester && !currentFriends.includes(userInput)) {
@@ -25,6 +26,7 @@ async function friendRequest({
         case 200: {
           setAddSuccessful(true);
           setErrorMsg(false);
+          setShow(false);
           break;
         }
         case 403: {
@@ -67,7 +69,7 @@ const AddFriend = ({
   const monad = useRef();
   /*Handle click outside createThread modal */
   const handleClick = (e) => {
-    if (show == true) {
+    if (show === true) {
       if (monad.current.contains(e.target)) {
         // inside click
         return;
@@ -111,6 +113,7 @@ const AddFriend = ({
               requester,
               from,
               setErrorMsg,
+              setShow,
             })
           }
         >

@@ -104,7 +104,7 @@ const MessagesList = ({ handleFocusedChat, username, focusedChat }) => {
               className="text-white text-xl hover:bg-gray-500 cursor-pointer flex flex-row justify-between"
             >
               {/* TODO FIX SAME ID BAD PRAXIS */}
-              <div id={chat.chatID}>{chat.chatName}</div>
+              <div id={chat.chatID}>{chat.chatName} </div>
               <div className="text-red-700">
                 {focusedChat === chat.chatID
                   ? ""

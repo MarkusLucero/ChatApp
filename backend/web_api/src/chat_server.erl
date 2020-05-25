@@ -282,9 +282,11 @@ loop(Connection_map) ->
                     io:format("About to encode ~p~n",[DMs]),
                     %% DMs === [{Chat_ID, Chat_Name, [{Sender,  Message}]}]
                     %{"messages", lists:map(fun({Src, Msg}) -> mochijson:encode({struct, [{"message", Msg}, {"username", Src}]}) end, Messages)}
+                    Members = fun(ID) -> Members = database_api:fetch_chat_members(ID), [Member || {Member} <- Members] end,
                     List_of_DMs = [{struct, [{"chatName", Chat_Name}, 
                                              {"chatID", Chat_ID},
-                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}]} || {Src, Msg} <- Messages]}}
+                                             {"members", {array, Members(Chat_ID)}},
+                                             {"messages", {array, [{struct, [{"message", Msg}, {"username", Src}, {"timestamp", lists:flatten(io_lib:format("~p-~p-~p ~p:~p:~p", [Year, Month, Day, Hr, Mi, Se]))}]} || {Src, Msg, {{Year,Month,Day}, {Hr,Mi,Se}}} <- Messages]}}
                                             ]} || {Chat_ID, Chat_Name, Messages} = _MsgS <- DMs],
                     io:format("MADE IT PAST LIST OF DMs: ~p~w~n~s~n", [List_of_DMs, length(List_of_DMs), FriendList]),
                     JSON_Message = mochijson:encode(
