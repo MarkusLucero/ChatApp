@@ -1,6 +1,4 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import * as actions from "../../actions/actions.js";
 
 /**
  * OriginalPost is the first post of a Thread
@@ -9,8 +7,6 @@ import * as actions from "../../actions/actions.js";
  * @returns a div containing all the information regarding the original post
  */
 const OriginalPost = ({ thread, resetFocusedThread }) => {
-  const username = useSelector((state) => state.socketState.username);
-  const dispatch = useDispatch();
   return (
     <div
       onClick={resetFocusedThread}

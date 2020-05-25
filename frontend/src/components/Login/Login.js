@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useFormik, setNestedObjectValues } from "formik";
+import { useFormik} from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
 
@@ -79,10 +79,6 @@ const Login = () => {
       dispatch(actions.login({ values }));
     },
   });
-  function a() {
-    setErrorMsg(false);
-    return null;
-  }
   return (
     <div
       style={{

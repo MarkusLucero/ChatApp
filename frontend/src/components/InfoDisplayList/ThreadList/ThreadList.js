@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import plus from "../../../img/plus.svg";
 import CreateThread from "./CreateThread";
 import { useSelector } from "react-redux";

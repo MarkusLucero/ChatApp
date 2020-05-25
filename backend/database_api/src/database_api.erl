@@ -4,7 +4,7 @@
 -module(database_api).
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("stdlib/include/assert.hrl").
--export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1, insert_comment/5, fetch_thread_IDs/0]).
+-export([start/0, stop/0, insert_user/3, insert_friend/2, create_chat/3, insert_chat/4, fetch_user/1, fetch_friendlist/1, fetch_chat/1, fetch_chat_members/1, fetch_chat_undelivered/1, fetch_all_chats/1, create_thread/4, fetch_thread/1, insert_comment/5, fetch_thread_IDs/0, upvote/2, downvote/2]).
 
 
 get_timestamp() ->
@@ -64,7 +64,7 @@ insert_friend(Username, Friend) ->
         ok ->
             ok;
         {error, Reason} ->
-	    {error, Reason};
+            {error, Reason};
         Msg ->
             io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
     end.
@@ -201,7 +201,7 @@ fetch_chat_undelivered(Chat_ID) ->
     database ! {fetch_chat_undelivered, Chat_ID, self()},
     receive
         {_,_,Content} ->
-	    Content;
+            Content;
         {error, no_chat} ->
             {error, "Chat_ID not found in database."};
         Msg ->
@@ -210,7 +210,7 @@ fetch_chat_undelivered(Chat_ID) ->
 
 %% @doc Fetch all chats and messages asociated with a user.
 %% @param Username The username to fetch chats from.
-%% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Status}]}] if fetch from database was successfull, [] (empty list) if not.
+%% @returns [{Chat_ID, Chat_Name, [{Sender, Msg, Timestamp}]}] if fetch from database was successfull, [] (empty list) if not.
 fetch_all_chats(Username) ->
     database ! {fetch_all_chats, Username, self()},
 
@@ -319,6 +319,45 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Text) ->
             io:format("database_api:insert_comment/5 Unhandled message: ~p~n", [Msg])
     end.
 
+%% @doc Upvotes a comment on in a thread.
+%% @param Thread_ID The thread ID to the thread where the comment belongs.
+%% @param Index The index of the comment. Set this to "0" if this is the first comment.
+%% @returns The new rating if successfull, Ex 5 or -3. {error, Reason} if not.
+-spec upvote(Thread_ID, Index) -> Rating when
+      Thread_ID::list(),
+      Index::list(),
+      Rating:: integer.
+
+upvote(Thread_ID, Index) ->
+    database ! {upvote, Thread_ID, Index, self()},
+    receive
+        {error, Reason} ->
+            {error, Reason};
+        {ok, Rating} ->
+            Rating;
+        Msg ->
+            io:format("database_api:upvote/2 Unhandled message: ~p~n", [Msg])
+    end.
+
+%% @doc Downvotes a comment on in a thread.
+%% @param Thread_ID The thread ID to the thread where the comment belongs.
+%% @param Index The index of the comment. Set this to "0" if this is the first comment.
+%% @returns The new rating if successfull, Ex 5 or -3. {error, Reason} if not.
+-spec downvote(Thread_ID, Index) -> Rating when
+      Thread_ID::list(),
+      Index::list(),
+      Rating:: integer.
+
+downvote(Thread_ID, Index) ->
+    database ! {downvote, Thread_ID, Index, self()},
+    receive
+        {error, Reason} ->
+            {error, Reason};
+        {ok, Rating} ->
+            Rating;
+        Msg ->
+            io:format("database_api:downvote/2 Unhandled message: ~p~n", [Msg])
+    end.
 
 
 
@@ -385,7 +424,7 @@ fetch_chat_test() ->
     database ! {get_group_id, "skolchatten", self()},
     receive
         Group_ID2 ->
-	    {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
+            {_, "skolchatten", [{Sender2, Msg2, Status2}]} = fetch_chat(Group_ID2),          
             "testfriend1" = Sender2,
             "test message2!!!" = Msg2,
             0 = Status2
@@ -433,14 +472,33 @@ insert_comment_test() ->
     Creator = "testuser1",
     Header = "Test thread 2",
     Text = "This is the second root thread.",
-    {Thread_ID, "testuser1", "text test", {"",""}} = Comment1,
-    {Thread_ID, "testfriend1", "reply text test", {"testuser1", "text test"}} = Comment2.
+    {Thread_ID, "testuser1", "text test", 0, {"",""}} = Comment1,
+    {Thread_ID, "testfriend1", "reply text test", 0, {"testuser1", "text test"}} = Comment2.
+
+upvote_and_downvote_test() ->
+    Thread_ID = create_thread("testuser1", "0","Test thread 3", "This is the third root thread."),
+    insert_comment(Thread_ID, "0", "", "testuser1", "text test"),
+    insert_comment(Thread_ID, "1", "0", "testfriend1", "reply text test"),
+
+    upvote(Thread_ID, "0"),
+    upvote(Thread_ID, "0"),
+    downvote(Thread_ID, "0"),
+    downvote(Thread_ID, "1"),
+    downvote(Thread_ID, "1"),
+
+    {Server, Creator, Header, Text, _Timestamp, [Comment1, Comment2]} = fetch_thread(Thread_ID),
+    Server = "0",
+    Creator = "testuser1",
+    Header = "Test thread 3",
+    Text = "This is the third root thread.",
+    {Thread_ID, "testuser1", "text test", 1, {"",""}} = Comment1,
+    {Thread_ID, "testfriend1", "reply text test", -2, {"testuser1", "text test"}} = Comment2.
 
 
 
 
 stop_test_() ->
-    %% database ! reset_tests,
+    database ! reset_tests,
     %% database ! {remove_user, "testuser1"},
     %% database ! {remove_user, "testfriend1"},
     %% database ! {remove_table, "chat_id_1"},
