@@ -34,8 +34,6 @@ const ChatContainer = ({ focusedChat }) => {
    * @param event the event object of the window
    */
   const handleSearchSubmit = (event) => {
-    console.log(searchTerm);
-
     setSearching(true);
     var filteredChat = [];
     messages.map((chat) => {
@@ -60,10 +58,19 @@ const ChatContainer = ({ focusedChat }) => {
   const rightChat = (list) => {
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
-        return chat;
+        return chat.messages;
       }
     }
     return [];
+  };
+
+  const getChatName = (list)=>{
+    for (const chat of list){
+      if (chat.chatID === focusedChat){
+        return chat.chatName;
+      }
+    }
+    return "";
   };
 
   const [messages, setMessages] = React.useState([]);
@@ -104,9 +111,11 @@ const ChatContainer = ({ focusedChat }) => {
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
   React.useEffect(() => {
     if (listOfDms !== null && searching === false) {
-      const chat =rightChat(listOfDms);
-      setMessages(chat.messages);
-      setChatName(chat.chatName);
+      setMessages(rightChat(listOfDms));
+      setChatName(getChatName(listOfDms));
+      if(focusedChat){
+        dispatch(actions.resetLastSeen({chatID:focusedChat}));
+      }
     }
   }, [focusedChat, listOfDms, searching]);
 
