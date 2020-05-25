@@ -29,9 +29,7 @@ const Upvote = ({ comment, index }) => {
 
   React.useEffect(() => {
     if (voteDown === true && !inFlight) {
-      console.log(inFlight);
       setInFlight(true);
-      console.log(inFlight);
       dispatch(
         actions.downVote({
           thread_id: comment.thread_id,
