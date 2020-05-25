@@ -138,13 +138,6 @@ logout_user(Username, Token) ->
     gen_server:cast(?MODULE, {logout_user, Username, Token}),
     ok.
 
-%% @doc Generates a unique chat id
-%% @returns A chat id
-%% TODO: Better rand function?
-%% TODO: Make sure that chat id is unique
-%% create_chat_id() ->
-%%     rand:uniform(1000000).
-
 -spec send_chat(Chat_Name, Creator, Members) -> ok when
       Chat_Name :: list(Integer),
       Creator :: list(Integer),

@@ -9,7 +9,7 @@
       Args :: any().
 %% @doc Starts the Web API listener
 %% @param Type IGNORED
-%% @parak Args IGNORED
+%% @param Args IGNORED
 %% @returns ok
 start(_Type, _Args) ->
     Dispatch = cowboy_router:compile([
