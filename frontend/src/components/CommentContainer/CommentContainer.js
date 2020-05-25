@@ -76,7 +76,7 @@ const CommentContainer = ({ thread }) => {
           thread_id: thread.id,
           index: commentCounter.toString(),
           reply_index: index.toString(),
-          rating: "0",
+          rating: 0,
           username: poster,
           comment: reply,
         })
