@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
 import Chat from "../Chat/Chat";
@@ -34,8 +34,6 @@ const ChatContainer = ({ focusedChat }) => {
    * @param event the event object of the window
    */
   const handleSearchSubmit = (event) => {
-    console.log(searchTerm);
-
     setSearching(true);
     var filteredChat = [];
     messages.map((chat) => {
@@ -58,13 +56,21 @@ const ChatContainer = ({ focusedChat }) => {
    * @return {array} array containing the list of message objects from the corresponding DM object
    */
   const rightChat = (list) => {
-    console.log(list);
     for (const chat of list) {
       if (chat.chatID === focusedChat) {
         return chat.messages;
       }
     }
     return [];
+  };
+
+  const getChatName = (list)=>{
+    for (const chat of list){
+      if (chat.chatID === focusedChat){
+        return chat.chatName;
+      }
+    }
+    return "";
   };
 
   const [messages, setMessages] = React.useState([]);
@@ -78,7 +84,8 @@ const ChatContainer = ({ focusedChat }) => {
   const sendMessage = (event) => {
     const today = new Date(); 
     const month = today.getMonth() + 1 ; //January is 0, need to add 1 
-    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+today.getHours().toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
+    const hours = today.getHours() - 2; //convert to UTC
+    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+hours.toString()+":"+today.getMinutes().toString()+":"+today.getSeconds().toString();   
     event.preventDefault();
     setMessages([...messages, { message: newMessage, username: myUsername, timestamp: timestamp }]);
     dispatch(
@@ -100,16 +107,23 @@ const ChatContainer = ({ focusedChat }) => {
     setNewMessage(event.target.value);
   };
 
+  const [chatName, setChatName] = useState("");
   /* HANDLING THE DISPLAY OF NEW MESSAGES AND NEW FOCUSED CHAT */
-
   React.useEffect(() => {
     if (listOfDms !== null && searching === false) {
       setMessages(rightChat(listOfDms));
+      setChatName(getChatName(listOfDms));
+      if(focusedChat){
+        dispatch(actions.resetLastSeen({chatID:focusedChat}));
+      }
     }
   }, [focusedChat, listOfDms, searching]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
+      <div className="text-3xl text-white self-center">
+        {chatName}
+      </div>
       {focusedChat ? (
         <SearchBar
           id="search-chat"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Up from "../../img/uploading.svg";
 import Down from "../../img/multimedia-option.svg";
 

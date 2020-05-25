@@ -25,16 +25,13 @@ const logoutHandler = async (username, magicToken, setLogoutSuccess) => {
     const data = await response;
     switch (data.status) {
       case 200: {
-        console.log("200");
         setLogoutSuccess(true);
         break;
       }
       case 404: {
-        console.log("404");
         break;
       }
       default:
-        console.log("default catch");
         break;
     }
   } catch (error) {
@@ -68,6 +65,7 @@ const Logout = () => {
   return (
     <div className="text-white cursor-pointer flex flex-row justify-center  mb-2">
       <img
+        alt={logout}
         data-tip
         data-for="logoutUser"
         src={logout}
