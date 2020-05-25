@@ -1,5 +1,5 @@
 -module(chat_server).
--export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2, create_thread/4, insert_comment/5]).
+-export([new_connection/1, start/0, register_user/4, send_message/5, get_unread_messages/3, login_user/3, send_friend_request/2, send_chat/3, logout_user/2, create_thread/4, insert_comment/5, upvote/2, downvote/2]).
 
 -spec new_connection(PID) -> ok when
       PID :: pid().
@@ -212,6 +212,38 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
             ok
     end.
 
+-spec upvote(Thread_ID, Index) -> ok when
+      Thread_ID :: list(Integer),
+      Index :: list(Integer).
+%% @doc Upvotes a thread comment
+%% @param Thread_ID the ID of the thread where the upvoted comment is located
+%% @param Index the index of the upvoted comment in the thread
+%% @returns ok
+upvote(Thread_ID, Index) ->
+    case database_api:upvote(Thread_ID, Index) of
+	{error, _Reason} ->
+	    erlang:error('Error upvoting thread comment');
+	Rating ->
+	    chat_server ! {Thread_ID, Rating, Index},
+	    ok
+    end.
+
+-spec downvote(Thread_ID, Index) -> ok when
+      Thread_ID :: list(Integer),
+      Index :: list(Integer).
+%% @doc Downvotes a thread comment
+%% @param Thread_ID the ID of the thread where the downvoted comment is located
+%% @param Index the index of the downvoted comment in the thread
+%% @returns ok
+downvote(Thread_ID, Index) ->
+    case database_api:downvote(Thread_ID, Index) of
+	{error, _Reason} ->
+	    erlang:error('Error downvoting thread comment');
+	Rating ->
+	    chat_server ! {Thread_ID, Rating, Index},
+	    ok
+    end.
+
 -spec start() -> ok.
 %% @doc Starts a Web API node and registers the central process to the name chat_server
 %% @returns ok For every start.
@@ -376,5 +408,28 @@ loop(Connection_map) ->
                           PID ! {text, JSON_Message}
                   end,
             maps:map(Fun, Connection_map),
+            loop(Connection_map);
+	{upvote, Thread_ID, Rating, Index} ->
+            JSON_Message = mochijson:encode(
+                             {struct,[{"action", "upvote"},
+                                      {"thread_id", Thread_ID},
+                                      {"rating", Rating},
+                                      {"index", Index}]}),
+            Fun = fun(_Username, {PID, _Magic_Token}) ->
+                          PID ! {text, JSON_Message}
+                  end,
+            maps:map(Fun, Connection_map),
+            loop(Connection_map);
+	{downvote, Thread_ID, Rating, Index} ->
+            JSON_Message = mochijson:encode(
+                             {struct,[{"action", "downvote"},
+                                      {"thread_id", Thread_ID},
+                                      {"rating", Rating},
+                                      {"index", Index}]}),
+            Fun = fun(_Username, {PID, _Magic_Token}) ->
+                          PID ! {text, JSON_Message}
+                  end,
+            maps:map(Fun, Connection_map),
             loop(Connection_map)
+		
     end.
