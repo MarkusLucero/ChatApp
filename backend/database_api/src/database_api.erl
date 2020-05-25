@@ -60,7 +60,7 @@ insert_friend(Username, Friend) ->
         {error, Reason} ->
 	    {error, Reason};
         Msg ->
-            io:format("database_api:insert_friend/2 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:insert_friend/2 unhandeled case: ~p~n", [Msg])
     end.
 
 
@@ -84,7 +84,7 @@ create_chat(Chat_Name, Creator, Members) ->
         {error, Reason} ->
             {error, Reason};
         Msg ->
-            io:format("databse_api:create_chat/3 Unhandeled message ~p~n", [Msg])
+            io:format("databse_api:create_chat/3 unhandeled case ~p~n", [Msg])
     end.
 
 %% @doc Store information about a chat in the database.
@@ -125,7 +125,7 @@ fetch_user(Username) ->
         {Username, Password, TimeStamp} ->
             {Username, Password, TimeStamp};
         Msg ->
-            io:format("database_api:fetch_user/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_user/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Fetch the firendlist of a user from the database.
@@ -144,7 +144,7 @@ fetch_friendlist(Username) ->
         {ok, Friends} ->
             Friends;
         Msg ->
-            io:format("database_api:fetch_friendlist/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_friendlist/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Fetch information about a chat from the database.
@@ -163,7 +163,7 @@ fetch_chat(Chat_ID) ->
             {Chat_ID, Chat_Name, Content};
 
         Msg ->
-            io:format("database_api:fetch_chat/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_chat/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Fetch the usernames from all mebers of a chat. This function can be stuck waiting for a time when trying to fetch from database.
@@ -176,7 +176,7 @@ fetch_chat_members(Chat_ID) ->
         {error, _} ->
             {error, "Chat_ID not found in database."};
         Msg ->
-            io:format("database_api:fetch_chat_members/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_chat_members/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Fetch all undelivered messages of a certain chat.
@@ -189,7 +189,7 @@ fetch_chat_undelivered(Chat_ID) ->
         {error, no_chat} ->
             {error, "Chat_ID not found in database."};
         Msg ->
-            io:format("database_api:fetch_chat_undelivered/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_chat_undelivered/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Fetch all chats and messages asociated with a user.
@@ -204,7 +204,7 @@ fetch_all_chats(Username) ->
             Chats;
 
         Msg ->
-            io:format("database_api:fetch_all_chat/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_all_chat/1 unhandeled case: ~p~n", [Msg])
     end.
 
 
@@ -230,7 +230,7 @@ create_thread(Username, Server, Header, Text) ->
         {ok, Thread_ID} ->
             Thread_ID;
         Msg ->
-            io:format("database_api:create_thread/4 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:create_thread/4 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc fetches information about a thread from the database. This also include all the comments made on that thread.
@@ -254,7 +254,7 @@ fetch_thread(Thread_ID) ->
         {ok, {Server, Creator, Header, Text, Timestamp, Commentlist}} ->
             {Server, Creator, Header, Text, Timestamp, Commentlist};
         Msg ->
-            io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_thread/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc fetches all thread IDs on the database
@@ -268,7 +268,7 @@ fetch_thread_IDs() ->
         {ok, ThreadList} ->
            [ID || {ID} <- ThreadList];
         Msg ->
-            io:format("database_api:fetch_thread/1 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:fetch_thread/1 unhandeled case: ~p~n", [Msg])
     end.
 
 %% @doc Inserts a comment on a thread.
@@ -293,7 +293,7 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Text) ->
         {ok, Comment_ID} ->
             Comment_ID;
         Msg ->
-            io:format("database_api:insert_comment/5 Unhandled message: ~p~n", [Msg])
+            io:format("database_api:insert_comment/5 unhandeled case: ~p~n", [Msg])
     end.
 
 
