@@ -51,6 +51,7 @@ const Server = ({
       switch (data.status) {
         case 200:
           {
+            console.log(data.data);
             /*The threads in the list of threads recieced looks different, need to create new thredobjects from that information */
             let threads = [];
             for (const thread of data.data.threads) {
