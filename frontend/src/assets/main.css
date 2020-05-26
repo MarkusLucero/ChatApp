@@ -11203,12 +11203,12 @@ a:checked {
 
 /* LOGIN & REGISTER CSS */
 
-h1 {
+.intro-header {
   font-weight: bold;
   margin: 0;
 }
 
-p {
+.form-paragraphs {
   font-size: 14px;
   font-weight: 100;
   line-height: 20px;
@@ -11216,18 +11216,7 @@ p {
   margin: 20px 0 30px;
 }
 
-span {
-  font-size: 12px;
-}
-
-a {
-  color: #333;
-  font-size: 14px;
-  text-decoration: none;
-  margin: 15px 0;
-}
-
-button {
+.formButton {
   border-radius: 20px;
   border: 1px solid #ff4b2b;
   background-color: #ff4b2b;
@@ -11326,7 +11315,7 @@ input {
   transform: translateX(100%);
   opacity: 1;
   z-index: 5;
-  animation: show 0.6s;
+  animation: show 0.2s;
 }
 
 @keyframes show {
@@ -11359,8 +11348,12 @@ input {
 }
 
 .overlay {
-  background: #ff416c;
-  background: linear-gradient(to right, #ff4b2b, #ff416c);
+  background: #cb2d3e; /* fallback for old browsers */ /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #ef473a,
+    #cb2d3e
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { useFormik, setNestedObjectValues } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
@@ -18,6 +17,7 @@ const Login = () => {
   /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
   const [errorMsg, setErrorMsg] = useState(false);
+  const [fade, setFade] = useState(false);
   const validate = (values) => {
     const errors = {};
     if (!values.Username) {
@@ -32,9 +32,9 @@ const Login = () => {
     }
   };
 
-  let container;
+  console.log(setFade);
   React.useEffect(() => {
-    container = document.getElementById("container");
+    setFade(document.getElementById("container"));
   }, []);
 
   const formik = useFormik({
@@ -99,8 +99,12 @@ const Login = () => {
             className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
             onSubmit={formik.handleSubmit}
           >
-            <p className=" justify-center">Welcome!</p>
-            <p>Enter your login details to access Chat Up!</p>
+            <p className=" justify-center text-4xl font-bold font-mono">
+              Log in
+            </p>
+            <p className="font-mono text-xl ">
+              Enter your login details to access Chat Up!
+            </p>
 
             <div className="mb-4">
               <label
@@ -150,40 +154,39 @@ const Login = () => {
                   <div className="text-red-600">{formik.errors.Password}</div>
                 ) : null}
               </div>
-              <button
-                className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-                type="submit"
-              >
+              <button className="formButton" type="submit">
                 Login
               </button>
             </div>
           </form>
         </div>
         <div className="form-container sign-up-container">
-          <Register></Register>
+          <Register container={fade}></Register>
         </div>
         <div className="overlay-container">
-          <div class="overlay">
-            <div class="overlay-panel overlay-left">
-              <h1>Welcome Back!</h1>
-              <p>
+          <div className="overlay">
+            <div className="overlay-panel overlay-left">
+              <h1 className="intro-header text-2xl"> Hey there!</h1>
+              <p className="form-paragraphs">
                 To keep connected with us please login with your personal info
               </p>
               <button
-                class="ghost"
+                className="ghost formButton"
                 id="signIn"
-                onClick={() => container.classList.remove("right-panel-active")}
+                onClick={() => fade.classList.remove("right-panel-active")}
               >
                 Sign In
               </button>
             </div>
-            <div class="overlay-panel overlay-right">
-              <h1>Hello, Friend!</h1>
-              <p>Enter your personal details and start journey with us</p>
+            <div className="overlay-panel overlay-right">
+              <h1 className="intro-header text-2xl"> Welcome!</h1>
+              <p className="form-paragraphs">
+                Enter your personal details to join the Chat Up community!
+              </p>
               <button
-                class="ghost"
+                className="ghost formButton"
                 id="signUp"
-                onClick={() => container.classList.add("right-panel-active")}
+                onClick={() => fade.classList.add("right-panel-active")}
               >
                 Sign Up
               </button>
