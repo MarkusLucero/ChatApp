@@ -22,7 +22,7 @@ const Message = ({ message }) => {
     >
       <h1 className="font-medium">
         {message.username + "  "}
-    <span className="font-light text-xs text-right">{timestamp === timestampDate ? ("Today at: " + timestampTime ): (stampWithoutSec)}</span>
+    <span className="font-light text-xs text-right">{timestamp === timestampDate ? ("Today at " + timestampTime ): (stampWithoutSec)}</span>
       </h1>
       <p className="font-light"> {message.message}</p>
     </div>

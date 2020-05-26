@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import "../../assets/main.css";
 import SearchBar from "../SearchBar/SearchBar";
 import Chat from "../Chat/Chat";
@@ -64,9 +64,9 @@ const ChatContainer = ({ focusedChat }) => {
     return [];
   };
 
-  const getChatName = (list)=>{
-    for (const chat of list){
-      if (chat.chatID === focusedChat){
+  const getChatName = (list) => {
+    for (const chat of list) {
+      if (chat.chatID === focusedChat) {
         return chat.chatName;
       }
     }
@@ -82,16 +82,37 @@ const ChatContainer = ({ focusedChat }) => {
    * @param event the event object of the window
    */
   const sendMessage = (event) => {
-    const today = new Date(); 
-    const month = today.getMonth() + 1 ; //January is 0, need to add 1 
-    const hours = today.getHours() - 2; //convert to UTC
-    var minutes = today.getMinutes(); 
-    if(minutes < 10 ){
+    const today = new Date();
+    const month = today.getMonth() + 1; //January is 0, need to add 1
+    var hours = today.getHours() - 2; //convert to UTC
+    var minutes = today.getMinutes();
+    if (minutes < 10) {
       minutes = "0" + minutes.toString();
-    }else{minutes = minutes.toString();}
-    const timestamp = today.getFullYear().toString()+"-"+month.toString()+"-"+today.getDate().toString()+" "+hours.toString()+":"+minutes+":"+today.getSeconds().toString();   
+    } else {
+      minutes = minutes.toString();
+    }
+    if (hours < 10) {
+      hours = "0" + hours.toString();
+    } else {
+      hours = hours.toString();
+    }
+    const timestamp =
+      today.getFullYear().toString() +
+      "-" +
+      month.toString() +
+      "-" +
+      today.getDate().toString() +
+      " " +
+      hours +
+      ":" +
+      minutes +
+      ":" +
+      today.getSeconds().toString();
     event.preventDefault();
-    setMessages([...messages, { message: newMessage, username: myUsername, timestamp: timestamp }]);
+    setMessages([
+      ...messages,
+      { message: newMessage, username: myUsername, timestamp: timestamp },
+    ]);
     dispatch(
       actions.sendMessage({
         message: newMessage,
@@ -117,17 +138,15 @@ const ChatContainer = ({ focusedChat }) => {
     if (listOfDms !== null && searching === false) {
       setMessages(rightChat(listOfDms));
       setChatName(getChatName(listOfDms));
-      if(focusedChat){
-        dispatch(actions.resetLastSeen({chatID:focusedChat}));
+      if (focusedChat) {
+        dispatch(actions.resetLastSeen({ chatID: focusedChat }));
       }
     }
   }, [focusedChat, listOfDms, searching]);
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
-      <div className="text-3xl text-white self-center">
-        {chatName}
-      </div>
+      <div className="text-3xl text-white self-center">{chatName}</div>
       {focusedChat ? (
         <SearchBar
           id="search-chat"
