@@ -54,11 +54,12 @@ handle_message(Msg, PID) ->
                  {"username", Username},
                  {"comment", Comment}]} ->
             chat_server:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment);
-	 {struct,[{"action", "upvote"},
+         {struct,[{"action", "upvote"},
                  {"thread_id", Thread_ID},
                  {"index", Index}]} ->
+            io:format("received upvote~n"),
             chat_server:upvote(Thread_ID, Index);
-	 {struct,[{"action", "downvote"},
+         {struct,[{"action", "downvote"},
                  {"thread_id", Thread_ID},
                  {"index", Index}]} ->
             chat_server:downvote(Thread_ID, Index);

@@ -21,6 +21,32 @@ const CREATE_THREAD = "CREATE_THREAD";
 const ADD_THREADS = "ADD_THREADS";
 const ADD_COMMENT = "ADD_COMMENT";
 const RESET_LAST_SEEN = "RESET_LAST_SEEN";
+const UPVOTE = "UPVOTE";
+const DOWNVOTE = "DOWNVOTE"
+
+
+export function upVote(data){
+  console.log(data);
+  return{
+    type: UPVOTE,
+    payload: {
+      action:"upvote",
+      thread_id: data.thread_id,
+      index: data.index,
+    }
+  }
+}
+export function downVote(data){
+  console.log(data);
+  return{
+    type: DOWNVOTE,
+    payload: {
+      action:"downvote",
+      thread_id: data.thread_id,
+      index: data.index,
+    }
+  }
+}
 
 
 export function sendMessage(data) {
@@ -37,7 +63,6 @@ export function sendMessage(data) {
 }
 
 export function addComment(data) {
-  console.log(data);
   return {
     type: ADD_COMMENT,
     payload: {
@@ -67,7 +92,6 @@ export function logOut(data) {
 }
 
 export function login({ values }) {
-  console.log(values);
   return {
     type: LOGIN,
     payload: {
@@ -79,7 +103,6 @@ export function login({ values }) {
 }
 
 export function register(values) {
-  console.log(values);
   return {
     type: REGISTER,
     payload: {
@@ -91,7 +114,6 @@ export function register(values) {
 }
 
 export function startChat(values) {
-  console.log(values);
   return {
     type: CHAT_REQUEST,
     payload: {

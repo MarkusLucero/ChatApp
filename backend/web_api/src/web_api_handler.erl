@@ -64,6 +64,7 @@ websocket_init(State) ->
 %% @param State The state of the handler.
 %% @returns An ACK-message for the client if the request was valid, nothing otherwise.
 websocket_handle({text, Msg}, State) ->
+    io:format("Received: ~s~n", [Msg]),
     message_parser:handle_message(Msg, self()),
     {[{text, <<"ACK">>}], State, hibernate};
 websocket_handle(_Data, State) ->

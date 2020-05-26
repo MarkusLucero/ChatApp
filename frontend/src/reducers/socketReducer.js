@@ -81,11 +81,20 @@ const socketReducer = (state = initialState, action) => {
     case "ADD_COMMENT":
       state.socket.send(JSON.stringify(action.payload));
       return state;
+    case "UPVOTE":
+      console.log("sending upvote");
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
+    case "DOWNVOTE":
+      console.log("sending downvote");
+      state.socket.send(JSON.stringify(action.payload));
+      return state;
     case "CREATE_THREAD":
       state.socket.send(JSON.stringify(action.payload));
       return state;
 
     case "ADD_THREADS":
+      console.log(action.payload);
       return {
         ...state,
         server: {
@@ -148,15 +157,66 @@ const socketReducer = (state = initialState, action) => {
 
         /* We respond differently depending on the action/type of received data */
         switch (parsedData.action) {
+         
+          case "upvote":
+             {
+            console.log("upvoting");  
+            let iT = getThreadIndex(
+              parsedData.thread_id,
+              state.server.listOfThreads
+            );
+            const threads = state.server.listOfThreads;
+            return {
+              ...state,
+              server: {
+                ...state.server,
+                listOfThreads: [
+                  ...state.server.listOfThreads.threads[iT],
+                  {
+                    comments: {
+                      ...state.server.listOfThreads.threads[iT].comments,
+                      rating: parsedData.rating,
+                    },
+                  },
+                ],
+              },
+            };
+          }
+          /* needs threadId, comment index and new rating */
+          case "downvote": {
+            let iT = getThreadIndex(
+              parsedData.thread_id,
+              state.server.listOfThreads
+            );
+            const threads = state.server.listOfThreads;
+            return {
+              ...state,
+              server: {
+                ...state.server,
+                listOfThreads: [
+                  ...state.server.listOfThreads.threads[iT],
+                  {
+                    comments: {
+                      ...state.server.listOfThreads.threads[iT].comments,
+                      rating: parsedData.rating,
+                    },
+                  },
+                ],
+              },
+            };
+          }
           case "insert_comment":
+            console.log(parsedData);
             let iT = getThreadIndex(
               parsedData.thread_id,
               state.server.listOfThreads
             );
             const threads = state.server.listOfThreads;
             threads[iT].comments.push({
+              thread_id: parsedData.thread_id,
               user_id: parsedData.username,
               comment: parsedData.comment,
+              rating: parsedData.rating,
               reply: parsedData.reply,
             });
             return {

@@ -206,7 +206,7 @@ create_thread(Server_Name, Username, Root_Header, Root_Comment) ->
 insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
     case database_api:insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) of
         {error, Reason} ->
-	    io:format("~n~p~n", [Reason]),
+            io:format("~n~p~n", [Reason]),
             erlang:error('Error inserting comment');
         {Thread_ID, Username, Comment, Rating, {Reply_User, Reply_Comment}} ->
             chat_server ! {insert_comment, Thread_ID, Username, Comment, Rating, Reply_User, Reply_Comment},
@@ -222,11 +222,11 @@ insert_comment(Thread_ID, Index, Reply_Index, Username, Comment) ->
 %% @returns ok
 upvote(Thread_ID, Index) ->
     case database_api:upvote(Thread_ID, Index) of
-	{error, _Reason} ->
-	    erlang:error('Error upvoting thread comment');
-	Rating ->
-	    chat_server ! {Thread_ID, Rating, Index},
-	    ok
+        {error, _Reason} ->
+            erlang:error('Error upvoting thread comment');
+        Rating ->
+            chat_server ! {Thread_ID, Rating, Index},
+            ok
     end.
 
 -spec downvote(Thread_ID, Index) -> ok when
@@ -238,11 +238,11 @@ upvote(Thread_ID, Index) ->
 %% @returns ok
 downvote(Thread_ID, Index) ->
     case database_api:downvote(Thread_ID, Index) of
-	{error, _Reason} ->
-	    erlang:error('Error downvoting thread comment');
-	Rating ->
-	    chat_server ! {Thread_ID, Rating, Index},
-	    ok
+        {error, _Reason} ->
+            erlang:error('Error downvoting thread comment');
+        Rating ->
+            chat_server ! {Thread_ID, Rating, Index},
+            ok
     end.
 
 -spec start() -> ok.
@@ -404,7 +404,7 @@ loop(Connection_map) ->
                                       {"thread_id", Thread_ID},
                                       {"username", Username},
                                       {"comment", Comment},
-				      {"rating", Rating},
+                                      {"rating", Rating},
                                       {"reply", {struct, [{"reply_user", Reply_User},
                                                           {"reply_comment", Reply_Comment}]}}
                                      ]}),
@@ -413,7 +413,8 @@ loop(Connection_map) ->
                   end,
             maps:map(Fun, Connection_map),
             loop(Connection_map);
-	{upvote, Thread_ID, Rating, Index} ->
+        {upvote, Thread_ID, Rating, Index} ->
+            io:format("UPVOTING~n"),
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "upvote"},
                                       {"thread_id", Thread_ID},
@@ -424,7 +425,7 @@ loop(Connection_map) ->
                   end,
             maps:map(Fun, Connection_map),
             loop(Connection_map);
-	{downvote, Thread_ID, Rating, Index} ->
+        {downvote, Thread_ID, Rating, Index} ->
             JSON_Message = mochijson:encode(
                              {struct,[{"action", "downvote"},
                                       {"thread_id", Thread_ID},
@@ -435,5 +436,5 @@ loop(Connection_map) ->
                   end,
             maps:map(Fun, Connection_map),
             loop(Connection_map)
-		
+                
     end.
