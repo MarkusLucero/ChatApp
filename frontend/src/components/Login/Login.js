@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useFormik, setNestedObjectValues } from "formik";
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
+import Register from "../Register/Register";
 
 const axios = require("axios");
 
@@ -30,6 +31,11 @@ const Login = () => {
       return errors;
     }
   };
+
+  let container;
+  React.useEffect(() => {
+    container = document.getElementById("container");
+  }, []);
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
@@ -79,100 +85,107 @@ const Login = () => {
       dispatch(actions.login({ values }));
     },
   });
-  function a() {
-    setErrorMsg(false);
-    return null;
-  }
-  return (
-    <div>
-      <ul className="nav">
-        <li className=" right-align m-6 float-right active:border-blue">
-          <a className="text-white hover:text-blue-800 text-2xl" href="#">
-            Login
-          </a>
-        </li>
-        <li className="m-6 float-right">
-          <a className="text-white hover:text-blue-800 text-2xl" href="#">
-            Register
-          </a>
-        </li>
-      </ul>
-      <div
-        className="flex items-center justify-center h-screen bg-cover"
-        style={{
-          backgroundImage: "url(" + require("../../background_night.png") + ")",
-        }}
-      >
-        <form
-          className="bg-gray-400 shadow-md rounded px-8 pt-6 pb-8 mb-4 "
-          onSubmit={formik.handleSubmit}
-        >
-          <p className=" justify-center">Welcome!</p>
-          <p>Enter your login details to access Chat Up!</p>
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="Username"
-            >
-              Username
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="Username"
-              name="Username"
-              type="Text"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.Username}
-            ></input>
-            <div>
-              {formik.touched.Username && formik.errors.Username ? (
-                <div className="text-red-600">{formik.errors.Username}</div>
-              ) : null}
+  return (
+    <div
+      className="flex justify-center w-screen h-screen"
+      style={{
+        backgroundImage: "url(" + require("../../background_night.png") + ")",
+      }}
+    >
+      <div className="container" id="container">
+        <div className="form-container sign-in-container ">
+          <form
+            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+            onSubmit={formik.handleSubmit}
+          >
+            <p className=" justify-center">Welcome!</p>
+            <p>Enter your login details to access Chat Up!</p>
+
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="Username"
+              >
+                Username
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="Username"
+                name="Username"
+                type="Text"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.Username}
+              ></input>
+              <div>
+                {formik.touched.Username && formik.errors.Username ? (
+                  <div className="text-red-600">{formik.errors.Username}</div>
+                ) : null}
+              </div>
+              <div>
+                {errorMsg ? (
+                  <label className="text-red-600">
+                    Login failed! Try something else.
+                  </label>
+                ) : null}
+              </div>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="Password"
+              >
+                Password
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="Password"
+                name="Password"
+                type="Password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.Password}
+              ></input>
+              <div>
+                {formik.touched.Password && formik.errors.Password ? (
+                  <div className="text-red-600">{formik.errors.Password}</div>
+                ) : null}
+              </div>
+              <button
+                className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+                type="submit"
+              >
+                Login
+              </button>
             </div>
-            <div>
-              {errorMsg ? (
-                <label className="text-red-600">
-                  Login failed! Try something else.
-                </label>
-              ) : null}
+          </form>
+        </div>
+        <div className="form-container sign-up-container">
+          <Register></Register>
+        </div>
+        <div className="overlay-container">
+          <div class="overlay">
+            <div class="overlay-panel overlay-left">
+              <h1>Welcome Back!</h1>
+              <p>
+                To keep connected with us please login with your personal info
+              </p>
+              <button class="ghost" id="signIn" onClick={() => container.classList.add("right-panel-active")}>
+                Sign In
+              </button>
             </div>
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="Password"
-            >
-              Password
-            </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="Password"
-              name="Password"
-              type="Password"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.Password}
-            ></input>
-            <div>
-              {formik.touched.Password && formik.errors.Password ? (
-                <div className="text-red-600">{formik.errors.Password}</div>
-              ) : null}
+            <div class="overlay-panel overlay-right">
+              <h1>Hello, Friend!</h1>
+              <p>Enter your personal details and start journey with us</p>
+              <button
+                class="ghost"
+                id="signUp"
+                onClick={() => container.classList.add("right-panel-active")}
+              >
+                Sign Up
+              </button>
             </div>
-            <button
-              className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-              type="submit"
-            >
-              Login
-            </button>
-            <Link
-              to="/register"
-              className=" mt-10 ml-40 5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-              type="button"
-            >
-              Register
-            </Link>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
