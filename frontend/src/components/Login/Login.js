@@ -169,7 +169,11 @@ const Login = () => {
               <p>
                 To keep connected with us please login with your personal info
               </p>
-              <button class="ghost" id="signIn" onClick={() => container.classList.add("right-panel-active")}>
+              <button
+                class="ghost"
+                id="signIn"
+                onClick={() => container.classList.remove("right-panel-active")}
+              >
                 Sign In
               </button>
             </div>
