@@ -328,6 +328,9 @@ fetch_group_id(Ref, Groupname) ->
     case ID of
         {selected, _, [{Group_ID}]} ->
             Group_ID;
+	{selected, _, Group_IDs} ->
+	    [{Group_ID} | _Tail] = lists:reverse(Group_IDs),
+            Group_ID; 
         Error ->
             {error, Error}
     end.
