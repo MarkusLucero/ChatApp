@@ -1,5 +1,4 @@
 import React from "react";
-import SearchBar from "../SearchBar/SearchBar";
 import OriginalPost from "./OriginalPost";
 import {useSelector} from "react-redux"
 import CommentContainer from "../CommentContainer/CommentContainer"

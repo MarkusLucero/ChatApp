@@ -6,16 +6,24 @@ import * as actions from "../../../actions/actions";
 import ReactTooltip from "react-tooltip";
 /**
  * FriendsList contains a list of the users friends
+ * @param {string} myUsername The currently logged in used
+ * @param {function} setFocusedChat callback for focusing on a chat
  * @returns a div containing all friends for the logged in user
  */
 
-const FriendsList = () => {
+const FriendsList = ({ myUsername, setFocusedChat}) => {
   const dispatch = useDispatch();
 
   const currentFriends = useSelector(
     (state) => state.socketState.listOfFriends
   );
+  
 
+  const currentChats = useSelector(
+    (state) => state.socketState.listOfDms
+  ); 
+
+  const [allChats, setAllChats] = useState([]);
   const [friends, setFriends] = useState([]);
 
   /* state to toggle modal, state should preferably probably be handled
@@ -46,6 +54,18 @@ const FriendsList = () => {
     }
   }, [addSuccessful]);
 
+  const [newChat, setNewChat] = useState(false);
+
+  React.useEffect(()=>{
+    if(currentChats !=null && currentChats !==[]){
+      let difference = currentChats.filter(x => !allChats.includes(x));
+      setAllChats(currentChats);
+      if(newChat && difference.length !== 0 && allChats !== []){
+        setFocusedChat(difference[0].chatID);
+        setNewChat(false);
+      }
+    }
+  }, [currentChats]);
   /* when currentFriends changes - refire useEffect and add the new friends to friends state */
   React.useEffect(() => {
     if (currentFriends != null) {
@@ -53,6 +73,15 @@ const FriendsList = () => {
     }
   }, [currentFriends]);
 
+  const startChat = (e) => {
+    //cant start a chat if there's allready one with that person 
+    if(!allChats.map(chat => chat.chatName === e.target.id).includes(true)){
+      console.log("creating new chat");
+      const data = { chatName: e.target.id , from: myUsername, members: [myUsername, e.target.id] };
+      dispatch(actions.startChat(data));
+      setNewChat(true);
+    }
+  };
   return (
     <div className="flex flex-col ml-2">
       <div
@@ -102,6 +131,8 @@ const FriendsList = () => {
             <div
               className="text-white text-xl hover:bg-gray-500 cursor-pointer"
               key={index}
+              onClick ={(e)=>{startChat(e)}}
+              id={friend}
             >
               {friend}
             </div>

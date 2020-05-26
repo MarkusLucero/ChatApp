@@ -74,6 +74,7 @@ const LandingPage = () => {
         server={server}
         setThreadLock={setThreadLock} />
       <InfoDisplayList
+        setFocusedChat={setFocusedChat}
         handleFocusedChat={handleFocusedChat}
         focusedPage={focusedPage}
         focusedChat={focusedChat}

@@ -12,8 +12,6 @@ import CommentField from "../CommentField/CommentField.js";
  The comment object must in turn be an object that holds the actual message, 
  the poster of the message and an array of comment objects that symbolize replies. */
 
-
-
 const CommentContainer = ({ thread }) => {
   /* Thread is passed in as a paprameter. Use its comments array as start array*/
   /* This state handles the comment input */
@@ -36,31 +34,39 @@ const CommentContainer = ({ thread }) => {
   const dispatch = useDispatch();
 
   const [commentCounter, setCommentCounter] = useState(0);
-/* This function returns a comment object.  */
-function getParentId(){
-    if (commentCounter === 0){
-        return 0;
+  /* This function returns a comment object.  */
+  function getParentId() {
+    if (commentCounter === 0) {
+      return 0;
     }
     return commentCounter - 1;
-
-}
+  }
   /* When we successfully change the value of comment, i.e someone comment button is pressed, we 
   dispatch an addComment action.  */
   React.useEffect(() => {
-    if (addComment === true) {
-      dispatch(
-        actions.addComment({
-          thread_id: thread.id,
-          index: commentCounter.toString(),
-          reply_index: "",
-          username: poster,
-          comment: comment,
-        })
-      );
-      setAddComment(false);
-      setCommentCounter(commentCounter + 1);
-      setComment("");
+    let didCancel = false;
+    function fetchData() {
+      if (addComment === true) {
+        dispatch(
+          actions.addComment({
+            thread_id: thread.id,
+            index: commentCounter.toString(),
+            reply_index: "",
+            rating: "0",
+            username: poster,
+            comment: comment,
+          })
+        );
+        setAddComment(false);
+        setCommentCounter(commentCounter + 1);
+        setComment("");
+      }
     }
+
+    fetchData();
+    return () => {
+      didCancel = true;
+    };
   }, [addComment]);
 
   React.useEffect(() => {
@@ -70,6 +76,7 @@ function getParentId(){
           thread_id: thread.id,
           index: commentCounter.toString(),
           reply_index: index.toString(),
+          rating: 0,
           username: poster,
           comment: reply,
         })
@@ -81,13 +88,11 @@ function getParentId(){
   }, [addReply]);
 
   React.useEffect(() => {
-    if(thread){
-      setComments(thread.comments)
-      setCommentCounter(thread.comments.length)
+    if (thread) {
+      setComments(thread.comments);
+      setCommentCounter(thread.comments.length);
     }
-
   }, [thread]);
-
 
   const handleInputChange = (event) => {
     setComment(event.target.value);
@@ -119,16 +124,18 @@ function getParentId(){
               username={poster}
             ></Comment>
             {/* only render this part if there's comments */}
-            {comments.length >  0 && <CommentField
-              setIndex={setIndex}
-              inputHandler={handleReplyChange}
-              setAddReply={setAddReply}
-              addReply={addReply}
-              username={poster}
-              comment={comment}
-              comments={comments}
-              setComments={setComments}
-            ></CommentField> }
+            {comments.length > 0 && (
+              <CommentField
+                setIndex={setIndex}
+                inputHandler={handleReplyChange}
+                setAddReply={setAddReply}
+                addReply={addReply}
+                username={poster}
+                comment={comment}
+                comments={comments}
+                setComments={setComments}
+              ></CommentField>
+            )}
           </div>
         </div>
       </div>

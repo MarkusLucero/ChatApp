@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useFormik, setNestedObjectValues } from "formik";
+
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
 import Register from "../Register/Register";
@@ -85,7 +86,6 @@ const Login = () => {
       dispatch(actions.login({ values }));
     },
   });
-
   return (
     <div
       className="flex justify-center w-screen h-screen"

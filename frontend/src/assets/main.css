@@ -11120,6 +11120,10 @@ video {
     hue-rotate(291deg) brightness(98%) contrast(106%);
 }
 
+.vote-disabled {
+  filter: brightness(0) saturate(100%) invert(42%) sepia(0%) saturate(0%) hue-rotate(156deg) brightness(93%) contrast(80%);
+}
+
 /* Chat Container */
 
 textarea {

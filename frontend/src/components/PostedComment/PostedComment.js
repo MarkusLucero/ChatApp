@@ -8,7 +8,6 @@ const PostedComment = ({
   username,
   inputHandler,
   setAddReply,
-  addReply,
   comments,
   setComments,
   setIndex,
@@ -21,22 +20,20 @@ const PostedComment = ({
           <div className=" w-full " key={index}>
             <span className=" inline-flex float-left">
               <div className="mr-4">
-                <Upvote></Upvote>
+                <Upvote comment={comment} index={index}></Upvote>
               </div>
               <img
                 className="rounded-full w-12 h-auto  mb-4 mr-4 float-left"
                 alt=""
-                src={placeholder}
+                src={placeholder} 
               ></img>
             </span>
             <div className="break-words ml-12">
               <div className="  mt-4 ml-4 text-blue-700">{comment.user_id}</div>
-              {console.log(comment)}
               {Object.keys(comment.reply.reply_comment).length !== 0 ? (
                 <div className="quote">
                   <div className=" font-bold ml-8 ">
                     Originally posted by {""}
-                    {console.log(comment.reply)}
                     <span className="font-bold text-blue-700">
                       {comment.reply.reply_user}
                     </span>
