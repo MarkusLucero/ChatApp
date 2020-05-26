@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useFormik} from "formik";
+import { useFormik, setNestedObjectValues } from "formik";
+
 import * as actions from "../../actions/actions";
 import { useDispatch } from "react-redux";
+import Register from "../Register/Register";
 
 const axios = require("axios");
 
@@ -17,6 +18,7 @@ const Login = () => {
   /* useDispatch from dispatch function from store */
   const dispatch = useDispatch();
   const [errorMsg, setErrorMsg] = useState(false);
+  const [fade, setFade] = useState(false);
   const validate = (values) => {
     const errors = {};
     if (!values.Username) {
@@ -30,6 +32,11 @@ const Login = () => {
       return errors;
     }
   };
+
+  console.log(setFade);
+  React.useEffect(() => {
+    setFade(document.getElementById("container"));
+  }, []);
 
   const formik = useFormik({
     initialValues: { Username: "", Password: "" },
@@ -81,81 +88,112 @@ const Login = () => {
   });
   return (
     <div
+      className="flex justify-center w-screen h-screen"
       style={{
         backgroundImage: "url(" + require("../../background_night.png") + ")",
       }}
-      className="flex items-center justify-center h-screen bg-scroll"
     >
-      <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
-        onSubmit={formik.handleSubmit}
-      >
-        <p className=" justify-center">Welcome!</p>
-        <p>Enter your login details to access Chat Up!</p>
+      <div className="container" id="container">
+        <div className="form-container sign-in-container ">
+          <form
+            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+            onSubmit={formik.handleSubmit}
+          >
+            <p className=" justify-center text-4xl font-bold font-mono">
+              Log in
+            </p>
+            <p className="font-mono text-xl ">
+              Enter your login details to access Chat Up!
+            </p>
 
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="Username"
-          >
-            Username
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="Username"
-            name="Username"
-            type="Text"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.Username}
-          ></input>
-          <div>
-            {formik.touched.Username && formik.errors.Username ? (
-              <div className="text-red-600">{formik.errors.Username}</div>
-            ) : null}
-          </div>
-          <div>
-            {errorMsg ? (
-              <label className="text-red-600">
-                Login failed! Try something else.
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="Username"
+              >
+                Username
               </label>
-            ) : null}
-          </div>
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="Password"
-          >
-            Password
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="Password"
-            name="Password"
-            type="Password"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.Password}
-          ></input>
-          <div>
-            {formik.touched.Password && formik.errors.Password ? (
-              <div className="text-red-600">{formik.errors.Password}</div>
-            ) : null}
-          </div>
-          <button
-            className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-            type="submit"
-          >
-            Login
-          </button>
-          <Link
-            to="/register"
-            className=" mt-10 ml-40 5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-            type="button"
-          >
-            Register
-          </Link>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="Username"
+                name="Username"
+                type="Text"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.Username}
+              ></input>
+              <div>
+                {formik.touched.Username && formik.errors.Username ? (
+                  <div className="text-red-600">{formik.errors.Username}</div>
+                ) : null}
+              </div>
+              <div>
+                {errorMsg ? (
+                  <label className="text-red-600">
+                    Login failed! Try something else.
+                  </label>
+                ) : null}
+              </div>
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="Password"
+              >
+                Password
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="Password"
+                name="Password"
+                type="Password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.Password}
+              ></input>
+              <div>
+                {formik.touched.Password && formik.errors.Password ? (
+                  <div className="text-red-600">{formik.errors.Password}</div>
+                ) : null}
+              </div>
+              <button className="formButton" type="submit">
+                Login
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+        <div className="form-container sign-up-container">
+          <Register container={fade}></Register>
+        </div>
+        <div className="overlay-container">
+          <div className="overlay">
+            <div className="overlay-panel overlay-left">
+              <h1 className="intro-header text-2xl"> Hey there!</h1>
+              <p className="form-paragraphs">
+                To keep connected with us please login with your personal info
+              </p>
+              <button
+                className="ghost formButton"
+                id="signIn"
+                onClick={() => fade.classList.remove("right-panel-active")}
+              >
+                Sign In
+              </button>
+            </div>
+            <div className="overlay-panel overlay-right">
+              <h1 className="intro-header text-2xl"> Welcome!</h1>
+              <p className="form-paragraphs">
+                Enter your personal details to join the Chat Up community!
+              </p>
+              <button
+                className="ghost formButton"
+                id="signUp"
+                onClick={() => fade.classList.add("right-panel-active")}
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

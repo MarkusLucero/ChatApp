@@ -12,7 +12,7 @@ const axios = require("axios");
  * @property history is passed on due to Register being an immediate child of a Route component in Container component
  * @returns a div containing the form to fill out and its validation
  */
-const Register = ({ history }) => {
+const Register = ({ container }) => {
   const [errorMsg, setErrorMsg] = useState(false);
 
   const validate = (values) => {
@@ -52,7 +52,7 @@ const Register = ({ history }) => {
             case 200: {
               /* TODO history.push isnt declarative... maybe change this when we have login authentication. */
               Notifications.registerSuccess();
-              history.push("/");
+              container.classList.remove("right-panel-active");
               break;
             }
             case 404: {
@@ -66,73 +66,73 @@ const Register = ({ history }) => {
           }
         })
         .catch(function (error) {
+          console.log(error);
           setErrorMsg(true);
         });
     },
   });
   return (
-    <div className="flex items-center justify-center h-screen">
-      <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
-        onSubmit={formik.handleSubmit}
-      >
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="Username"
-          >
-            Username
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="Username"
-            name="Username"
-            type="Text"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.Username}
-          ></input>
-          <div>
-            {formik.touched.Password && formik.errors.Password ? (
-              <div className="text-red-600">{formik.errors.Username}</div>
-            ) : null}
-          </div>
-          <div>
-            {errorMsg ? (
-              <label className="text-red-600">
-                Register failed! Try something else.
-              </label>
-            ) : null}
-          </div>
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="Password"
-          >
-            Password
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="Password"
-            name="Password"
-            type="Password"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.Password}
-          ></input>
-          <div>
-            {formik.touched.Password && formik.errors.Password ? (
-              <div className="text-red-600">{formik.errors.Password}</div>
-            ) : null}
-          </div>
-          <button
-            className="5pxbg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
-            type="submit"
-          >
-            Register
-          </button>
+    <form
+      className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 "
+      onSubmit={formik.handleSubmit}
+    >
+      <p className=" justify-center text-4xl font-bold font-mono">Sign up</p>
+      <p className="font-mono text-xl ">
+        Sign up to access our amazing community!
+      </p>
+      <div>
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="Username"
+        >
+          Username
+        </label>
+        <input
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          id="Username"
+          name="Username"
+          type="Text"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.Username}
+        ></input>
+        <div>
+          {formik.touched.Password && formik.errors.Password ? (
+            <div className="text-red-600">{formik.errors.Username}</div>
+          ) : null}
         </div>
-      </form>
-    </div>
+        <div>
+          {errorMsg ? (
+            <label className="text-red-600">
+              Register failed! Try something else.
+            </label>
+          ) : null}
+        </div>
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="Password"
+        >
+          Password
+        </label>
+        <input
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          id="Password"
+          name="Password"
+          type="Password"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.Password}
+        ></input>
+        <div>
+          {formik.touched.Password && formik.errors.Password ? (
+            <div className="text-red-600">{formik.errors.Password}</div>
+          ) : null}
+        </div>
+        <button className="formButton" type="submit">
+          Sign up
+        </button>
+      </div>
+    </form>
   );
 };
 
