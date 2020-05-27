@@ -146,7 +146,7 @@ const ChatContainer = ({ focusedChat }) => {
 
   return (
     <div className="flex flex-col content-center focused-view-custom-bg">
-      <div className="text-3xl text-white self-center">{chatName}</div>
+      <div className="text-3xl text-white self-center focused-view-custom-bg">{chatName}</div>
       {focusedChat ? (
         <SearchBar
           id="search-chat"

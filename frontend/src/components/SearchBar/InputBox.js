@@ -25,7 +25,7 @@ const InputBox = ({
 }) => {
   return (
 
-    <form className="flex justify-center">
+    <form className="flex justify-center focused-view-custom-bg">
       <input
         className={inputStyles}
         id={id}
