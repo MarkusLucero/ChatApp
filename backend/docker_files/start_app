@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+cd /web_api
+make run
