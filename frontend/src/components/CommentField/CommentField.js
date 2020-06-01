@@ -2,8 +2,10 @@ import React from "react";
 import "../../assets/main.css";
 import PostedComment from "../PostedComment/PostedComment";
 
-/* Each reply must have its own replyBox state */
-
+/**
+ * CommentField provides a container for all the posted comments on a forum thread
+ * @returns a div containing the posted comments on a forum thread
+ */
 const CommentField = ({
   inputHandler,
   setAddReply,

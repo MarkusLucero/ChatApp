@@ -4,6 +4,12 @@ import Up from "../../img/uploading.svg";
 import Down from "../../img/multimedia-option.svg";
 import * as actions from "../../actions/actions";
 
+
+/**
+ * Upvote provides the layout and functionality related to voting on a comment
+ * Upvoting or Downvoting sends a dispatches an action to the Web Api
+ * @returns a div containing the current state of a comment vote
+ */
 const Upvote = ({ comment, index }) => {
   const [votes, setVotes] = useState(comment.rating);
   const [voteUp, setVoteUp] = useState(false);
@@ -13,9 +19,6 @@ const Upvote = ({ comment, index }) => {
   const [upDisabled, setUpDisabled]= useState(false);
   const [downDisabled, setDownDisabled] = useState(false);
 
-  /* sends thread id and index for the comment and if its an upvote or not */
-  /*  Added a rating: 0 parameter to each comment*/
-  /* What does backend need for information to add upvotes? */
   React.useEffect(() => {
     if (voteUp === true && inFlight) {
       setVoteUp(false);

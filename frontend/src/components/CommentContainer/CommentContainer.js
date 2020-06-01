@@ -5,12 +5,12 @@ import "../../assets/main.css";
 import Comment from "../Comment/Comment";
 import CommentField from "../CommentField/CommentField.js";
 
-/* CommentContainer handles comment state and receives comment updates from the Comment through callback functions.
- This updated comment is then passed to the CommentField in order to update CommentField which in turn displays the comment
- 
- CommentField must hold an array representing every parent comment, in this case an array of comment objects.
- The comment object must in turn be an object that holds the actual message, 
- the poster of the message and an array of comment objects that symbolize replies. */
+/**  
+ * CommentContainer handles comment state and receives comment updates from the Comment through callback functions.
+ * This updated comment is then passed to the CommentField in order to update CommentField which in turn displays the comment.
+ * CommentContainer acts as a container for all components related to comments on threads
+ * @returns The entire comment section (posted comments + comment box) for a forum thraed
+ */
 
 const CommentContainer = ({ thread }) => {
   /* Thread is passed in as a paprameter. Use its comments array as start array*/

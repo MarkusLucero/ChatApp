@@ -4,6 +4,11 @@ import Reply from "../Reply/Reply";
 import placeholder from "../../img/placeholder.png";
 import Upvote from "../Upvote/Upvote";
 
+/**
+ * PostedComment maps and renders all comments from the comment array associated with the current thread
+ * @returns a div with all comments rendered
+ */
+
 const PostedComment = ({
   username,
   inputHandler,
