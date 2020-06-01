@@ -28,20 +28,18 @@ Följande steg sker i /frontend mappen.
 - För att köra enhetstester kör du "npm test" och följer kommandon som visas upp i terminalen.
 
 ## Katalogstruktur
-
-**TODO:** Lägg till en kortfattad beskrivning över katalogstrukturen.
 <pre>
 ├── backend  
 │   ├── database_api  
-│   │   ├── backup  
-│   │   ├── ebin  
-│   │   ├── postgres  
+│   │   ├── backup   
+│   │   ├── .erlang.mk  
 │   │   └── src  
-│   └── web_api  
-│       ├── config  
-│       └── src  
+│   ├── web_api  
+│   │   ├── config  
+│   |   └── src  
+|   └── docker_files
+|
 └── frontend    
-    ├── node_modules  
     ├── public  
     └── src  
         ├── actions  
@@ -49,6 +47,7 @@ Följande steg sker i /frontend mappen.
         ├── components  
         ├── img  
         └── reducers  
+
 </pre>
 
 ## Färdigställ
