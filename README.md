@@ -27,6 +27,12 @@ Följande steg sker i /frontend mappen.
 - För att generera dokument och öppna den i webläsaren kör du "npm run doc"
 - För att köra enhetstester kör du "npm test" och följer kommandon som visas upp i terminalen.
 
+## Backend
+
+För att generera dokumentation i backenden går du in i den delens katalog (/database_api eller /web_api)
+och kör make edoc. Därefter dyker det upp en katalog som kallas doc. I denna finns html-filer med dokumentation
+som du kan öppna i din webbläsare.
+
 ## Katalogstruktur
 <pre>
 ├── backend  
