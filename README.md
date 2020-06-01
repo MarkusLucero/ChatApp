@@ -59,7 +59,6 @@ Följande steg sker i /frontend mappen.
 - För att generera dokument kör du "npm run doc - du behöver själv öppna html filen som kommer ligga i /docs mappen.
 
 ## Katalogstruktur
-<pre>
 ├── backend  
 │   ├── database_api  
 │   │   ├── backup   
@@ -79,10 +78,21 @@ Följande steg sker i /frontend mappen.
         ├── img  
         └── reducers  
 
-</pre>
 
-#### Frontend
+### Frontend
 /public innehåller den enda html filen som behövs för att rendera alla komponenter.  
+
 /actions och /reducers innehåller de actions och reducer-funktioner som krävs för tillståndshanteringen med Redux.   
+
 /components innehåller alla React-komponenter som bygger upp vår applikation.   
+
 /img innehåller alla svg filer och bilder som används i applikationen.
+
+### Backend
+/web_api innehåller allt som krävs för web_api:ns körning.
+
+/web_api/config innehåller konfiguration för BEAM VM:en
+
+/web_api/src innehåller all källkod för Web API:n
+
+/docker_files innehåller skript och andra filer som krävs för docker-körningen av programmet
