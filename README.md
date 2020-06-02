@@ -59,12 +59,13 @@ Följande steg sker i /frontend mappen.
 - För att generera dokument kör du "npm run doc - du behöver själv öppna html filen som kommer ligga i /docs mappen.
 
 ## Katalogstruktur
+<pre>
 ├── backend  
-│   ├── database_api   
-│   │   └── src  
-│   ├── web_api  
-│   │   ├── config  
-│   |   └── src  
+│   ├── database_api  
+│   │   └── src  
+│   ├── web_api  
+│   │   ├── config  
+│   |   └── src  
 |   └── docker_files
 |
 └── frontend    
@@ -76,6 +77,7 @@ Följande steg sker i /frontend mappen.
         ├── img  
         └── reducers  
 
+</pre>
 
 ### Frontend
 /public innehåller den enda html filen som behövs för att rendera alla komponenter.  
