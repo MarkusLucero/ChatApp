@@ -96,3 +96,7 @@ Följande steg sker i /frontend mappen.
 /web_api/src innehåller all källkod för Web API:n
 
 /docker_files innehåller skript och andra filer som krävs för docker-körningen av programmet
+
+/database_api innehåller allt som krävs för att databasens körning
+
+/database_api/src innehåller källkod för databas API:n

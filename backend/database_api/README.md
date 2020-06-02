@@ -4,7 +4,7 @@ Det rekommenderas att backenden körs med docker. Se `backend/README.md` för in
 # Instruktioner för databaskonfiguration ifall docker ej används
 **STEG 1:**
 
-Hitta din _odbcinst.ini_ fil. Min ligger i _/usr/local/etc/odbcinst.ini_ men ni kan ha den någon annan stans.
+Hitta din _odbcinst.ini_ fil. EX: _/usr/local/etc/odbcinst.ini_ men er kan finnas den någon annan stans.
 TIPS LINUX:
 ```
 whereis odbcinst.ini
@@ -29,7 +29,7 @@ OBS!! DRIVER= _din sökväg till filen psqlodbca.so_ (det finns en möjlighet at
 
 **STEG 3:**
 
-Hitta din _odbc.ini_ fil. Min ligger i _/usr/local/etc/odbc.ini_ men ni kan ha den någon annan stans.
+Hitta din _odbc.ini_ fil. EX: _/usr/local/etc/odbc.ini_ men er kan finnas någon annan stans.
 
 TIPS LINUX:
 ```
@@ -82,7 +82,7 @@ MAC:
 ```
 psql -f Init.sql -U postgres
 ```
-OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Init.sql_
+OBS!!! Du måste ha med sökvägen till Init.sql filen. tex _/home/$USER/adrenaline/backend/database_api/postgres/Init.sql_
 
 **STEG 7:**  
 
@@ -91,7 +91,7 @@ kör följande kommando när du är inloggad i postgres:
 ```
 psql -d adrenaline_db -a -f Setup.sql
 ```
-OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/skooben/adrenaline/backend/database_api/postgres/Setup.sql_
+OBS!!! Du måste ha med sökvägen till Setup.sql filen. tex _/home/$USER/adrenaline/backend/database_api/postgres/Setup.sql_
 
 **STEG 8:** 
 
