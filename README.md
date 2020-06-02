@@ -60,9 +60,7 @@ Följande steg sker i /frontend mappen.
 
 ## Katalogstruktur
 ├── backend  
-│   ├── database_api  
-│   │   ├── backup   
-│   │   ├── .erlang.mk  
+│   ├── database_api   
 │   │   └── src  
 │   ├── web_api  
 │   │   ├── config  
