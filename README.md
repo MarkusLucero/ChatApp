@@ -12,7 +12,7 @@ Chat up! är en applikation som drar inspiration från redan befintliga chat- oc
 
 ## Backend
 Instruktionerna är för linux.
-### Dokumentation
+### Dokumentation och tester
 För att generera dokumentation går du in i katalogen för den komponent du vill generera dokumentation för (backend/database_api eller backend/web_api). Därefter kör du `make edoc`. Om du vill köra testerna gör du detsamma, men går in i den korrekta mappen och kör `make tests`.
 
 ### Om placeholder-namn i kommandorna
