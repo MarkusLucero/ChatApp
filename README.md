@@ -1,14 +1,10 @@
+**DISCLAIMER**
+The code has not been refactored to a point where bad practice is almost (or completely) eliminated.
+
 # Chat up! (Adrenaline)
 
-Projektarbete på kursen [Operativsystem och processorienterad programmering
-(1DT096) våren 2020][homepage], [Uppsala universitet][uu].
-
-[homepage]: https://www.it.uu.se/education/course/homepage/os/vt19/project/
-
-[uu]: https://www.uu.se/
 
 Chat up! är en applikation som drar inspiration från redan befintliga chat- och kommunikationsplattformar. Syftet med applikationen är att kombinera de mest användbara aspekterna från andra plattformar till en och samma plattform. Användare skall kunna skapa enkel- och gruppchatt kanaler tillsammans med andra användare och samtidigt kunna prenumerera/ansluta sig till olika servrar som tillhandahåller ett slags forumliknande vy där anslutna användare kan skapa trådar och interagera med varandra på det viset också.
-
 
 ## Backend
 Instruktionerna är för linux.
